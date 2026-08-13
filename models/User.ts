@@ -7,7 +7,7 @@ export interface IUser extends Document {
 }
 
 // 2. Define the Mongoose Schema matching the database structure
-const UserSchema: Schema = new Schema(
+const UserSchema: Schema<IUser> = new Schema(
   {
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
