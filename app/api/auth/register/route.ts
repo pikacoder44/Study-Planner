@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import User from "../../../models/User";
 import bcrypt from "bcryptjs";
-
+import { signToken } from "@/lib/jwt";
 export async function POST(request: Request) {
   try {
     // Extract userData from the incoming request body
@@ -46,11 +46,29 @@ export async function POST(request: Request) {
     });
     await newUser.save();
 
+    // Generate a JWT token
+    const token = signToken({
+      userId: newUser._id,
+      username: newUser.username,
+    });
+
     // return a success response
-    return NextResponse.json(
+    const response = NextResponse.json(
       { message: "User registered successfully!" },
       { status: 201 },
     );
+
+    // Set token in cookies
+    response.cookies.set("token", token, {
+      name: "token",
+      value: token,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60, // 7 days in seconds
+      path: "/", // Cookie is accessible throughout the site
+    });
+    return response;
   } catch (error) {
     console.error("Error in POST /api/auth/register:", error);
     return NextResponse.json(
