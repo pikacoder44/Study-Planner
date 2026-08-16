@@ -43,13 +43,13 @@ export async function POST(request: Request) {
     const newUser = new User({
       username,
       password: hashedPassword,
-      role: "student", // Default role for new users
+      role: "student", // default role for new accounts
     });
     await newUser.save();
 
-    // Generate a JWT token
+    // Generate a JWT token with the minimal auth claims needed for authorization.
     const token = signToken({
-      userId: newUser._id,
+      userId: newUser._id.toString(),
       username: newUser.username,
       role: newUser.role,
     });

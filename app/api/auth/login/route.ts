@@ -27,8 +27,12 @@ export async function POST(request: Request) {
       );
     }
 
-    // Generate a JWT token
-    const token = signToken({ userId: user._id, username: user.username });
+    // Generate a JWT token with the minimal auth claims needed for authorization.
+    const token = signToken({
+      userId: user._id.toString(),
+      username: user.username,
+      role: user.role,
+    });
 
     // If the credentials are valid, return a success response
     const response = NextResponse.json(

@@ -1,11 +1,15 @@
 import jwt from "jsonwebtoken";
 
-// Get the secret key from environment variables (.env.local)
-const JWT_SECRET = process.env.JWT_SECRET || "your_fallback_secret_key_change_me";
+export type UserRole = "student" | "teacher";
 
-interface TokenPayload {
+// Get the secret key from environment variables (.env.local)
+const JWT_SECRET =
+  process.env.JWT_SECRET || "your_fallback_secret_key_change_me";
+
+export interface TokenPayload {
   userId: string;
   username: string;
+  role: UserRole;
 }
 
 // Generates a signed JWT token valid for 7 days
