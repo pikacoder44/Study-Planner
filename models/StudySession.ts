@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-export interface ISubjectSession extends Document {
+export interface IStudySession extends Document {
   userId: string;
   subjectId: string;
   title: string;
@@ -12,7 +12,7 @@ export interface ISubjectSession extends Document {
   updatedAt: Date;
 }
 
-const StudySessionSchema: Schema<ISubject> = new Schema(
+const StudySessionSchema: Schema<IStudySession> = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,
@@ -51,6 +51,6 @@ const StudySessionSchema: Schema<ISubject> = new Schema(
 
 const StudySession =
   mongoose.models.StudySession ||
-  mongoose.model<ISubjectSession>("StudySession", StudySessionSchema);
+  mongoose.model<IStudySession>("StudySession", StudySessionSchema);
 
 export default StudySession;
