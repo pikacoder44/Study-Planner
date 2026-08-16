@@ -13,7 +13,7 @@ if (!MONGODB_URI) {
 export async function connectDB() {
   try {
     // Await the Mongoose connection
-    const conn = await mongoose.connect(MONGO_URI);
+    const conn = await mongoose.connect(MONGODB_URI);
 
     console.log(`MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
