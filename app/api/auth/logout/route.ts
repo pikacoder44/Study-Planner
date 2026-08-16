@@ -7,7 +7,7 @@ export async function POST() {
         const response = NextResponse.json({ message: "Logout successful!" }, { status: 200 });
         
         // Clear the token cookie
-        response.cookies.set("token", "", {
+        response.cookies.set({
             name: "token",
             value: "",
             httpOnly: true,

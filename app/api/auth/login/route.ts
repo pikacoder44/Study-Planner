@@ -37,7 +37,7 @@ export async function POST(request: Request) {
     );
 
     // Set token in cookies
-    response.cookies.set("token", token, {
+    response.cookies.set({
       name: "token",
       value: token,
       httpOnly: true,

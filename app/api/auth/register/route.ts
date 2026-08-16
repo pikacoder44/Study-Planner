@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     const newUser = new User({
       username,
       password: hashedPassword,
-      role: "user", // Default role for new users
+      role: "student", // Default role for new users
     });
     await newUser.save();
 
@@ -61,7 +61,7 @@ export async function POST(request: Request) {
     );
 
     // Set token in cookies
-    response.cookies.set("token", token, {
+    response.cookies.set({
       name: "token",
       value: token,
       httpOnly: true,
