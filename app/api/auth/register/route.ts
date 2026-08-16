@@ -43,6 +43,7 @@ export async function POST(request: Request) {
     const newUser = new User({
       username,
       password: hashedPassword,
+      role: "user", // Default role for new users
     });
     await newUser.save();
 
@@ -50,6 +51,7 @@ export async function POST(request: Request) {
     const token = signToken({
       userId: newUser._id,
       username: newUser.username,
+      role: newUser.role,
     });
 
     // return a success response
