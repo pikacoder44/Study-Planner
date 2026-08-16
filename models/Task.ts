@@ -4,7 +4,7 @@ interface TaskType {
   type: "assignment" | "homework" | "revision" | "reminder" | "general";
 }
 interface TaskStatus {
-  status: "pending" | "completed" | "overdue";
+  status: "pending" | "completed";
 }
 
 export interface ITask extends Document {
