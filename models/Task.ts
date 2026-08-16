@@ -6,6 +6,9 @@ interface TaskType {
 interface TaskStatus {
   status: "pending" | "completed";
 }
+interface Priority {
+  priority: "low" | "medium" | "high";
+}
 
 export interface ITask extends Document {
   userId: string;
@@ -14,6 +17,7 @@ export interface ITask extends Document {
   title: string;
   description: string;
   dueDate: Date;
+  priority: Priority;
   status: TaskStatus;
   createdAt: Date;
   uploadedAt: Date;
@@ -45,6 +49,11 @@ const TaskSchema: Schema<ITask> = new Schema({
   },
   dueDate: {
     type: Date,
+    required: true,
+  },
+    priority: {
+    type: Priority,
+    enum: ["low", "medium", "high"],
     required: true,
   },
   status: {
