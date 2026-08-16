@@ -6,13 +6,14 @@ export interface IUser extends Document {
   password: string;
 }
 
+const options = { discriminatorKey: "role", timestamps: true}
 // 2. Define the Mongoose Schema matching the database structure
 const UserSchema: Schema<IUser> = new Schema(
   {
     username: { type: String, required: true, unique: true },
     password: { type: String, required: true },
   },
-  { timestamps: true } // Automatically manages createdAt and updatedAt fields
+  options
 );
 
 // 3. Compile and export the model
