@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 interface TaskType {
-  type: "assignment" | "exam" | "project";
+  type: "assignment" | "homework" | "revision" | "reminder" | "general";
 }
 interface TaskStatus {
   status: "pending" | "completed" | "overdue";
