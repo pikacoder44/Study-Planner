@@ -18,7 +18,12 @@ export interface Subject {
   nextClass?: string;
 }
 
-export type TaskType = "assignment" | "homework" | "revision" | "reminder" | "general";
+export type TaskType =
+  | "assignment"
+  | "homework"
+  | "revision"
+  | "reminder"
+  | "general";
 export type Priority = "low" | "medium" | "high";
 export type TaskStatus = "pending" | "completed";
 
@@ -44,7 +49,12 @@ export interface Exam {
   description: string;
 }
 
-export type DayOfWeek = "Monday" | "Tuesday" | "Wednesday" | "Thursday" | "Friday";
+export type DayOfWeek =
+  | "Monday"
+  | "Tuesday"
+  | "Wednesday"
+  | "Thursday"
+  | "Friday";
 
 export interface Class {
   id: string;
