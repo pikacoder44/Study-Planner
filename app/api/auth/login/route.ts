@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
-import User from "../../../../models/User";
+import { connectDB } from "@/lib/db";
+import User from "@/models/User";
 import bcrypt from "bcryptjs";
 import { signToken } from "@/lib/jwt";
 
 export async function POST(request: Request) {
   try {
+    // Connect to the database
+    await connectDB();
     // Extract userData from the incoming request body
     const userData = await request.json();
     const { username, password } = userData;
