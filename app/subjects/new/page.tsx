@@ -41,11 +41,11 @@ export default function NewSubjectPage() {
           </div>
           <Field label="Description">
             <textarea
-              className="min-h-28 w-full rounded-md border border-[var(--border)] p-3 text-sm outline-none focus:border-[var(--accent)]"
+              className="min-h-28 w-full rounded-md border border-(--border) p-3 text-sm outline-none focus:border-(--accent)"
               placeholder="What is this course about?"
             />
           </Field>
-          <div className="flex justify-end gap-3 border-t border-[var(--border)] pt-5">
+          <div className="flex justify-end gap-3 border-t border-(--border) pt-5">
             <Link href="/subjects">
               <Button type="button" variant="secondary">
                 Cancel
