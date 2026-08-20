@@ -20,16 +20,16 @@ export function Button({
     primary:
       "bg-[linear-gradient(135deg,var(--primary),var(--primary-strong))] text-white shadow-[0_10px_20px_rgba(20,89,230,0.28)] hover:translate-y-[-1px] hover:shadow-[0_14px_28px_rgba(20,89,230,0.34)]",
     secondary:
-      "border border-[var(--border)] bg-white text-[var(--ink)] shadow-[0_4px_12px_rgba(9,28,68,0.05)] hover:bg-[var(--surface-muted)]",
+      "border border-(--border) bg-white text-foreground shadow-[0_4px_12px_rgba(9,28,68,0.05)] hover:bg-(--surface-muted)",
     ghost:
-      "text-[var(--muted)] hover:bg-[var(--primary-soft)] hover:text-[var(--ink)]",
+      "text-[var(--muted)] hover:bg-[var(--primary-soft)] hover:text-[varforeground]",
     danger:
       "bg-[linear-gradient(135deg,var(--danger),#c03e57)] text-white shadow-[0_10px_20px_rgba(210,76,102,0.24)] hover:translate-y-[-1px] hover:shadow-[0_14px_28px_rgba(210,76,102,0.3)]",
   };
   return (
     <button
       className={cn(
-        "inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold tracking-[-0.01em] transition duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] disabled:cursor-not-allowed disabled:opacity-50",
+        "inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold tracking-[-0.01em] transition duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--primary) disabled:cursor-not-allowed disabled:opacity-50",
         styles[variant],
         className,
       )}
@@ -48,7 +48,7 @@ export function Card({
   return (
     <section
       className={cn(
-        "rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-card)]",
+        "rounded-2xl border border-(--border) bg-(--surface) shadow-(--shadow-card)",
         className,
       )}
     >
@@ -88,7 +88,7 @@ export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
     <input
       {...props}
       className={cn(
-        "h-11 w-full rounded-xl border border-[var(--border)] bg-white px-3 text-sm text-[var(--ink)] outline-none placeholder:text-[#8c9ab7] focus:border-[var(--primary)] focus:ring-2 focus:ring-[color:rgba(20,89,230,0.18)]",
+        "h-11 w-full rounded-xl border border-(--border) bg-white px-3 text-sm text-foreground outline-none placeholder:text-[#8c9ab7] focus:border-(--primary) focus:ring-2 focus:ring-[rgba(20,89,230,0.18)]",
         props.className,
       )}
     />
@@ -100,7 +100,7 @@ export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
     <select
       {...props}
       className={cn(
-        "h-11 w-full rounded-xl border border-[var(--border)] bg-white px-3 text-sm text-[var(--ink)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[color:rgba(20,89,230,0.18)]",
+        "h-11 w-full rounded-xl border border-(--border) bg-white px-3 text-sm text-foreground outline-none focus:border-(--primary) focus:ring-2 focus:ring-[rgba(20,89,230,0.18)]",
         props.className,
       )}
     />
@@ -112,7 +112,7 @@ export function Textarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
     <textarea
       {...props}
       className={cn(
-        "min-h-28 w-full rounded-xl border border-[var(--border)] bg-white px-3 py-2.5 text-sm text-[var(--ink)] outline-none placeholder:text-[#8c9ab7] focus:border-[var(--primary)] focus:ring-2 focus:ring-[color:rgba(20,89,230,0.18)]",
+        "min-h-28 w-full rounded-xl border border-(--border) bg-white px-3 py-2.5 text-sm text-foreground outline-none placeholder:text-[#8c9ab7] focus:border-(--primary) focus:ring-2 focus:ring-[rgba(20,89,230,0.18)]",
         props.className,
       )}
     />
@@ -129,11 +129,11 @@ export function Field({
   hint?: string;
 }) {
   return (
-    <label className="flex flex-col gap-2 text-sm font-semibold text-[var(--ink)]">
+    <label className="flex flex-col gap-2 text-sm font-semibold text-foreground">
       <span className="tracking-[-0.01em]">{label}</span>
       {children}
       {hint && (
-        <span className="text-xs font-normal text-[var(--muted)]">{hint}</span>
+        <span className="text-xs font-normal text-(--muted)">{hint}</span>
       )}
     </label>
   );
@@ -154,15 +154,15 @@ export function PageHeader({
     <div className="mb-8 flex flex-col gap-4 sm:mb-10 sm:flex-row sm:items-end sm:justify-between">
       <div>
         {eyebrow && (
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-[var(--primary)]">
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-(--primary)">
             {eyebrow}
           </p>
         )}
-        <h1 className="text-3xl font-extrabold tracking-[-0.04em] text-[var(--ink)] sm:text-[2.1rem]">
+        <h1 className="text-3xl font-extrabold tracking-[-0.04em] text-foreground sm:text-[2.1rem]">
           {title}
         </h1>
         {description && (
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)] sm:text-[0.95rem]">
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-(--muted) sm:text-[0.95rem]">
             {description}
           </p>
         )}

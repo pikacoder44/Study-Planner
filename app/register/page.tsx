@@ -15,7 +15,7 @@ export default function RegisterPage() {
         <h1 className="text-2xl font-bold tracking-[-0.03em]">
           Create your account
         </h1>
-        <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+        <p className="mt-2 text-sm leading-6 text-(--muted)">
           Start with a simple view of your academic week.
         </p>
         <form onSubmit={handleRegister} className="mt-7 space-y-4">
@@ -51,11 +51,11 @@ export default function RegisterPage() {
             Create account
           </Button>
         </form>
-        <p className="mt-6 text-center text-sm text-[var(--muted)]">
+        <p className="mt-6 text-center text-sm text-(--muted)">
           Already have an account?{" "}
           <Link
             href="/login"
-            className="font-semibold text-[var(--accent)] hover:underline"
+            className="font-semibold text-(--accent) hover:underline"
           >
             Log in
           </Link>

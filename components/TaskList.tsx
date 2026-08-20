@@ -31,7 +31,7 @@ export default function TaskList({ limit }: { limit?: number }) {
                   ),
                 )
               }
-              className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${completed ? "border-[var(--accent)] bg-[var(--accent)] text-white" : "border-[#b7c1bb] text-transparent hover:border-[var(--accent)]"}`}
+              className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${completed ? "border-(--accent) bg-(--accent) text-white" : "border-[#b7c1bb] text-transparent hover:border-(--accent)"}`}
             >
               <Check size={13} strokeWidth={3} />
             </button>
@@ -41,7 +41,7 @@ export default function TaskList({ limit }: { limit?: number }) {
               >
                 {task.title}
               </p>
-              <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-[var(--muted)]">
+              <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-(--muted)">
                 <span className="flex items-center gap-1">
                   <Circle
                     size={7}

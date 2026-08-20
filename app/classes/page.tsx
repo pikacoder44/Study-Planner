@@ -20,7 +20,7 @@ export default function ClassesPage() {
       <div className="grid gap-3 md:grid-cols-5">
         {days.map((day) => (
           <Card key={day} className="min-h-48 overflow-hidden">
-            <div className="border-b border-[var(--border)] bg-[var(--surface-muted)] px-4 py-3">
+            <div className="border-b border-(--border) bg-(--surface-muted) px-4 py-3">
               <p className="text-sm font-bold">{day}</p>
             </div>
             <div className="space-y-2 p-3">
@@ -37,10 +37,10 @@ export default function ClassesPage() {
                       style={{ borderColor: subject?.color }}
                     >
                       <p className="text-sm font-bold">{subject?.code}</p>
-                      <p className="mt-1 text-xs text-[var(--muted)]">
+                      <p className="mt-1 text-xs text-(--muted)">
                         {item.startTime} - {item.endTime}
                       </p>
-                      <p className="mt-1 text-xs text-[var(--muted)]">
+                      <p className="mt-1 text-xs text-(--muted)">
                         {item.room}
                       </p>
                     </div>
@@ -54,7 +54,7 @@ export default function ClassesPage() {
         <AlertTriangle size={18} className="mt-0.5 text-[#9b783d]" />
         <div>
           <p className="text-sm font-bold">Conflict checking is enabled</p>
-          <p className="mt-1 text-sm text-[var(--muted)]">
+          <p className="mt-1 text-sm text-(--muted)">
             New timetable entries will be checked against overlapping classes
             before they are saved.
           </p>
