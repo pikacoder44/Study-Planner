@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  ArrowUpRight,
   Bell,
   BookOpen,
   CalendarDays,
@@ -32,30 +33,37 @@ const mainLinks = [
 export default function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const todayLabel = new Intl.DateTimeFormat("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date());
+
   const navigation = (
     <>
-      <div className="mb-8 flex items-center justify-between">
+      <div className="mb-7 flex items-center justify-between">
         <Link
           href="/dashboard"
           className="flex items-center gap-2.5"
           onClick={() => setMobileOpen(false)}
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-[var(--navy)] text-[var(--amber)]">
+          <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[linear-gradient(145deg,var(--primary),var(--primary-strong))] text-white shadow-[0_10px_18px_rgba(20,89,230,0.35)]">
             <BookOpen size={19} />
           </span>
-          <span className="text-base font-bold tracking-[-0.02em] text-[var(--ink)]">
+          <span className="text-base font-extrabold tracking-[-0.03em] text-[var(--ink)]">
             Smart Study Planner
           </span>
         </Link>
         <button
-          className="rounded-md p-2 text-[var(--muted)] lg:hidden"
+          className="rounded-xl p-2 text-[var(--muted)] hover:bg-[var(--surface-muted)] lg:hidden"
           onClick={() => setMobileOpen(false)}
           aria-label="Close navigation"
         >
           <X size={19} />
         </button>
       </div>
-      <nav className="space-y-1" aria-label="Main navigation">
+      <nav className="space-y-1.5" aria-label="Main navigation">
         {mainLinks.map(([label, href, Icon]) => {
           const active = pathname === href || pathname.startsWith(`${href}/`);
           return (
@@ -63,8 +71,11 @@ export default function AppShell({ children }: { children: ReactNode }) {
               key={href}
               href={href}
               onClick={() => setMobileOpen(false)}
-              className={`flex items-center gap-3 rounded-md border-l-2 px-3 py-2.5 text-sm font-semibold transition-colors ${active ? "border-[var(--amber)] bg-[var(--amber-soft)] text-[var(--ink)]" : "border-transparent text-[var(--muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--ink)]"}`}
+              className={`group relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-semibold transition ${active ? "bg-[var(--primary-soft)] text-[var(--primary-strong)] shadow-[inset_0_0_0_1px_rgba(20,89,230,0.16)]" : "text-[var(--muted)] hover:bg-[var(--surface-muted)] hover:text-[var(--ink)]"}`}
             >
+              {active && (
+                <span className="absolute left-1.5 top-1/2 h-6 w-1 -translate-y-1/2 rounded-full bg-[var(--primary)]" />
+              )}
               <Icon size={18} strokeWidth={active ? 2.4 : 1.8} />
               {label}
             </Link>
@@ -75,7 +86,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       <Link
         href="/settings"
         onClick={() => setMobileOpen(false)}
-        className={`flex items-center gap-3 rounded-md border-l-2 px-3 py-2.5 text-sm font-semibold ${pathname.startsWith("/settings") ? "border-[var(--amber)] bg-[var(--amber-soft)] text-[var(--ink)]" : "border-transparent text-[var(--muted)] hover:bg-[var(--surface-muted)]"}`}
+        className={`flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-semibold ${pathname.startsWith("/settings") ? "bg-[var(--primary-soft)] text-[var(--primary-strong)]" : "text-[var(--muted)] hover:bg-[var(--surface-muted)]"}`}
       >
         <Settings size={18} />
         Settings
@@ -83,62 +94,81 @@ export default function AppShell({ children }: { children: ReactNode }) {
       <Link
         href="/teacher"
         onClick={() => setMobileOpen(false)}
-        className="mt-2 flex items-center gap-3 rounded-md px-3 py-2.5 text-sm font-semibold text-[var(--muted)] hover:bg-[var(--surface-muted)]"
+        className="mt-2 flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-semibold text-[var(--muted)] hover:bg-[var(--surface-muted)]"
       >
         <GraduationCap size={18} />
         Teacher view
         <ChevronRight size={15} className="ml-auto" />
       </Link>
+
+      <div className="mt-8 rounded-2xl border border-[var(--border)] bg-[linear-gradient(165deg,#f8fbff,#eaf2ff)] p-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[var(--muted)]">
+          Focus status
+        </p>
+        <p className="mt-2 text-sm font-bold tracking-[-0.01em] text-[var(--ink)]">
+          68% of weekly study goal
+        </p>
+        <div className="mt-3 h-1.5 rounded-full bg-white/90">
+          <div className="h-full w-[68%] rounded-full bg-[linear-gradient(90deg,var(--support),var(--primary))]" />
+        </div>
+      </div>
     </>
   );
   return (
     <div className="min-h-screen bg-[var(--background)] text-[var(--ink)]">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 border-r border-[var(--border)] bg-white px-5 py-6 lg:block">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-68 border-r border-[var(--border)] bg-[rgba(255,255,255,0.8)] px-5 py-6 backdrop-blur-md lg:block">
         {navigation}
       </aside>
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-[#172033]/25 lg:hidden"
+          className="fixed inset-0 z-40 bg-[#0d1b35]/35 backdrop-blur-[2px] lg:hidden"
           onClick={() => setMobileOpen(false)}
         >
           <aside
-            className="h-full w-[min(84vw,300px)] bg-white px-5 py-6"
+            className="h-full w-[min(86vw,320px)] border-r border-[var(--border)] bg-[rgba(255,255,255,0.95)] px-5 py-6 backdrop-blur-md"
             onClick={(event) => event.stopPropagation()}
           >
             {navigation}
           </aside>
         </div>
       )}
-      <div className="lg:pl-64">
-        <header className="sticky top-0 z-20 flex h-[72px] items-center justify-between border-b border-[var(--border)] bg-[rgba(250,250,248,0.94)] px-5 backdrop-blur-sm sm:px-8">
+      <div className="lg:pl-68">
+        <header className="sticky top-0 z-20 flex h-[76px] items-center justify-between border-b border-[var(--border)] bg-[rgba(247,251,255,0.88)] px-5 backdrop-blur-md sm:px-8">
           <button
-            className="rounded-md p-2 text-[var(--muted)] hover:bg-white lg:hidden"
+            className="rounded-xl p-2 text-[var(--muted)] hover:bg-white lg:hidden"
             onClick={() => setMobileOpen(true)}
             aria-label="Open navigation"
           >
             <Menu size={21} />
           </button>
-          <div className="hidden text-sm text-[var(--muted)] lg:block">
-            Wednesday, August 19, 2026
+          <div className="hidden text-sm font-medium text-[var(--muted)] lg:block">
+            {todayLabel}
           </div>
           <div className="ml-auto flex items-center gap-3">
             <button
-              className="rounded-md p-2 text-[var(--muted)] hover:bg-white"
+              className="rounded-xl border border-transparent p-2 text-[var(--muted)] hover:border-[var(--border)] hover:bg-white"
               aria-label="Notifications"
             >
               <Bell size={19} />
             </button>
-            <div className="flex items-center gap-2 border-l border-[var(--border)] pl-3">
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--amber-soft)] text-xs font-bold text-[var(--ink)]">
+            <Link
+              href="/user/profile"
+              className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-white px-2.5 py-1.5 hover:border-[var(--primary)]"
+            >
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--primary-soft)] text-xs font-bold text-[var(--primary-strong)]">
                 HK
               </span>
               <span className="hidden text-sm font-semibold sm:block">
                 {currentUser.name}
               </span>
-            </div>
+              <ArrowUpRight
+                size={14}
+                className="hidden text-[var(--muted)] sm:block"
+              />
+            </Link>
           </div>
         </header>
-        <main className="mx-auto max-w-[1440px] px-5 py-8 sm:px-8">
+        <main className="mx-auto max-w-[1440px] px-5 py-8 sm:px-8 sm:py-10">
           {children}
         </main>
       </div>

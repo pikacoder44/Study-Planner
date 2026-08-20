@@ -3,7 +3,11 @@ import type {
   InputHTMLAttributes,
   ReactNode,
   SelectHTMLAttributes,
+  TextareaHTMLAttributes,
 } from "react";
+
+const cn = (...classes: Array<string | undefined>) =>
+  classes.filter(Boolean).join(" ");
 
 export function Button({
   variant = "primary",
@@ -13,16 +17,22 @@ export function Button({
   variant?: "primary" | "secondary" | "ghost" | "danger";
 }) {
   const styles = {
-    primary: "bg-[var(--navy)] text-white hover:bg-[#25324b]",
+    primary:
+      "bg-[linear-gradient(135deg,var(--primary),var(--primary-strong))] text-white shadow-[0_10px_20px_rgba(20,89,230,0.28)] hover:translate-y-[-1px] hover:shadow-[0_14px_28px_rgba(20,89,230,0.34)]",
     secondary:
-      "border border-[var(--border)] bg-white text-[var(--ink)] hover:bg-[var(--surface-muted)]",
+      "border border-[var(--border)] bg-white text-[var(--ink)] shadow-[0_4px_12px_rgba(9,28,68,0.05)] hover:bg-[var(--surface-muted)]",
     ghost:
-      "text-[var(--muted)] hover:bg-[var(--amber-soft)] hover:text-[var(--ink)]",
-    danger: "bg-[#a85a55] text-white hover:bg-[#914844]",
+      "text-[var(--muted)] hover:bg-[var(--primary-soft)] hover:text-[var(--ink)]",
+    danger:
+      "bg-[linear-gradient(135deg,var(--danger),#c03e57)] text-white shadow-[0_10px_20px_rgba(210,76,102,0.24)] hover:translate-y-[-1px] hover:shadow-[0_14px_28px_rgba(210,76,102,0.3)]",
   };
   return (
     <button
-      className={`inline-flex min-h-10 items-center justify-center gap-2 rounded-md px-4 text-sm font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--amber)] disabled:cursor-not-allowed disabled:opacity-50 ${styles[variant]} ${className}`}
+      className={cn(
+        "inline-flex min-h-10 items-center justify-center gap-2 rounded-xl px-4 text-sm font-semibold tracking-[-0.01em] transition duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] disabled:cursor-not-allowed disabled:opacity-50",
+        styles[variant],
+        className,
+      )}
       {...props}
     />
   );
@@ -37,7 +47,10 @@ export function Card({
 }) {
   return (
     <section
-      className={`rounded-lg border border-[var(--border)] bg-white shadow-[0_2px_10px_rgba(30,42,48,0.03)] ${className}`}
+      className={cn(
+        "rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[var(--shadow-card)]",
+        className,
+      )}
     >
       {children}
     </section>
@@ -52,15 +65,18 @@ export function Badge({
   tone?: "neutral" | "blue" | "green" | "amber" | "red";
 }) {
   const tones = {
-    neutral: "bg-[#f1f3f1] text-[#59635e]",
-    blue: "bg-[#e9f0f3] text-[#315c72]",
-    green: "bg-[#eaf1e8] text-[#557149]",
-    amber: "bg-[#f6efe2] text-[#8b6a3f]",
-    red: "bg-[#f6e9e7] text-[#9a514b]",
+    neutral: "bg-[#eef3ff] text-[#4b5c87]",
+    blue: "bg-[var(--primary-soft)] text-[var(--primary-strong)]",
+    green: "bg-[var(--support-soft)] text-[#0b7e7c]",
+    amber: "bg-[#e8f9f8] text-[#0f7b79]",
+    red: "bg-[var(--danger-soft)] text-[var(--danger)]",
   };
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${tones[tone]}`}
+      className={cn(
+        "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold",
+        tones[tone],
+      )}
     >
       {children}
     </span>
@@ -71,7 +87,10 @@ export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
   return (
     <input
       {...props}
-      className={`h-11 w-full rounded-md border border-[var(--border)] bg-white px-3 text-sm text-[var(--ink)] outline-none placeholder:text-[#9aa39e] focus:border-[var(--accent)] focus:ring-2 focus:ring-[#eab308]/20 ${props.className ?? ""}`}
+      className={cn(
+        "h-11 w-full rounded-xl border border-[var(--border)] bg-white px-3 text-sm text-[var(--ink)] outline-none placeholder:text-[#8c9ab7] focus:border-[var(--primary)] focus:ring-2 focus:ring-[color:rgba(20,89,230,0.18)]",
+        props.className,
+      )}
     />
   );
 }
@@ -80,7 +99,22 @@ export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
   return (
     <select
       {...props}
-      className={`h-11 w-full rounded-md border border-[var(--border)] bg-white px-3 text-sm text-[var(--ink)] outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[#eab308]/20 ${props.className ?? ""}`}
+      className={cn(
+        "h-11 w-full rounded-xl border border-[var(--border)] bg-white px-3 text-sm text-[var(--ink)] outline-none focus:border-[var(--primary)] focus:ring-2 focus:ring-[color:rgba(20,89,230,0.18)]",
+        props.className,
+      )}
+    />
+  );
+}
+
+export function Textarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  return (
+    <textarea
+      {...props}
+      className={cn(
+        "min-h-28 w-full rounded-xl border border-[var(--border)] bg-white px-3 py-2.5 text-sm text-[var(--ink)] outline-none placeholder:text-[#8c9ab7] focus:border-[var(--primary)] focus:ring-2 focus:ring-[color:rgba(20,89,230,0.18)]",
+        props.className,
+      )}
     />
   );
 }
@@ -96,7 +130,7 @@ export function Field({
 }) {
   return (
     <label className="flex flex-col gap-2 text-sm font-semibold text-[var(--ink)]">
-      <span>{label}</span>
+      <span className="tracking-[-0.01em]">{label}</span>
       {children}
       {hint && (
         <span className="text-xs font-normal text-[var(--muted)]">{hint}</span>
@@ -117,18 +151,18 @@ export function PageHeader({
   action?: ReactNode;
 }) {
   return (
-    <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div className="mb-8 flex flex-col gap-4 sm:mb-10 sm:flex-row sm:items-end sm:justify-between">
       <div>
         {eyebrow && (
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-[var(--accent)]">
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-[var(--primary)]">
             {eyebrow}
           </p>
         )}
-        <h1 className="text-3xl font-bold tracking-[-0.03em] text-[var(--ink)]">
+        <h1 className="text-3xl font-extrabold tracking-[-0.04em] text-[var(--ink)] sm:text-[2.1rem]">
           {title}
         </h1>
         {description && (
-          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)]">
+          <p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted)] sm:text-[0.95rem]">
             {description}
           </p>
         )}
