@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 import { connectDB } from "@/lib/db";
 import User from "@/models/User";
 import { verifyToken } from "@/lib/jwt";
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
     // Connect to the database
     await connectDB();
@@ -10,6 +10,7 @@ export async function GET(request: Request) {
     // Extract the token from the cookies
     const token = request.cookies.get("token")?.value;
     if (!token) {
+      console.error("No token found in cookies.");
       return NextResponse.json(
         { errors: ["No token provided."] },
         { status: 401 },
@@ -19,6 +20,7 @@ export async function GET(request: Request) {
     // Verify the token and extract the payload
     const payload = verifyToken(token);
     if (!payload) {
+      console.error("Token verification failed or token is invalid.");
       return NextResponse.json(
         { errors: ["Invalid or expired token."] },
         { status: 401 },
@@ -26,7 +28,7 @@ export async function GET(request: Request) {
     }
 
     // Find the user in the database using the userId from the token payload
-    const user = await User.findById(payload.userId).select("-password");
+    const user = await User.findById(payload.userId).select("-passwordHash");
     if (!user) {
       return NextResponse.json(
         { errors: ["User not found."] },
