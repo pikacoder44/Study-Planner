@@ -12,7 +12,7 @@ export async function POST(request: Request) {
     // Extract userData from the incoming request body
     const userData = await request.json();
 
-    const { username, password, confirmPassword } = userData;
+    const { username, password, confirmPassword, role } = userData;
     const validationErrors: string[] = [];
 
     if (!username || username.trim().length < 3) {
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
     const newUser = new User({
       username,
       password: hashedPassword,
-      role: "student", // default role for new accounts
+      role: role,
     });
     await newUser.save();
 
