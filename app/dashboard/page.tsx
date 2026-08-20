@@ -26,6 +26,14 @@ const todaySchedule = [
   ["14:00", "Architecture assignment", "Due tomorrow", "Task"],
 ] as const;
 
+// Icon chips reuse the sidebar logo's gradient treatment so every section
+// header feels like it belongs to the same system, not a one-off accent.
+const CHIP = {
+  primary: "bg-[linear-gradient(145deg,var(--primary),var(--primary-strong))]",
+  support: "bg-[linear-gradient(145deg,var(--support),#0c8988)]",
+  danger: "bg-[linear-gradient(145deg,var(--danger),#b23955)]",
+} as const;
+
 export default function DashboardPage() {
   const pendingTasks = tasks.filter((task) => task.status === "pending");
   const upcomingExams = exams
@@ -48,41 +56,52 @@ export default function DashboardPage() {
           </Link>
         }
       />
-      <div className="mb-10 grid border-y border-[var(--border)] sm:grid-cols-3">
+
+      <div className="mb-10 grid gap-4 sm:grid-cols-3">
         <QuickStat
+          icon={<Check size={17} />}
+          tone="primary"
           label="Pending tasks"
           value={`${pendingTasks.length}`}
           detail="1 needs attention today"
         />
         <QuickStat
+          icon={<GraduationCap size={17} />}
+          tone="danger"
           label="Upcoming exams"
           value={`${upcomingExams.length}`}
           detail="Next one tomorrow"
         />
         <QuickStat
+          icon={<Clock3 size={17} />}
+          tone="support"
           label="Study time"
           value="9h 45m"
           detail="Across 4 sessions"
         />
       </div>
+
       <div className="grid gap-10 xl:grid-cols-[1.15fr_0.85fr]">
         <div className="space-y-10">
           <DashboardSection
             title="Today's schedule"
-            icon={<CalendarDays size={18} />}
+            icon={<CalendarDays size={16} />}
+            tone="primary"
           >
-            <div className="divide-y divide-[var(--border)] border-y border-[var(--border)]">
+            <Card className="divide-y divide-(--border) p-0">
               {todaySchedule.map(([time, title, detail, type]) => (
                 <div
                   key={title}
-                  className="grid grid-cols-[4.5rem_1fr_auto] items-center gap-4 py-4"
+                  className="grid grid-cols-[4.5rem_1fr_auto] items-center gap-4 px-5 py-4"
                 >
-                  <span className="text-sm font-bold text-[var(--accent)]">
+                  <span className="text-sm font-bold text-(--primary-strong)">
                     {time}
                   </span>
                   <div>
-                    <p className="text-sm font-bold">{title}</p>
-                    <p className="mt-1 text-xs text-[var(--muted)]">{detail}</p>
+                    <p className="text-sm font-bold text-foreground">
+                      {title}
+                    </p>
+                    <p className="mt-1 text-xs text-(--muted)">{detail}</p>
                   </div>
                   <Badge
                     tone={
@@ -97,15 +116,17 @@ export default function DashboardPage() {
                   </Badge>
                 </div>
               ))}
-            </div>
+            </Card>
           </DashboardSection>
+
           <DashboardSection
             title="Tasks to complete"
-            icon={<Check size={18} />}
+            icon={<Check size={16} />}
+            tone="primary"
             action={
               <Link
                 href="/tasks"
-                className="text-sm font-semibold text-[var(--accent)]"
+                className="text-sm font-semibold text-(--primary-strong) hover:underline"
               >
                 View all
               </Link>
@@ -113,29 +134,34 @@ export default function DashboardPage() {
           >
             <TaskList limit={3} />
           </DashboardSection>
+
           <DashboardSection
             title="Recent study activity"
-            icon={<Clock3 size={18} />}
+            icon={<Clock3 size={16} />}
+            tone="support"
             action={
               <Link
                 href="/study-sessions"
-                className="text-sm font-semibold text-[var(--accent)]"
+                className="text-sm font-semibold text-(--primary-strong) hover:underline"
               >
                 See history
               </Link>
             }
           >
-            <div className="divide-y divide-[var(--border)] border-y border-[var(--border)]">
+            <Card className="divide-y divide-(--border) p-0">
               {studySessions.slice(0, 3).map((session) => (
-                <div key={session.id} className="flex items-center gap-4 py-4">
-                  <span className="flex h-9 w-9 items-center justify-center rounded-md bg-[var(--amber-soft)] text-[var(--accent)]">
-                    <BookOpen size={17} />
+                <div
+                  key={session.id}
+                  className="flex items-center gap-4 px-5 py-4"
+                >
+                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-(--support-soft) text-(--support)">
+                    <BookOpen size={16} />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-bold">
+                    <p className="truncate text-sm font-bold text-foreground">
                       {session.title}
                     </p>
-                    <p className="mt-1 text-xs text-[var(--muted)]">
+                    <p className="mt-1 text-xs text-(--muted)">
                       {
                         subjects.find(
                           (subject) => subject.id === session.subjectId,
@@ -144,22 +170,24 @@ export default function DashboardPage() {
                       · {session.date}
                     </p>
                   </div>
-                  <span className="text-sm font-semibold text-[var(--muted)]">
-                    {session.startTime} - {session.endTime}
+                  <span className="text-sm font-semibold text-(--muted)">
+                    {session.startTime}–{session.endTime}
                   </span>
                 </div>
               ))}
-            </div>
+            </Card>
           </DashboardSection>
         </div>
+
         <aside className="space-y-8">
           <DashboardSection
             title="Upcoming exams"
-            icon={<GraduationCap size={18} />}
+            icon={<GraduationCap size={16} />}
+            tone="danger"
             action={
               <Link
                 href="/exams"
-                className="text-sm font-semibold text-[var(--accent)]"
+                className="text-sm font-semibold text-(--primary-strong) hover:underline"
               >
                 View all
               </Link>
@@ -169,59 +197,72 @@ export default function DashboardPage() {
               {upcomingExams.map((exam, index) => (
                 <Card
                   key={exam.id}
-                  className="border-l-4 border-l-[var(--amber)] p-4"
+                  className="relative overflow-hidden p-4 pl-5"
                 >
+                  <span
+                    className={`absolute inset-y-0 left-0 w-1.5 ${
+                      index === 0 ? "bg-(--danger)" : "bg-(--support)"
+                    }`}
+                  />
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-xs font-bold text-[var(--accent)]">
+                      <p className="text-xs font-bold uppercase tracking-[0.06em] text-(--primary-strong)">
                         {
                           subjects.find(
                             (subject) => subject.id === exam.subjectId,
                           )?.code
                         }
                       </p>
-                      <p className="mt-1 text-sm font-bold">{exam.title}</p>
+                      <p className="mt-1 text-sm font-bold text-foreground">
+                        {exam.title}
+                      </p>
                     </div>
                     <Badge tone={index === 0 ? "red" : "amber"}>
                       {index === 0 ? "Tomorrow" : "9 days"}
                     </Badge>
                   </div>
-                  <p className="mt-3 text-xs text-[var(--muted)]">
+                  <p className="mt-3 text-xs text-(--muted)">
                     {exam.examDate} · {exam.startTime} · {exam.location}
                   </p>
                 </Card>
               ))}
             </div>
           </DashboardSection>
+
           <DashboardSection
             title="Upcoming classes"
-            icon={<GraduationCap size={18} />}
+            icon={<GraduationCap size={16} />}
+            tone="primary"
             action={
               <Link
                 href="/classes"
-                className="text-sm font-semibold text-[var(--accent)]"
+                className="text-sm font-semibold text-(--primary-strong) hover:underline"
               >
                 Timetable
               </Link>
             }
           >
-            <div className="divide-y divide-[var(--border)] border-y border-[var(--border)]">
+            <Card className="divide-y divide-(--border) p-0">
               {upcomingClasses.map((item) => {
                 const subject = subjects.find(
                   (subjectItem) => subjectItem.id === item.subjectId,
                 );
                 return (
-                  <div key={item.id} className="py-4">
+                  <div key={item.id} className="px-5 py-4">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm font-bold">{subject?.code}</p>
-                      <span className="text-xs font-semibold text-[var(--accent)]">
+                      <p className="text-sm font-bold text-foreground">
+                        {subject?.code}
+                      </p>
+                      <span className="text-xs font-semibold text-(--primary-strong)">
                         {item.dayOfWeek}
                       </span>
                     </div>
-                    <p className="mt-1 text-sm">{subject?.name}</p>
-                    <p className="mt-2 flex items-center gap-1 text-xs text-[var(--muted)]">
+                    <p className="mt-1 text-sm text-foreground">
+                      {subject?.name}
+                    </p>
+                    <p className="mt-2 flex items-center gap-1 text-xs text-(--muted)">
                       <Clock3 size={13} />
-                      {item.startTime} - {item.endTime}
+                      {item.startTime}–{item.endTime}
                       <span className="mx-1">·</span>
                       <MapPin size={13} />
                       {item.room}
@@ -229,29 +270,36 @@ export default function DashboardPage() {
                   </div>
                 );
               })}
-            </div>
+            </Card>
           </DashboardSection>
-          <DashboardSection title="Study progress" icon={<Clock3 size={18} />}>
-            <div className="border-y border-[var(--border)] py-4">
+
+          <DashboardSection
+            title="Study progress"
+            icon={<Clock3 size={16} />}
+            tone="support"
+          >
+            <Card className="p-5">
               <div className="flex items-end justify-between">
                 <div>
-                  <p className="text-3xl font-bold tracking-[-0.04em]">
+                  <p className="text-3xl font-extrabold tracking-[-0.03em] text-foreground">
                     9h 45m
                   </p>
-                  <p className="mt-1 text-xs text-[var(--muted)]">
+                  <p className="mt-1 text-xs text-(--muted)">
                     Focused study this week
                   </p>
                 </div>
-                <span className="text-sm font-bold text-[#557149]">+2h</span>
+                <span className="rounded-full bg-(--support-soft) px-2.5 py-1 text-xs font-bold text-(--support)">
+                  +2h this week
+                </span>
               </div>
-              <div className="mt-5 h-2 rounded-full bg-[#edf0ed]">
-                <div className="h-full w-[68%] rounded-full bg-[var(--amber)]" />
+              <div className="mt-5 h-2 rounded-full bg-(--surface-muted)">
+                <div className="h-full w-[68%] rounded-full bg-[linear-gradient(90deg,var(--support),var(--primary))]" />
               </div>
-              <div className="mt-3 flex justify-between text-xs text-[var(--muted)]">
+              <div className="mt-3 flex justify-between text-xs text-(--muted)">
                 <span>Goal: 14 hours</span>
-                <span>68%</span>
+                <span className="font-semibold text-foreground">68%</span>
               </div>
-            </div>
+            </Card>
           </DashboardSection>
         </aside>
       </div>
@@ -260,42 +308,62 @@ export default function DashboardPage() {
 }
 
 function QuickStat({
+  icon,
+  tone,
   label,
   value,
   detail,
 }: {
+  icon: React.ReactNode;
+  tone: keyof typeof CHIP;
   label: string;
   value: string;
   detail: string;
 }) {
   return (
-    <div className="px-1 py-5 sm:px-5 sm:first:pl-0 sm:not-first:border-l sm:not-first:border-[var(--border)]">
-      <p className="text-xs font-bold uppercase tracking-[0.12em] text-[var(--muted)]">
-        {label}
-      </p>
-      <div className="mt-2 flex items-baseline gap-2">
-        <span className="text-2xl font-bold tracking-[-0.04em]">{value}</span>
-        <span className="text-xs text-[var(--muted)]">{detail}</span>
+    <Card className="flex items-start gap-4 p-5">
+      <span
+        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white shadow-(--shadow-card) ${CHIP[tone]}`}
+      >
+        {icon}
+      </span>
+      <div>
+        <p className="text-xs font-bold uppercase tracking-widest text-(--muted)">
+          {label}
+        </p>
+        <div className="mt-1 flex items-baseline gap-2">
+          <span className="text-2xl font-extrabold tracking-[-0.03em] text-foreground">
+            {value}
+          </span>
+        </div>
+        <p className="mt-0.5 text-xs text-(--muted)">{detail}</p>
       </div>
-    </div>
+    </Card>
   );
 }
+
 function DashboardSection({
   title,
   icon,
+  tone,
   action,
   children,
 }: {
   title: string;
   icon: React.ReactNode;
+  tone: keyof typeof CHIP;
   action?: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <section>
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="flex items-center gap-2 text-lg font-bold tracking-[-0.02em]">
-          <span className="text-[var(--accent)]">{icon}</span>
+        <h2 className="flex items-center gap-2.5 text-lg font-extrabold tracking-[-0.02em] text-foreground">
+          <span
+            className={`flex h-7 w-7 items-center justify-center rounded-lg text-white ${CHIP[tone]}`}
+          >
+            {icon}
+          </span>
           {title}
         </h2>
         {action}
