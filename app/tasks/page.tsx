@@ -1,13 +1,14 @@
 "use client";
 import Link from "next/link";
-import { Plus, Search, SlidersHorizontal } from "lucide-react";
+import { ListChecks, Plus, Search, SlidersHorizontal } from "lucide-react";
 import { useState } from "react";
 import AppShell from "@/components/AppShell";
 import TaskList from "@/components/TaskList";
-import { Button, Input, PageHeader, Select } from "@/components/ui";
+import { Button, Card, Input, PageHeader, Select } from "@/components/ui";
 
 export default function TasksPage() {
   const [query, setQuery] = useState("");
+
   return (
     <AppShell>
       <PageHeader
@@ -23,40 +24,49 @@ export default function TasksPage() {
           </Link>
         }
       />
-      <div className="mb-5 flex flex-col gap-3 sm:flex-row">
+
+      <Card className="mb-8 flex flex-col gap-3 p-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
-          <Search
-            size={17}
-            className="absolute left-3 top-3 text-[var(--muted)]"
-          />
+          <span className="pointer-events-none absolute left-2.5 top-1/2 flex h-7 w-7 -translate-y-1/2 items-center justify-center rounded-lg bg-(--primary-soft) text-(--primary-strong)">
+            <Search size={15} />
+          </span>
           <Input
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             placeholder="Search tasks"
-            className="pl-10"
+            className="border-transparent bg-(--surface-muted) pl-12 focus:border-(--primary) focus:bg-(--surface)"
           />
         </div>
-        <Select className="sm:w-40">
-          <option>All statuses</option>
-          <option>Pending</option>
-          <option>Completed</option>
-        </Select>
-        <Select className="sm:w-40">
-          <option>All priorities</option>
-          <option>High priority</option>
-          <option>Medium priority</option>
-        </Select>
-        <Button variant="secondary" aria-label="More filters">
-          <SlidersHorizontal size={17} />
-          <span className="hidden sm:inline">Filters</span>
-        </Button>
-      </div>
+        <div className="flex flex-wrap gap-3">
+          <Select className="border-transparent bg-(--surface-muted) sm:w-40">
+            <option>All statuses</option>
+            <option>Pending</option>
+            <option>Completed</option>
+          </Select>
+          <Select className="border-transparent bg-(--surface-muted) sm:w-44">
+            <option>All priorities</option>
+            <option>High priority</option>
+            <option>Medium priority</option>
+          </Select>
+          <Button variant="secondary" aria-label="More filters">
+            <SlidersHorizontal size={17} />
+            <span className="hidden sm:inline">Filters</span>
+          </Button>
+        </div>
+      </Card>
+
       <TaskList />
+
       {query && (
-        <p className="mt-3 text-xs text-[var(--muted)]">
-          Search is ready to connect to the data layer. Current mock list shows
-          all tasks.
-        </p>
+        <Card className="mt-5 flex items-center gap-3 border-dashed bg-(--surface-muted) p-4">
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-(--primary-soft) text-(--primary-strong)">
+            <ListChecks size={15} />
+          </span>
+          <p className="text-xs text-(--muted)">
+            Search is ready to connect to the data layer. Current mock list
+            shows all tasks.
+          </p>
+        </Card>
       )}
     </AppShell>
   );
