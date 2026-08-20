@@ -3,14 +3,15 @@ import type { NextRequest } from "next/server";
 import { verifyToken } from "@/lib/jwt";
 
 export async function proxy(request: NextRequest) {
-  const token = request.headers.get("authorization")?.split(" ")[1];
-
+  
   // Protect all /api routes except auth routes
   if (request.nextUrl.pathname.startsWith("/api/")) {
     if (request.nextUrl.pathname.startsWith("/api/auth")) {
       return NextResponse.next();
     }
 
+    const token = request.cookies.get("token")?.value || request.headers.get("authorization")?.split(" ")[1];
+    
     if (!token) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
