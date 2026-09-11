@@ -30,7 +30,7 @@ export default function NewTaskPage() {
           </Field>
           <Field label="Description">
             <textarea
-              className="min-h-28 w-full rounded-md border border-[var(--border)] p-3 text-sm outline-none focus:border-[var(--accent)]"
+              className="min-h-28 w-full rounded-md border border-(--border) p-3 text-sm outline-none focus:border-(--accent)"
               placeholder="What does done look like?"
             />
           </Field>
@@ -61,7 +61,7 @@ export default function NewTaskPage() {
               </Select>
             </Field>
           </div>
-          <div className="flex justify-end gap-3 border-t border-[var(--border)] pt-5">
+          <div className="flex justify-end gap-3 border-t border-(--border) pt-5">
             <Link href="/tasks">
               <Button type="button" variant="secondary">
                 Cancel
