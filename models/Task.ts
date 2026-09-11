@@ -12,10 +12,10 @@ interface Priority {
 
 export interface ITask extends Document {
   userId: string;
-  subjectId: string;
-  type: TaskType;
   title: string;
   description: string;
+  subject: string;
+  taskType: TaskType;
   dueDate: Date;
   priority: Priority;
   status: TaskStatus;
