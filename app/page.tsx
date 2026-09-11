@@ -9,13 +9,13 @@ import {
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-[var(--background)] px-5 py-6 sm:px-10">
+    <main className="min-h-screen bg-background px-5 py-6 sm:px-10">
       <nav className="mx-auto flex max-w-6xl items-center justify-between">
         <Link
           href="/"
           className="flex items-center gap-2.5 text-base font-bold"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-[var(--accent)] text-white">
+          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-accent text-white">
             <BookOpen size={19} />
           </span>
           Study Planner
@@ -23,13 +23,13 @@ export default function Home() {
         <div className="flex items-center gap-2">
           <Link
             href="/login"
-            className="rounded-md px-3 py-2 text-sm font-semibold text-[var(--muted)] hover:bg-white"
+            className="rounded-md px-3 py-2 text-sm font-semibold text-muted hover:bg-white"
           >
             Log in
           </Link>
           <Link
             href="/register"
-            className="rounded-md bg-[var(--accent)] px-4 py-2.5 text-sm font-semibold text-white hover:bg-[var(--accent-strong)]"
+            className="rounded-md bg-accent px-4 py-2.5 text-sm font-semibold text-white hover:bg--accent-strong"
           >
             Create account
           </Link>
@@ -37,36 +37,36 @@ export default function Home() {
       </nav>
       <section className="mx-auto grid max-w-6xl items-center gap-14 pb-20 pt-20 lg:grid-cols-[0.9fr_1.1fr] lg:pt-28">
         <div>
-          <p className="mb-4 text-xs font-bold uppercase tracking-[0.16em] text-[var(--accent)]">
+          <p className="mb-4 text-xs font-bold uppercase tracking-[0.16em] text-accent">
             A clearer academic week
           </p>
-          <h1 className="max-w-xl text-5xl font-bold leading-[1.08] tracking-[-0.05em] text-[var(--ink)] sm:text-6xl">
+          <h1 className="max-w-xl text-5xl font-bold leading-[1.08] tracking-tighter text-ink sm:text-6xl">
             Make room for the work that matters.
           </h1>
-          <p className="mt-6 max-w-lg text-lg leading-8 text-[var(--muted)]">
+          <p className="mt-6 max-w-lg text-lg leading-8 text-muted">
             Plan tasks, classes, exams, and focused study time in one calm
             workspace built for students.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/register"
-              className="inline-flex items-center gap-2 rounded-md bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-white hover:bg-[var(--accent-strong)]"
+              className="inline-flex items-center gap-2 rounded-md bg-accent px-5 py-3 text-sm font-semibold text-white hover:bg-accent-strong"
             >
               Start planning
               <ArrowRight size={17} />
             </Link>
             <Link
               href="/dashboard"
-              className="rounded-md border border-[var(--border)] bg-white px-5 py-3 text-sm font-semibold text-[var(--ink)] hover:bg-[var(--surface-muted)]"
+              className="rounded-md border border-border bg-white px-5 py-3 text-sm font-semibold text-ink hover:bg-surface-muted"
             >
               View demo
             </Link>
           </div>
         </div>
-        <div className="rounded-xl border border-[var(--border)] bg-white p-4 shadow-[0_12px_35px_rgba(30,42,48,0.07)] sm:p-6">
-          <div className="flex items-center justify-between border-b border-[var(--border)] pb-5">
+        <div className="rounded-xl border border-border bg-white p-4 shadow-[0_12px_35px_rgba(30,42,48,0.07 sm:p-6">
+          <div className="flex items-center justify-between border-b border-border pb-5">
             <div>
-              <p className="text-xs font-semibold text-[var(--muted)]">
+              <p className="text-xs font-semibold text-muted">
                 Wednesday, August 19
               </p>
               <h2 className="mt-1 text-xl font-bold">Good morning, Hashir</h2>
@@ -92,10 +92,10 @@ export default function Home() {
               value="9h 45m"
             />
           </div>
-          <div className="rounded-lg bg-[var(--surface-muted)] p-4">
+          <div className="rounded-lg bg-surface-muted p-4">
             <div className="mb-3 flex items-center justify-between">
               <p className="text-sm font-bold">Today&apos;s schedule</p>
-              <span className="text-xs text-[var(--muted)]">3 items</span>
+              <span className="text-xs text-muted">3 items</span>
             </div>
             {[
               "10:00  CS603 Lecture",
@@ -104,16 +104,16 @@ export default function Home() {
             ].map((item) => (
               <div
                 key={item}
-                className="flex items-center gap-3 border-t border-[var(--border)] py-3 text-sm"
+                className="flex items-center gap-3 border-t border-border py-3 text-sm"
               >
-                <span className="h-2 w-2 rounded-full bg-[var(--accent)]" />
+                <span className="h-2 w-2 rounded-full bg-accent" />
                 <span>{item}</span>
               </div>
             ))}
           </div>
         </div>
       </section>
-      <section className="mx-auto grid max-w-6xl gap-8 border-t border-[var(--border)] py-12 sm:grid-cols-3">
+      <section className="mx-auto grid max-w-6xl gap-8 border-t border-border py-12 sm:grid-cols-3">
         <Feature
           icon={<Check size={18} />}
           title="Stay ahead"
@@ -144,11 +144,11 @@ function Metric({
   value: string;
 }) {
   return (
-    <div className="rounded-lg border border-[var(--border)] bg-white p-3">
-      <span className="flex h-7 w-7 items-center justify-center rounded-md bg-[#e8eff1] text-[var(--accent)]">
+    <div className="rounded-lg border border-border bg-white p-3">
+      <span className="flex h-7 w-7 items-center justify-center rounded-md bg-[#e8eff1] text-accent">
         {icon}
       </span>
-      <p className="mt-3 text-xs text-[var(--muted)]">{label}</p>
+      <p className="mt-3 text-xs text-muted">{label}</p>
       <p className="mt-1 text-lg font-bold">{value}</p>
     </div>
   );
@@ -164,12 +164,12 @@ function Feature({
 }) {
   return (
     <div className="flex gap-3">
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#e8eff1] text-[var(--accent)]">
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#e8eff1] text-accent">
         {icon}
       </span>
       <div>
         <h2 className="text-sm font-bold">{title}</h2>
-        <p className="mt-1 text-sm leading-6 text-[var(--muted)]">{text}</p>
+        <p className="mt-1 text-sm leading-6 text-muted">{text}</p>
       </div>
     </div>
   );
