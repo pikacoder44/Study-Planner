@@ -3,20 +3,24 @@ import { connectDB } from "@/lib/db";
 import Task from "@/models/Task";
 import { verifyToken } from "@/lib/jwt";
 
+// Helper function to authenticate requests
+async function authenticateUser(req: NextRequest) {
+  const authHeader = req.headers.get("Authorization");
+  const token = authHeader?.replace("Bearer ", "");
+
+  if (!token) return null;
+
+  const decoded = verifyToken(token) as { id: string } | null;
+  return decoded?.id || null;
+}
+
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
 
-    const authHeader = req.headers.get("Authorization");
-    const token = authHeader?.replace("Bearer ", "");
-
-    if (!token) {
+    const userId = await authenticateUser(req);
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const decoded = verifyToken(token) as { id: string } | null;
-    if (!decoded?.id) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
     const body = await req.json();
@@ -32,12 +36,12 @@ export async function POST(req: NextRequest) {
     ) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
     const savedTask = await Task.create({
-      userId: decoded.id,
+      userId,
       title,
       description,
       subject,
@@ -45,19 +49,38 @@ export async function POST(req: NextRequest) {
       dueDate,
       priority,
       status: "pending",
-      createdAt: new Date(),
-      uploadedAt: new Date(),
     });
 
     return NextResponse.json(
       { message: "Task created successfully", task: savedTask },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     console.error("Error creating task:", error);
     return NextResponse.json(
       { error: "Internal server error" },
-      { status: 500 }
+      { status: 500 },
+    );
+  }
+}
+
+export async function GET(req: NextRequest) {
+  try {
+    await connectDB();
+
+    const userId = await authenticateUser(req);
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // FIXED: Only fetch tasks belonging to the authenticated user
+    const tasks = await Task.find({ userId });
+    return NextResponse.json({ tasks });
+  } catch (error) {
+    console.error("Error fetching tasks:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
     );
   }
 }
