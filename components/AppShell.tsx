@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   ArrowUpRight,
   Bell,
@@ -32,13 +32,24 @@ const mainLinks = [
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [loggingOut, setLoggingOut] = useState(false);
   const todayLabel = new Intl.DateTimeFormat("en-US", {
     weekday: "long",
     month: "long",
     day: "numeric",
     year: "numeric",
   }).format(new Date());
+
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } finally {
+      router.push("/login");
+    }
+  };
 
   const navigation = (
     <>
@@ -100,6 +111,14 @@ export default function AppShell({ children }: { children: ReactNode }) {
         Teacher view
         <ChevronRight size={15} className="ml-auto" />
       </Link>
+      <button
+        type="button"
+        onClick={handleLogout}
+        disabled={loggingOut}
+        className="mt-2 flex w-full items-center gap-3 rounded-xl px-3.5 py-2.5 text-left text-sm font-semibold text-(--muted) hover:bg-(--surface-muted) disabled:opacity-60"
+      >
+        {loggingOut ? "Signing out..." : "Sign out"}
+      </button>
 
       <div className="mt-8 rounded-2xl border border-(--border) bg-[linear-gradient(165deg,#f8fbff,#eaf2ff)] p-4">
         <p className="text-xs font-semibold uppercase tracking-[0.14em] text-(--muted)">

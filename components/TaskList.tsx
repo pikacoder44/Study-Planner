@@ -1,21 +1,66 @@
 "use client";
 
-import { CalendarDays, Check, Circle, Clock3 } from "lucide-react";
-import { useState } from "react";
+import { CalendarDays, Check, Circle } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Badge, Card } from "@/components/ui";
-import { subjects, tasks as initialTasks } from "@/lib/mock-data";
+
+type ApiTask = {
+  _id: string;
+  title: string;
+  subjectId: string;
+  dueDate: string;
+  priority: "low" | "medium" | "high";
+  status: "pending" | "completed";
+};
 
 export default function TaskList({ limit }: { limit?: number }) {
-  const [tasks, setTasks] = useState(initialTasks);
+  const [tasks, setTasks] = useState<ApiTask[]>([]);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    async function loadTasks() {
+      try {
+        const response = await fetch("/api/tasks");
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error || "Unable to load tasks.");
+        }
+        setTasks(data.tasks);
+      } catch (loadError) {
+        setError(
+          loadError instanceof Error
+            ? loadError.message
+            : "Unable to load tasks.",
+        );
+      }
+    }
+
+    void loadTasks();
+  }, []);
+
   const visibleTasks = limit ? tasks.slice(0, limit) : tasks;
+  if (error) {
+    return (
+      <p
+        role="alert"
+        className="rounded-xl bg-(--danger-soft) p-4 text-sm text-(--danger)"
+      >
+        {error}
+      </p>
+    );
+  }
+
+  if (visibleTasks.length === 0) {
+    return <p className="text-sm text-(--muted)">No tasks yet.</p>;
+  }
+
   return (
     <div className="space-y-2">
       {visibleTasks.map((task) => {
-        const subject = subjects.find((item) => item.id === task.subjectId);
         const completed = task.status === "completed";
         return (
           <Card
-            key={task.id}
+            key={task._id}
             className={`flex items-center gap-3 p-4 ${completed ? "opacity-65" : ""}`}
           >
             <button
@@ -25,7 +70,7 @@ export default function TaskList({ limit }: { limit?: number }) {
               onClick={() =>
                 setTasks((items) =>
                   items.map((item) =>
-                    item.id === task.id
+                    item._id === task._id
                       ? { ...item, status: completed ? "pending" : "completed" }
                       : item,
                   ),
@@ -45,14 +90,14 @@ export default function TaskList({ limit }: { limit?: number }) {
                 <span className="flex items-center gap-1">
                   <Circle
                     size={7}
-                    fill={subject?.color}
-                    color={subject?.color}
+                    fill="var(--primary)"
+                    color="var(--primary)"
                   />
-                  {subject?.code}
+                  {task.subjectId}
                 </span>
                 <span className="flex items-center gap-1">
                   <CalendarDays size={13} />
-                  {task.dueDate}
+                  {new Date(task.dueDate).toLocaleDateString()}
                 </span>
               </div>
             </div>
@@ -70,9 +115,6 @@ export default function TaskList({ limit }: { limit?: number }) {
           </Card>
         );
       })}
-      <div className="hidden">
-        <Clock3 />
-      </div>
     </div>
   );
 }
