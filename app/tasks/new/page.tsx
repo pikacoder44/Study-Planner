@@ -131,12 +131,7 @@ export default function NewTaskPage() {
               </Select>
             </Field>
             <Field label="Due date">
-              <Input
-                name="dueDate"
-                type="date"
-                min={minimumDueDate}
-                required
-              />
+              <Input name="dueDate" type="date" min={minimumDueDate} required />
             </Field>
             <Field label="Priority">
               <Select name="priority" defaultValue="medium">
