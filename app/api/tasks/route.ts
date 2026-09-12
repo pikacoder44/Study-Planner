@@ -14,6 +14,7 @@ async function authenticateUser(req: NextRequest) {
   return decoded?.id || null;
 }
 
+// POST route to create a new task
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
@@ -63,7 +64,7 @@ export async function POST(req: NextRequest) {
     );
   }
 }
-
+// Get route to fetch tasks
 export async function GET(req: NextRequest) {
   try {
     await connectDB();
