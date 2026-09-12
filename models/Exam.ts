@@ -13,7 +13,7 @@ export interface IExam extends Document {
   updatedAt: Date;
 }
 
-const ExamSchema: Schema<IExam> = new Schema(
+const ExamSchema = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,
@@ -54,8 +54,6 @@ const ExamSchema: Schema<IExam> = new Schema(
   },
 );
 
-const Exam =
-  mongoose.models.Exam ||
-  mongoose.model<IExam>("Exam", ExamSchema);
+const Exam = mongoose.models.Exam || mongoose.model<IExam>("Exam", ExamSchema);
 
 export default Exam;

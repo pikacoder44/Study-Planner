@@ -1,16 +1,13 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-interface DayOfWeek {
-  enum: [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
-}
+type DayOfWeek =
+  | "Sunday"
+  | "Monday"
+  | "Tuesday"
+  | "Wednesday"
+  | "Thursday"
+  | "Friday"
+  | "Saturday";
 
 export interface IClass extends Document {
   userId: string;
@@ -25,7 +22,7 @@ export interface IClass extends Document {
   updatedAt: Date;
 }
 
-const Class: Schema<IClass> = new Schema(
+const ClassSchema = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,
@@ -33,7 +30,8 @@ const Class: Schema<IClass> = new Schema(
       required: true,
     },
     subjectId: {
-      type: String,
+      type: Schema.Types.ObjectId,
+      ref: "Subject",
       required: true,
     },
     title: {
@@ -41,7 +39,16 @@ const Class: Schema<IClass> = new Schema(
       required: true,
     },
     dayOfWeek: {
-      type: DayOfWeek,
+      type: String,
+      enum: [
+        "Sunday",
+        "Monday",
+        "Tuesday",
+        "Wednesday",
+        "Thursday",
+        "Friday",
+        "Saturday",
+      ],
       required: true,
     },
     startTime: {
@@ -66,7 +73,7 @@ const Class: Schema<IClass> = new Schema(
   },
 );
 
-const Class =
+const ClassModel =
   mongoose.models.Class || mongoose.model<IClass>("Class", ClassSchema);
 
-export default Class;
+export default ClassModel;

@@ -12,7 +12,7 @@ export interface IStudySession extends Document {
   updatedAt: Date;
 }
 
-const StudySessionSchema: Schema<IStudySession> = new Schema(
+const StudySessionSchema = new Schema(
   {
     userId: {
       type: Schema.Types.ObjectId,

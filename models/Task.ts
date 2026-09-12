@@ -1,29 +1,19 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-interface TaskType {
-  type: "assignment" | "homework" | "revision" | "reminder" | "general";
-}
-interface TaskStatus {
-  status: "pending" | "completed";
-}
-interface Priority {
-  priority: "low" | "medium" | "high";
-}
-
 export interface ITask extends Document {
   userId: string;
   title: string;
   description: string;
-  subject: string;
-  taskType: TaskType;
+  subjectId: string;
+  type: "assignment" | "homework" | "revision" | "reminder" | "general";
   dueDate: Date;
-  priority: Priority;
-  status: TaskStatus;
+  priority: "low" | "medium" | "high";
+  status: "pending" | "completed";
   createdAt: Date;
   uploadedAt: Date;
 }
 
-const TaskSchema: Schema<ITask> = new Schema({
+const TaskSchema = new Schema({
   userId: {
     type: Schema.Types.ObjectId,
     ref: "User",
@@ -35,8 +25,8 @@ const TaskSchema: Schema<ITask> = new Schema({
     required: true,
   },
   type: {
-    type: TaskType,
-    enum: ["assignment", "exam", "project"],
+    type: String,
+    enum: ["assignment", "homework", "revision", "reminder", "general"],
     required: true,
   },
   title: {
@@ -51,13 +41,13 @@ const TaskSchema: Schema<ITask> = new Schema({
     type: Date,
     required: true,
   },
-    priority: {
-    type: Priority,
+  priority: {
+    type: String,
     enum: ["low", "medium", "high"],
     required: true,
   },
   status: {
-    type: TaskStatus,
+    type: String,
     enum: ["pending", "completed", "overdue"],
     required: true,
   },
