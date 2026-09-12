@@ -1,7 +1,7 @@
 import { NextResponse, NextRequest } from "next/server";
 import { connectDB } from "@/lib/db";
 import User from "@/models/User";
-import { verifyToken } from "@/lib/jwt";
+import { getAuthenticatedUserId } from "@/lib/api-auth";
 
 // Allowed fields
 const ALLOWED_FIELDS = ["name", "bio", "avatarUrl", "phone"];
@@ -10,16 +10,8 @@ export async function PUT(request: NextRequest) {
   try {
     await connectDB();
 
-    // Authenticate user from JWT header
-    const authHeader = request.headers.get("Authorization");
-    const token = authHeader?.replace("Bearer ", "");
-
-    if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const decoded = verifyToken(token) as { id: string } | null;
-    if (!decoded?.id) {
+    const userId = getAuthenticatedUserId(request);
+    if (!userId) {
       return NextResponse.json({ error: "Invalid token" }, { status: 401 });
     }
 
@@ -48,7 +40,7 @@ export async function PUT(request: NextRequest) {
 
     // Update user in database
     const updatedUser = await User.findByIdAndUpdate(
-      decoded.id,
+      userId,
       { $set: safeUpdates },
       { new: true, runValidators: true },
     ).select("-passwordHash");
