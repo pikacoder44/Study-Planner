@@ -17,6 +17,12 @@ export default function NewTaskPage() {
   const [subjects, setSubjects] = useState<ISubject[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState("");
+  const today = new Date();
+  const minimumDueDate = [
+    today.getFullYear(),
+    String(today.getMonth() + 1).padStart(2, "0"),
+    String(today.getDate()).padStart(2, "0"),
+  ].join("-");
 
   useEffect(() => {
     let isMounted = true;
@@ -125,7 +131,12 @@ export default function NewTaskPage() {
               </Select>
             </Field>
             <Field label="Due date">
-              <Input name="dueDate" type="date" required />
+              <Input
+                name="dueDate"
+                type="date"
+                min={minimumDueDate}
+                required
+              />
             </Field>
             <Field label="Priority">
               <Select name="priority" defaultValue="medium">

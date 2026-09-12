@@ -3,6 +3,24 @@ import { connectDB } from "@/lib/db";
 import Task from "@/models/Task";
 import { getAuthenticatedUserId } from "@/lib/api-auth";
 
+function isValidDateOnly(value: unknown): value is string {
+  if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return false;
+  }
+
+  const [year, month, day] = value.split("-").map(Number);
+  const parsed = new Date(Date.UTC(year, month - 1, day));
+  return (
+    parsed.getUTCFullYear() === year &&
+    parsed.getUTCMonth() === month - 1 &&
+    parsed.getUTCDate() === day
+  );
+}
+
+function getTodayDateOnly() {
+  return new Date().toISOString().slice(0, 10);
+}
+
 // POST route to create a new task
 export async function POST(req: NextRequest) {
   try {
@@ -26,6 +44,20 @@ export async function POST(req: NextRequest) {
     ) {
       return NextResponse.json(
         { error: "Missing required fields" },
+        { status: 400 },
+      );
+    }
+
+    if (!isValidDateOnly(dueDate)) {
+      return NextResponse.json(
+        { error: "Due date must be a valid date." },
+        { status: 400 },
+      );
+    }
+
+    if (dueDate < getTodayDateOnly()) {
+      return NextResponse.json(
+        { error: "Due date cannot be in the past." },
         { status: 400 },
       );
     }

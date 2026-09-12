@@ -40,6 +40,14 @@ const TaskSchema = new Schema({
   dueDate: {
     type: Date,
     required: true,
+    validate: {
+      validator: (value: Date) => {
+        const today = new Date();
+        today.setUTCHours(0, 0, 0, 0);
+        return value >= today;
+      },
+      message: "Due date cannot be in the past.",
+    },
   },
   priority: {
     type: String,
