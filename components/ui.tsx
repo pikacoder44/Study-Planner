@@ -1,5 +1,6 @@
 import type {
   ButtonHTMLAttributes,
+  HTMLAttributes,
   InputHTMLAttributes,
   ReactNode,
   SelectHTMLAttributes,
@@ -41,12 +42,14 @@ export function Button({
 export function Card({
   children,
   className = "",
-}: {
+  ...props
+}: HTMLAttributes<HTMLElement> & {
   children: ReactNode;
   className?: string;
 }) {
   return (
     <section
+      {...props}
       className={cn(
         "rounded-2xl border border-(--border) bg-(--surface) shadow-(--shadow-card)",
         className,
