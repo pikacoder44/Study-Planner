@@ -6,8 +6,6 @@ export interface ISubject extends Document {
   code: string;
   color: string;
   description?: string;
-  createdAt: Date;
-  updatedAt: Date;
 }
 
 const SubjectSchema: Schema<ISubject> = new Schema(
@@ -33,10 +31,7 @@ const SubjectSchema: Schema<ISubject> = new Schema(
       type: String,
       required: false,
     },
-  },
-  {
-    timestamps: true,
-  },
+  }
 );
 
 const Subject =
