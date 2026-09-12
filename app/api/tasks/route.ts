@@ -1,37 +1,26 @@
 import { NextResponse, NextRequest } from "next/server";
 import { connectDB } from "@/lib/db";
 import Task from "@/models/Task";
-import { verifyToken } from "@/lib/jwt";
-
-// Helper function to authenticate requests
-async function authenticateUser(req: NextRequest) {
-  const authHeader = req.headers.get("Authorization");
-  const token = authHeader?.replace("Bearer ", "");
-
-  if (!token) return null;
-
-  const decoded = verifyToken(token) as { id: string } | null;
-  return decoded?.id || null;
-}
+import { getAuthenticatedUserId } from "@/lib/api-auth";
 
 // POST route to create a new task
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
 
-    const userId = await authenticateUser(req);
+    const userId = getAuthenticatedUserId(req);
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await req.json();
-    const { title, description, subject, taskType, dueDate, priority } = body;
+    const { title, description, subjectId, type, dueDate, priority } = body;
 
     if (
       !title ||
       !description ||
-      !subject ||
-      !taskType ||
+      !subjectId ||
+      !type ||
       !dueDate ||
       !priority
     ) {
@@ -45,8 +34,8 @@ export async function POST(req: NextRequest) {
       userId,
       title,
       description,
-      subject,
-      taskType,
+      subjectId,
+      type,
       dueDate,
       priority,
       status: "pending",
@@ -69,7 +58,7 @@ export async function GET(req: NextRequest) {
   try {
     await connectDB();
 
-    const userId = await authenticateUser(req);
+    const userId = getAuthenticatedUserId(req);
     if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
