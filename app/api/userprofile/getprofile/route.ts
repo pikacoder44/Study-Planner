@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Find the user in the database using the userId from the token payload
-    const user = await User.findById(payload.userId).select("-passwordHash");
+    const user = await User.findById(payload.userId).select("-password");
     if (!user) {
       return NextResponse.json(
         { errors: ["User not found."] },
