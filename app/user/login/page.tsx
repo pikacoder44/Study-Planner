@@ -9,22 +9,42 @@ import { useRouter } from "next/navigation";
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
   const handleLogin = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const response = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ username, password }),
-    })
-    if (response.ok) {
-      router.push("/dashboard");
-    }
+    setError("");
+    setIsSubmitting(true);
 
-  }
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password }),
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => null);
+        const errors = data?.errors;
+        setError(
+          Array.isArray(errors)
+            ? errors.join(" ")
+            : typeof errors === "string"
+              ? errors
+              : "Unable to log in. Please try again.",
+        );
+        return;
+      }
+
+      router.push("/dashboard");
+    } catch {
+      setError("Network error. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <AuthShell>
@@ -35,13 +55,31 @@ export default function LoginPage() {
         </p>
         <form onSubmit={handleLogin} className="mt-7 space-y-5">
           <Field label="Username">
-            <Input type="text" placeholder="Your username" required  onChange={(e) => setUsername(e.target.value)} />
+            <Input
+              type="text"
+              placeholder="Your username"
+              required
+              onChange={(e) => setUsername(e.target.value)}
+            />
           </Field>
           <Field label="Password">
-            <Input type="password" placeholder="Your password" required onChange={(e) => setPassword(e.target.value)} />
+            <Input
+              type="password"
+              placeholder="Your password"
+              required
+              onChange={(e) => setPassword(e.target.value)}
+            />
           </Field>
-          <Button className="w-full" type="submit">
-            Log in
+          {error && (
+            <p
+              role="alert"
+              className="rounded-xl bg-(--danger-soft) px-3 py-2 text-sm text-(--danger)"
+            >
+              {error}
+            </p>
+          )}
+          <Button className="w-full" type="submit" disabled={isSubmitting}>
+            {isSubmitting ? "Logging in..." : "Log in"}
           </Button>
         </form>
         <p className="mt-6 text-center text-sm text-[--muted]">
