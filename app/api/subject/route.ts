@@ -1,24 +1,16 @@
 import { NextResponse, NextRequest } from "next/server";
 import { connectDB } from "@/lib/db";
 import Subject from "@/models/Subject";
-import { verifyToken } from "@/lib/jwt";
+import { getAuthenticatedUserId } from "@/lib/api-auth";
 
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
 
-    const authHeader = req.headers.get("Authorization");
-    const token = authHeader?.replace("Bearer ", "");
-
-    if (!token) {
+    const userId = getAuthenticatedUserId(req);
+    if (!userId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-
-    const decoded = verifyToken(token) as { id: string } | null;
-    if (!decoded) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    const userId = decoded.id;
 
     const body = await req.json();
     const { name, code, color, description } = body;
@@ -36,9 +28,26 @@ export async function POST(req: NextRequest) {
       { message: "Subject created successfully", subject: savedSubject },
       { status: 201 },
     );
-  } catch (error) {
+  } catch {
     return NextResponse.json(
-      { error: "Internal Server Error", error },
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
+  }
+}
+
+export async function GET(req: NextRequest) {
+  try {
+    await connectDB();
+    const userId = getAuthenticatedUserId(req);
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const subjects = await Subject.find({ userId }).sort({ createdAt: -1 });
+    return NextResponse.json({ subjects });
+  } catch {
+    return NextResponse.json(
+      { error: "Internal Server Error" },
       { status: 500 },
     );
   }
