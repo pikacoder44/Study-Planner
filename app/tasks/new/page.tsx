@@ -71,7 +71,11 @@ export default function NewTaskPage() {
       }
       router.push("/tasks");
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "Unable to create task.");
+      setError(
+        submitError instanceof Error
+          ? submitError.message
+          : "Unable to create task.",
+      );
     }
   };
 
@@ -83,10 +87,7 @@ export default function NewTaskPage() {
         description="Capture the next piece of work while it is still fresh."
       />
       <Card className="max-w-2xl p-6">
-        <form
-          className="space-y-5"
-          onSubmit={handleSubmit}
-        >
+        <form className="space-y-5" onSubmit={handleSubmit}>
           <Field label="Task title">
             <Input
               name="title"
@@ -134,7 +135,14 @@ export default function NewTaskPage() {
               </Select>
             </Field>
           </div>
-          {error && <p role="alert" className="rounded-xl bg-(--danger-soft) p-3 text-sm text-(--danger)">{error}</p>}
+          {error && (
+            <p
+              role="alert"
+              className="rounded-xl bg-(--danger-soft) p-3 text-sm text-(--danger)"
+            >
+              {error}
+            </p>
+          )}
           <div className="flex justify-end gap-3 border-t border-(--border) pt-5">
             <Link href="/tasks">
               <Button type="button" variant="secondary">
