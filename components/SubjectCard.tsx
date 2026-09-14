@@ -4,12 +4,43 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowUpRight, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
-import { Badge, Card } from "@/components/ui";
+import { Badge } from "@/components/ui";
 import type { Subject } from "@/types";
 
 interface SubjectCardProps {
   subject: Subject;
   onDeleteSuccess?: (id: string) => void;
+}
+
+// Convert Tailwind class names (e.g., "bg-blue-500" or "blue-500") to Hex if necessary
+function parseColor(colorStr?: string): string {
+  if (!colorStr) return "#3b82f6";
+  if (
+    colorStr.startsWith("#") ||
+    colorStr.startsWith("rgb") ||
+    colorStr.startsWith("hsl")
+  ) {
+    return colorStr;
+  }
+
+  const colorMap: Record<string, string> = {
+    red: "#ef4444",
+    blue: "#3b82f6",
+    green: "#22c55e",
+    amber: "#f59e0b",
+    yellow: "#eab308",
+    purple: "#a855f7",
+    pink: "#ec4899",
+    indigo: "#6366f1",
+    orange: "#f97316",
+    teal: "#14b8a6",
+    emerald: "#10b981",
+    cyan: "#06b6d4",
+    sky: "#0ea5e9",
+  };
+
+  const key = colorStr.replace(/^(bg-|text-)/, "").split("-")[0];
+  return colorMap[key] || "#3b82f6";
 }
 
 export default function SubjectCard({
@@ -21,10 +52,9 @@ export default function SubjectCard({
   const [isDeleting, setIsDeleting] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // Subject ID normalization (handles Mongo `_id` or `id`)
   const subjectId = (subject as { _id?: string })._id || subject.id;
+  const accentColor = parseColor(subject.color);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
@@ -35,13 +65,11 @@ export default function SubjectCard({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Handle Edit Action
   const handleEdit = () => {
     setIsOpen(false);
     router.push(`/subjects/update/${subjectId}`);
   };
 
-  // Handle Delete Action
   const handleDelete = async () => {
     if (!confirm(`Are you sure you want to delete "${subject.name}"?`)) return;
 
@@ -72,15 +100,17 @@ export default function SubjectCard({
   };
 
   return (
-    <Card
-      className={`rounded-2xl border border-(--border) bg-white/90 p-5 shadow-[0_10px_24px_rgba(20,89,230,0.06)] backdrop-blur-md transition hover:border-(--primary) hover:shadow-[0_14px_28px_rgba(20,89,230,0.12)] ${isDeleting ? "opacity-50 pointer-events-none" : ""}`}
+    <div
+      style={{
+        backgroundColor: `color-mix(in srgb, ${accentColor} 10%, white)`,
+        borderColor: `color-mix(in srgb, ${accentColor} 35%, transparent)`,
+      }}
+      className={`rounded-2xl border p-5 shadow-[0_10px_24px_rgba(20,89,230,0.06)] backdrop-blur-md transition hover:shadow-[0_14px_28px_rgba(20,89,230,0.12)] ${
+        isDeleting ? "pointer-events-none opacity-50" : ""
+      }`}
     >
       <div className="flex items-start justify-between">
         <div className="flex items-center gap-3">
-          <span
-            className="h-3 w-3 rounded-full shadow-[0_0_0_4px_rgba(20,89,230,0.08)]"
-            style={{ backgroundColor: subject.color }}
-          />
           <div>
             <p className="text-base font-bold tracking-[-0.01em] text-foreground">
               {subject.name}
@@ -97,7 +127,7 @@ export default function SubjectCard({
             type="button"
             disabled={isDeleting}
             onClick={() => setIsOpen((prev) => !prev)}
-            className="rounded-xl p-1.5 text-(--muted) transition hover:bg-(--surface-muted) hover:text-foreground disabled:opacity-50"
+            className="rounded-xl p-1.5 text-(--muted) transition hover:bg-black/5 hover:text-foreground disabled:opacity-50"
             aria-label={`More options for ${subject.name}`}
           >
             <MoreHorizontal size={18} />
@@ -132,15 +162,15 @@ export default function SubjectCard({
 
       <div className="mt-5">
         <div className="mb-2 flex justify-between text-xs font-semibold">
-          <span className="text-(--muted)">Progress</span>
+          <span className="text-(--muted)]">Progress</span>
           <span className="text-foreground">{subject.progress}%</span>
         </div>
-        <div className="h-1.5 overflow-hidden rounded-full bg-(--surface-muted)">
+        <div className="h-1.5 overflow-hidden rounded-full bg-black/10">
           <div
             className="h-full rounded-full transition-all"
             style={{
               width: `${subject.progress}%`,
-              backgroundColor: subject.color,
+              backgroundColor: accentColor,
             }}
           />
         </div>
@@ -150,12 +180,12 @@ export default function SubjectCard({
         <Badge tone="blue">{subject.nextClass ?? "No class scheduled"}</Badge>
         <Link
           href={`/subjects/${subjectId}`}
-          className="flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-semibold text-(--primary-strong) transition hover:bg-(--primary-soft)"
+          className="flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-semibold text-(--primary-strong) transition hover:bg-black/5"
         >
           Details
           <ArrowUpRight size={15} />
         </Link>
       </div>
-    </Card>
+    </div>
   );
 }
