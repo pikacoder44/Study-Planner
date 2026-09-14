@@ -1,5 +1,35 @@
+import { NextResponse, NextRequest } from "next/server";
+import { connectDB } from "@/lib/db";
+import Subject from "@/models/Subject";
+import { getAuthenticatedUserId } from "@/lib/api-auth";
 
-
+export async function GET(req: NextRequest) {
+  try {
+    await connectDB();
+    const userId = getAuthenticatedUserId(req);
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const { searchParams } = new URL(req.url);
+    const subjectId = searchParams.get("subjectId");
+    if (!subjectId) {
+      return NextResponse.json(
+        { error: "Missing subjectId parameter" },
+        { status: 400 },
+      );
+    }
+    const subject = await Subject.findOne({ _id: subjectId, userId });
+    if (!subject) {
+      return NextResponse.json({ error: "Subject not found" }, { status: 404 });
+    }
+    return NextResponse.json({ subject });
+  } catch {
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
+  }
+}
 
 export async function DELETE(req: NextRequest) {
   try {
