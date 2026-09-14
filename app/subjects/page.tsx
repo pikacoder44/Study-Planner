@@ -84,7 +84,15 @@ export default function SubjectsPage() {
       )}
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {items.map((subject) => (
-          <SubjectCard key={subject.id} subject={subject} />
+          <SubjectCard
+            key={subject.id}
+            subject={subject}
+            onDeleteSuccess={(deletedId) => {
+              setItems((currentItems) =>
+                currentItems.filter((item) => item.id !== deletedId),
+              );
+            }}
+          />
         ))}
       </div>
     </AppShell>
