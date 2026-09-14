@@ -1,4 +1,5 @@
 import { NextResponse, NextRequest } from "next/server";
+import mongoose from "mongoose";
 import { connectDB } from "@/lib/db";
 import Subject from "@/models/Subject";
 import { getAuthenticatedUserId } from "@/lib/api-auth";
@@ -53,9 +54,16 @@ export async function DELETE(req: NextRequest, { params }: Context) {
       );
     }
 
+    if (!mongoose.isValidObjectId(subjectId)) {
+      return NextResponse.json(
+        { error: "Invalid subject ID" },
+        { status: 400 },
+      );
+    }
+
     const deletedSubject = await Subject.findOneAndDelete({
-      _id: subjectId,
-      userId,
+      _id: new mongoose.Types.ObjectId(subjectId),
+      userId: new mongoose.Types.ObjectId(userId),
     });
 
     if (!deletedSubject) {
@@ -94,7 +102,7 @@ export async function PUT(req: NextRequest, { params }: Context) {
     const updatedSubject = await Subject.findOneAndUpdate(
       { _id: subjectId, userId },
       { name, code, color, description },
-      { new: true , runValidators: true },
+      { new: true, runValidators: true },
     );
 
     if (!updatedSubject) {
