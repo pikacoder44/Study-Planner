@@ -63,3 +63,38 @@ export async function DELETE(req: NextRequest) {
     );
   }
 }
+
+export async function PUT(req: NextRequest) {
+  try {
+    await connectDB();
+    const userId = getAuthenticatedUserId(req);
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const { searchParams } = new URL(req.url);
+    const subjectId = searchParams.get("subjectId");
+    if (!subjectId) {
+      return NextResponse.json(
+        { error: "Missing subjectId parameter" },
+        { status: 400 },
+      );
+    }
+    const body = await req.json();
+    const { name, code, color, description } = body;
+    const updatedSubject = await Subject.findOneAndUpdate(
+      { _id: subjectId, userId },
+      { name, code, color, description },
+      { new: true }
+    );
+    if (!updatedSubject) {
+      return NextResponse.json({ error: "Subject not found" }, { status: 404 });
+    }
+    return NextResponse.json({ message: "Subject updated successfully", subject: updatedSubject });
+  } catch (error) {
+    console.error("Error updating subject:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
+  }
+}
