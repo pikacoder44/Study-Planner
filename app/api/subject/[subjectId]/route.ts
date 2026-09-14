@@ -94,7 +94,7 @@ export async function PUT(req: NextRequest, { params }: Context) {
     const updatedSubject = await Subject.findOneAndUpdate(
       { _id: subjectId, userId },
       { name, code, color, description },
-      { new: true }
+      { new: true , runValidators: true },
     );
 
     if (!updatedSubject) {
