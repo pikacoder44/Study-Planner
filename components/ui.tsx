@@ -39,9 +39,11 @@ export function Button({
   );
 }
 
+
 export function Card({
   children,
   className = "",
+  style,
   ...props
 }: HTMLAttributes<HTMLElement> & {
   children: ReactNode;
@@ -50,6 +52,7 @@ export function Card({
   return (
     <section
       {...props}
+      style={style}
       className={cn(
         "rounded-2xl border border-(--border) bg-(--surface) shadow-(--shadow-card)",
         className,
