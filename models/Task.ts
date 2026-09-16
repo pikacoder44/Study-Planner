@@ -1,73 +1,65 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface ITask extends Document {
-  userId: string;
+  userId: mongoose.Types.ObjectId;
+  subjectId: mongoose.Types.ObjectId;
   title: string;
   description: string;
-  subjectId: string;
   type: "assignment" | "homework" | "revision" | "reminder" | "general";
   dueDate: Date;
   priority: "low" | "medium" | "high";
-  status: "pending" | "completed";
+  status: "pending" | "completed" | "overdue";
   createdAt: Date;
-  uploadedAt: Date;
+  updatedAt: Date;
 }
 
-const TaskSchema = new Schema({
-  userId: {
-    type: Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  subjectId: {
-    type: Schema.Types.ObjectId,
-    ref: "Subject",
-    required: true,
-  },
-  type: {
-    type: String,
-    enum: ["assignment", "homework", "revision", "reminder", "general"],
-    required: true,
-  },
-  title: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-    required: true,
-  },
-  dueDate: {
-    type: Date,
-    required: true,
-    validate: {
-      validator: (value: Date) => {
-        const today = new Date();
-        today.setUTCHours(0, 0, 0, 0);
-        return value >= today;
-      },
-      message: "Due date cannot be in the past.",
+const TaskSchema = new Schema<ITask>(
+  {
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
+    subjectId: {
+      type: Schema.Types.ObjectId,
+      ref: "Subject",
+      required: true,
+      index: true,
+    },
+    type: {
+      type: String,
+      enum: ["assignment", "homework", "revision", "reminder", "general"],
+      required: true,
+    },
+    title: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+    description: {
+      type: String,
+      default: "",
+    },
+    dueDate: {
+      type: Date,
+      required: true,
+    },
+    priority: {
+      type: String,
+      enum: ["low", "medium", "high"],
+      default: "medium",
+    },
+    status: {
+      type: String,
+      enum: ["pending", "completed", "overdue"],
+      default: "pending",
     },
   },
-  priority: {
-    type: String,
-    enum: ["low", "medium", "high"],
-    required: true,
+  {
+    timestamps: true,
   },
-  status: {
-    type: String,
-    enum: ["pending", "completed", "overdue"],
-    required: true,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-  uploadedAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+);
 
 const Task = mongoose.models.Task || mongoose.model<ITask>("Task", TaskSchema);
 
