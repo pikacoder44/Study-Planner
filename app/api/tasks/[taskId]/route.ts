@@ -132,3 +132,41 @@ export async function PUT(request: NextRequest) {
     );
   }
 }
+
+// Delete a task by ID for authenticated user
+export async function DELETE(request: NextRequest, { params }: Context) {
+  try {
+    await connectDB();
+
+    const userId = getAuthenticatedUserId(request);
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { taskId } = await params;
+    if (!taskId || !mongoose.Types.ObjectId.isValid(taskId)) {
+      return NextResponse.json(
+        { error: "A valid task ID is required." },
+        { status: 400 },
+      );
+    }
+
+    // Delete task only if it belongs to the authenticated user
+    const deletedTask = await Task.findOneAndDelete({ _id: taskId, userId });
+
+    if (!deletedTask) {
+      return NextResponse.json({ error: "Task not found." }, { status: 404 });
+    }
+
+    return NextResponse.json(
+      { message: "Task deleted successfully" },
+      { status: 200 },
+    );
+  } catch (error) {
+    console.error("Error deleting task:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
+}
