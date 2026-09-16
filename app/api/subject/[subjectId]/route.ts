@@ -8,6 +8,7 @@ type Context = {
   params: Promise<{ subjectId: string }>;
 };
 
+// Fetch one subject by ID for authenticated user
 export async function GET(req: NextRequest, { params }: Context) {
   try {
     await connectDB();
@@ -38,6 +39,7 @@ export async function GET(req: NextRequest, { params }: Context) {
   }
 }
 
+// Delete a subject by ID for authenticated user
 export async function DELETE(req: NextRequest, { params }: Context) {
   try {
     await connectDB();
@@ -80,6 +82,7 @@ export async function DELETE(req: NextRequest, { params }: Context) {
   }
 }
 
+// Update a subject by ID for authenticated user
 export async function PUT(req: NextRequest, { params }: Context) {
   try {
     await connectDB();
