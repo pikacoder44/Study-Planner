@@ -66,7 +66,7 @@ export const DELETE = withAuth<Context>(
   },
 );
 
-// Update an exam partially
+// Update a single exam
 export const PATCH = withAuth<Context>(
   async (request, { userId }, { params }) => {
     try {
@@ -88,14 +88,34 @@ export const PATCH = withAuth<Context>(
         );
       }
 
-      // Filter out undefined keys so partial updates do not wipe out unprovided fields
+      // Filter and validate allowed update fields
       const updateData: Record<string, unknown> = {};
-      const allowedFields = ["title", "description", "subjectName", "examDate"];
+      const allowedFields = [
+        "title",
+        "description",
+        "subjectName",
+        "subjectId",
+        "examDate",
+        "status",
+        "priority",
+      ];
 
       for (const field of allowedFields) {
         if (body[field] !== undefined) {
           updateData[field] = body[field];
         }
+      }
+
+      // Validate subjectId if it is being updated
+      if (
+        updateData.subjectId &&
+        typeof updateData.subjectId === "string" &&
+        !mongoose.Types.ObjectId.isValid(updateData.subjectId)
+      ) {
+        return NextResponse.json(
+          { error: "Invalid subject ID format." },
+          { status: 400 },
+        );
       }
 
       if (Object.keys(updateData).length === 0) {

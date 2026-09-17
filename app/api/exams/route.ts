@@ -30,7 +30,15 @@ export const POST = withAuth(async (request: NextRequest, { userId }) => {
       );
     }
 
-    const { subjectName, title, examDate, description } = body;
+    const {
+      subjectName,
+      subjectId,
+      title,
+      examDate,
+      description,
+      status,
+      priority
+    } = body;
 
     if (!title || !examDate) {
       return NextResponse.json(
@@ -43,9 +51,12 @@ export const POST = withAuth(async (request: NextRequest, { userId }) => {
     const newExam = await Exam.create({
       userId,
       subjectName,
+      subjectId,
       title,
       examDate,
       description,
+      status,
+      priority
     });
 
     return NextResponse.json(newExam, { status: 201 });
