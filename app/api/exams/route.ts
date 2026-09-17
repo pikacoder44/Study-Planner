@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Exam from "@/models/Exam";
-import { withAuth } from "@/lib/api-auth";
+import { withAuth } from "@/lib/with-auth";
 
 // Get all exams for the authenticated user
 export const GET = withAuth(async (request: NextRequest, { userId }) => {
