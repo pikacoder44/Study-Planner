@@ -5,9 +5,6 @@ export interface IExam extends Document {
   subjectId: string;
   title: string;
   examDate: Date;
-  startTime: Date;
-  endTime?: Date;
-  location?: string;
   description?: string;
   createdAt: Date;
   updatedAt: Date;
@@ -31,18 +28,6 @@ const ExamSchema = new Schema(
     examDate: {
       type: Date,
       required: true,
-    },
-    startTime: {
-      type: Date,
-      required: true,
-    },
-    endTime: {
-      type: Date,
-      required: false,
-    },
-    location: {
-      type: String,
-      required: false,
     },
     description: {
       type: String,
