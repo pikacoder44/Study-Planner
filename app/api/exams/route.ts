@@ -6,7 +6,7 @@ import { withAuth } from "@/lib/with-auth";
 export const GET = withAuth(async (request: NextRequest, { userId }) => {
   try {
     // Filter exams by the authenticated user's ID
-    const exams = await Exam.find({ userId }).sort({ date: 1 });
+    const exams = await Exam.find({ userId }).sort({ examDate: 1 });
     return NextResponse.json(exams, { status: 200 });
   } catch (error) {
     console.error("Error fetching exams:", error);
@@ -30,9 +30,9 @@ export const POST = withAuth(async (request: NextRequest, { userId }) => {
       );
     }
 
-    const { title, description, date } = body;
+    const { subjectName, title, examDate, description } = body;
 
-    if (!title || !date) {
+    if (!title || !examDate) {
       return NextResponse.json(
         { error: "Title and date are required fields." },
         { status: 400 },
@@ -42,9 +42,10 @@ export const POST = withAuth(async (request: NextRequest, { userId }) => {
     // Attach userId to ensure ownership
     const newExam = await Exam.create({
       userId,
+      subjectName,
       title,
+      examDate,
       description,
-      date,
     });
 
     return NextResponse.json(newExam, { status: 201 });
