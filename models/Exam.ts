@@ -20,7 +20,7 @@ const ExamSchema = new Schema(
       ref: "User",
       required: true,
     },
-    subjectId: {
+    subjectName: {
       type: String,
       required: true,
     },
