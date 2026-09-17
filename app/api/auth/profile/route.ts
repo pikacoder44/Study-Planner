@@ -1,18 +1,10 @@
-import { NextResponse, NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
-import { connectDB } from "@/lib/db";
 import User from "@/models/User";
-import { getAuthenticatedUserId } from "@/lib/api-auth";
+import { withAuth } from "@/lib/with-auth";
 
-export async function GET(request: NextRequest) {
+export const GET = withAuth(async (request, { userId }) => {
   try {
-    await connectDB();
-
-    const userId = getAuthenticatedUserId(request);
-    if (!userId) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-    }
-
     const user = await User.findById(userId).select("-password");
     if (!user) {
       return NextResponse.json({ error: "User not found." }, { status: 404 });
@@ -23,22 +15,15 @@ export async function GET(request: NextRequest) {
     console.error("Error in GET /api/userprofile:", error);
     return NextResponse.json(
       { error: "Internal Server Error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
-}
+});
 
 const ALLOWED_FIELDS = ["username", "password"];
 
-export async function PUT(request: NextRequest) {
+export const PUT = withAuth(async (request, { userId }) => {
   try {
-    await connectDB();
-
-    const userId = getAuthenticatedUserId(request);
-    if (!userId) {
-      return NextResponse.json({ error: "Invalid token" }, { status: 401 });
-    }
-
     let body: Record<string, unknown>;
     try {
       body = await request.json();
@@ -56,7 +41,7 @@ export async function PUT(request: NextRequest) {
     if (Object.keys(safeUpdates).length === 0) {
       return NextResponse.json(
         { error: "No valid fields provided to update" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -69,7 +54,7 @@ export async function PUT(request: NextRequest) {
     const updatedUser = await User.findByIdAndUpdate(
       userId,
       { $set: safeUpdates },
-      { new: true, runValidators: true }
+      { new: true, runValidators: true },
     ).select("-password");
 
     if (!updatedUser) {
@@ -81,16 +66,16 @@ export async function PUT(request: NextRequest) {
     console.error("Error updating user profile:", error);
 
     // Handle Mongoose duplicate key error (e.g., username already taken)
-    if (error.code === 11000) {
+    if (error instanceof Error && "code" in error && error.code === 11000) {
       return NextResponse.json(
         { error: "Username is already taken." },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
     return NextResponse.json(
       { error: "Failed to update user profile." },
-      { status: 500 }
+      { status: 500 },
     );
   }
-}
+});

@@ -1,7 +1,6 @@
-import { NextResponse, NextRequest } from "next/server";
-import { connectDB } from "@/lib/db";
+import { NextResponse } from "next/server";
 import Task from "@/models/Task";
-import { getAuthenticatedUserId } from "@/lib/api-auth";
+import { withAuth } from "@/lib/with-auth";
 
 function isValidDateOnly(value: unknown): value is string {
   if (typeof value !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
@@ -22,15 +21,8 @@ function getTodayDateOnly() {
 }
 
 // POST route to create a new task
-export async function POST(req: NextRequest) {
+export const POST = withAuth(async (req, { userId }) => {
   try {
-    await connectDB();
-
-    const userId = getAuthenticatedUserId(req);
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const body = await req.json();
     const { title, description, subjectId, type, dueDate, priority } = body;
 
@@ -84,17 +76,10 @@ export async function POST(req: NextRequest) {
       { status: 500 },
     );
   }
-}
+});
 // Get route to fetch tasks
-export async function GET(req: NextRequest) {
+export const GET = withAuth(async (req, { userId }) => {
   try {
-    await connectDB();
-
-    const userId = getAuthenticatedUserId(req);
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     // FIXED: Only fetch tasks belonging to the authenticated user
     const tasks = await Task.find({ userId });
     return NextResponse.json({ tasks });
@@ -105,4 +90,4 @@ export async function GET(req: NextRequest) {
       { status: 500 },
     );
   }
-}
+});

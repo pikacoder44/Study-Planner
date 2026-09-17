@@ -1,22 +1,15 @@
-import { NextResponse, NextRequest } from "next/server";
+import { NextResponse } from "next/server";
 import mongoose from "mongoose";
-import { connectDB } from "@/lib/db";
 import Subject from "@/models/Subject";
-import { getAuthenticatedUserId } from "@/lib/api-auth";
+import { withAuth } from "@/lib/with-auth";
 
 type Context = {
   params: Promise<{ subjectId: string }>;
 };
 
 // Fetch one subject by ID for authenticated user
-export async function GET(req: NextRequest, { params }: Context) {
+export const GET = withAuth<Context>(async (req, { userId }, { params }) => {
   try {
-    await connectDB();
-    const userId = getAuthenticatedUserId(req);
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const { subjectId } = await params;
     if (!subjectId) {
       return NextResponse.json(
@@ -37,17 +30,11 @@ export async function GET(req: NextRequest, { params }: Context) {
       { status: 500 },
     );
   }
-}
+});
 
 // Delete a subject by ID for authenticated user
-export async function DELETE(req: NextRequest, { params }: Context) {
+export const DELETE = withAuth<Context>(async (req, { userId }, { params }) => {
   try {
-    await connectDB();
-    const userId = getAuthenticatedUserId(req);
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const { subjectId } = await params;
     if (!subjectId) {
       return NextResponse.json(
@@ -80,17 +67,11 @@ export async function DELETE(req: NextRequest, { params }: Context) {
       { status: 500 },
     );
   }
-}
+});
 
 // Update a subject by ID for authenticated user
-export async function PUT(req: NextRequest, { params }: Context) {
+export const PUT = withAuth<Context>(async (req, { userId }, { params }) => {
   try {
-    await connectDB();
-    const userId = getAuthenticatedUserId(req);
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     const { subjectId } = await params;
     if (!subjectId) {
       return NextResponse.json(
@@ -123,4 +104,4 @@ export async function PUT(req: NextRequest, { params }: Context) {
       { status: 500 },
     );
   }
-}
+});
