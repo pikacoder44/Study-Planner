@@ -32,7 +32,7 @@ export default function ExamsPage() {
                       : "In 9 days"}
                 </Badge>
                 <h2 className="mt-4 text-lg font-bold">{exam.title}</h2>
-                <p className="mt-1 text-sm font-semibold text-[var(--accent)]">
+                <p className="mt-1 text-sm font-semibold text-(--accent)">
                   {
                     subjects.find((subject) => subject.id === exam.subjectId)
                       ?.code
@@ -48,7 +48,7 @@ export default function ExamsPage() {
                 </p>
               </div>
             </div>
-            <div className="mt-5 grid gap-3 border-t border-[var(--border)] pt-4 text-sm text-[var(--muted)] sm:grid-cols-2">
+            <div className="mt-5 grid gap-3 border-t border-(--border) pt-4 text-sm text-(--muted) sm:grid-cols-2">
               <span className="flex items-center gap-2">
                 <CalendarDays size={16} />
                 {exam.startTime} - {exam.endTime}
@@ -58,7 +58,7 @@ export default function ExamsPage() {
                 {exam.location}
               </span>
             </div>
-            <p className="mt-4 text-sm leading-6 text-[var(--muted)]">
+            <p className="mt-4 text-sm leading-6 text-(--muted)">
               {exam.description}
             </p>
           </Card>
