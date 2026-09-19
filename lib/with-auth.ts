@@ -2,14 +2,15 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/lib/db";
 import { getAuthenticatedUserId } from "@/lib/api-auth";
 
-// Signature for handlers with or without dynamic route params
+// Dynamic route params remain separate from the authenticated user context.
 type AuthenticatedHandler<T = Record<string, unknown>> = (
   req: NextRequest,
-  context: T & { userId: string }
+  authContext: { userId: string },
+  routeContext: T,
 ) => Promise<NextResponse>;
 
 export function withAuth<T = Record<string, unknown>>(
-  handler: AuthenticatedHandler<T>
+  handler: AuthenticatedHandler<T>,
 ) {
   return async (req: NextRequest, routeContext?: T) => {
     try {
@@ -19,22 +20,16 @@ export function withAuth<T = Record<string, unknown>>(
       if (!userId) {
         return NextResponse.json(
           { error: "Unauthorized: Invalid or missing token" },
-          { status: 401 }
+          { status: 401 },
         );
       }
 
-      // Merge userId into standard Next.js routeContext
-      const mergedContext = {
-        ...(routeContext as T),
-        userId,
-      };
-
-      return await handler(req, mergedContext);
+      return await handler(req, { userId }, routeContext as T);
     } catch (error) {
       console.error("Auth wrapper error:", error);
       return NextResponse.json(
         { error: "Internal server error" },
-        { status: 500 }
+        { status: 500 },
       );
     }
   };
