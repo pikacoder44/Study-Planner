@@ -8,6 +8,25 @@ import { Badge, Button, Card, PageHeader } from "@/components/ui";
 import { getCalendarRange } from "@/lib/frontend-data";
 import type { CalendarEvent } from "@/types";
 
+// Helper to assign distinct background tones and contrasting text per event type
+function getEventStyle(type: string) {
+  const normalizedType = type?.toLowerCase() || "";
+
+  switch (normalizedType) {
+    case "class":
+      return "bg-blue-500/15 border-blue-500/30 text-blue-200 hover:bg-blue-500/25";
+    case "study":
+    case "study_session":
+      return "bg-amber-500/15 border-amber-500/30 text-amber-200 hover:bg-amber-500/25";
+    case "exam":
+      return "bg-rose-500/15 border-rose-500/30 text-rose-200 hover:bg-rose-500/25";
+    case "task":
+      return "bg-emerald-500/15 border-emerald-500/30 text-emerald-200 hover:bg-emerald-500/25";
+    default:
+      return "bg-purple-500/15 border-purple-500/30 text-purple-200 hover:bg-purple-500/25";
+  }
+}
+
 export default function CalendarPage() {
   const [month, setMonth] = useState(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
@@ -17,6 +36,7 @@ export default function CalendarPage() {
   const monthIndex = month.getMonth();
   const daysInMonth = new Date(year, monthIndex + 1, 0).getDate();
   const firstDay = (new Date(year, monthIndex, 1).getDay() + 6) % 7;
+
   const days = useMemo(
     () =>
       Array.from(
@@ -80,7 +100,7 @@ export default function CalendarPage() {
       />
       <Card className="overflow-hidden">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 px-4 py-4">
-          <h2 className="font-bold">
+          <h2 className="font-bold text-zinc-100">
             {month.toLocaleDateString("en-US", {
               month: "long",
               year: "numeric",
@@ -93,49 +113,66 @@ export default function CalendarPage() {
           </div>
         </div>
         {loading && (
-          <p className="p-4 text-sm text-(--muted)">Loading calendar...</p>
+          <p className="p-4 text-sm text-zinc-400">Loading calendar...</p>
         )}
         {error && (
-          <p role="alert" className="p-4 text-sm text-(--danger)">
+          <p role="alert" className="p-4 text-sm text-rose-400">
             {error}
           </p>
         )}
         {!loading && !error && events.length === 0 && (
-          <p className="p-4 text-sm text-(--muted)">No events in this month.</p>
+          <p className="p-4 text-sm text-zinc-400">No events in this month.</p>
         )}
         <div className="grid min-w-180 grid-cols-7">
           {Array.from({ length: firstDay }).map((_, index) => (
             <div
               key={`empty-${index}`}
-              className="min-h-32 border-r border-b border-zinc-800/70"
+              className="min-h-32 border-r border-b border-zinc-800/70 bg-zinc-950/20"
             />
           ))}
-          {days.map((day) => (
-            <div
-              key={day.toISOString()}
-              className="min-h-32 border-r border-b border-zinc-800/70 p-3 last:border-r-0"
-            >
-              <p className="text-xs font-bold text-(--muted)">
-                {day.getDate()}
-              </p>
-              <div className="mt-4 space-y-2">
-                {eventsForDay(day).map((event) => (
-                  <motion.div
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    key={event.title}
-                    className="rounded-lg border border-zinc-800 bg-zinc-900/80 p-2"
-                  >
-                    <p className="text-[10px] font-bold text-(--accent)">
-                      {event.time ??
-                        ("startTime" in event ? String(event.startTime) : "")}
-                    </p>
-                    <p className="mt-1 text-xs font-semibold">{event.title}</p>
-                  </motion.div>
-                ))}
+          {days.map((day) => {
+            const dayEvents = eventsForDay(day);
+            return (
+              <div
+                key={day.toISOString()}
+                className="min-h-32 border-r border-b border-zinc-800/70 p-2.5 last:border-r-0"
+              >
+                <p className="text-xs font-semibold text-zinc-400">
+                  {day.getDate()}
+                </p>
+                <div className="mt-2 space-y-1.5">
+                  {dayEvents.map((event, idx) => {
+                    const styleClass = getEventStyle(event.type);
+                    const eventTime =
+                      event.time ??
+                      ("startTime" in event ? String(event.startTime) : "");
+
+                    return (
+                      <motion.div
+                        initial={{ opacity: 0, y: 4 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        key={
+                          (event as { _id?: string; id?: string }).id ||
+                          (event as { _id?: string; id?: string })._id ||
+                          `${event.title}-${idx}`
+                        }
+                        className={`rounded-md border p-2 transition-colors ${styleClass}`}
+                      >
+                        {eventTime && (
+                          <p className="text-[10px] font-semibold opacity-80">
+                            {eventTime}
+                          </p>
+                        )}
+                        <p className="mt-0.5 text-xs font-medium leading-tight truncate">
+                          {event.title}
+                        </p>
+                      </motion.div>
+                    );
+                  })}
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </Card>
     </AppShell>
