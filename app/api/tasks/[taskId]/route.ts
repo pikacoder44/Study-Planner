@@ -14,6 +14,7 @@ const editableFields = [
   "type",
   "dueDate",
   "priority",
+  "status",
 ] as const;
 
 function isValidDateOnly(value: unknown): value is string {
@@ -84,6 +85,16 @@ export const PUT = withAuth<Context>(
       const safeUpdates: Record<string, unknown> = {};
       for (const field of editableFields) {
         if (body[field] !== undefined) {
+          if (
+            field === "status" &&
+            body.status !== "pending" &&
+            body.status !== "completed"
+          ) {
+            return NextResponse.json(
+              { error: "status must be pending or completed." },
+              { status: 400 },
+            );
+          }
           if (field === "dueDate" && body.dueDate !== null) {
             if (!isValidDateOnly(body.dueDate)) {
               return NextResponse.json(
