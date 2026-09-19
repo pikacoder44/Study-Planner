@@ -22,7 +22,11 @@ export default function ClassesPage() {
         setSubjects(subjectData);
       })
       .catch((loadError) => {
-        setError(loadError instanceof Error ? loadError.message : "Unable to load classes.");
+        setError(
+          loadError instanceof Error
+            ? loadError.message
+            : "Unable to load classes.",
+        );
       })
       .finally(() => setLoading(false));
   }, []);
@@ -41,7 +45,14 @@ export default function ClassesPage() {
         }
       />
       {loading && <p className="text-sm text-(--muted)">Loading classes...</p>}
-      {error && <p role="alert" className="rounded-xl bg-(--danger-soft) p-4 text-sm text-(--danger)">{error}</p>}
+      {error && (
+        <p
+          role="alert"
+          className="rounded-xl bg-(--danger-soft) p-4 text-sm text-(--danger)"
+        >
+          {error}
+        </p>
+      )}
       <div className="grid gap-3 md:grid-cols-5">
         {days.map((day) => (
           <Card key={day} className="min-h-48 overflow-hidden">
@@ -49,31 +60,38 @@ export default function ClassesPage() {
               <p className="text-sm font-bold">{day}</p>
             </div>
             <div className="space-y-2 p-3">
-              {!loading && !error && classes
-                .filter((item) => item.dayOfWeek === day)
-                .map((item) => {
-                  const subject = subjects.find(
-                    (subjectItem) => subjectItem.id === item.subjectId,
-                  );
-                  return (
-                    <div
-                      key={item.id}
-                      className="rounded-md border-l-4 bg-[#f8faf8] p-3"
-                      style={{ borderColor: subject?.color }}
-                    >
-                      <p className="text-sm font-bold">{subject?.code}</p>
-                      <p className="mt-1 text-xs text-(--muted)">
-                        {item.startTime} - {item.endTime}
-                      </p>
-                      <p className="mt-1 text-xs text-(--muted)">
-                        {item.room}
-                      </p>
-                    </div>
-                  );
-                })}
-              {!loading && !error && classes.filter((item) => item.dayOfWeek === day).length === 0 && (
-                <p className="p-3 text-xs text-(--muted)">No classes scheduled.</p>
-              )}
+              {!loading &&
+                !error &&
+                classes
+                  .filter((item) => item.dayOfWeek === day)
+                  .map((item) => {
+                    const subject = subjects.find(
+                      (subjectItem) => subjectItem.id === item.subjectId,
+                    );
+                    return (
+                      <div
+                        key={item.id}
+                        className="rounded-md border-l-4 bg-[#f8faf8] p-3"
+                        style={{ borderColor: subject?.color }}
+                      >
+                        <p className="text-sm font-bold">{subject?.code}</p>
+                        <p className="mt-1 text-xs text-(--muted)">
+                          {item.startTime} - {item.endTime}
+                        </p>
+                        <p className="mt-1 text-xs text-(--muted)">
+                          {item.room}
+                        </p>
+                      </div>
+                    );
+                  })}
+              {!loading &&
+                !error &&
+                classes.filter((item) => item.dayOfWeek === day).length ===
+                  0 && (
+                  <p className="p-3 text-xs text-(--muted)">
+                    No classes scheduled.
+                  </p>
+                )}
             </div>
           </Card>
         ))}
