@@ -25,8 +25,18 @@ export function toDateTime(date: string, time: string) {
   return new Date(`${date}T${time}:00.000Z`);
 }
 
-export function formatDateOnly(value: Date) {
-  return value.toISOString().slice(0, 10);
+export function formatDateOnly(value: Date | string) {
+  const date = typeof value === "string" ? new Date(value) : value;
+
+  if (isNaN(date.getTime())) {
+    return "";
+  }
+
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = date.toLocaleString("en-US", { month: "long" }).toLowerCase();
+  const year = date.getFullYear();
+
+  return `${day}-${month}-${year}`;
 }
 
 export function formatTimeOnly(value: Date) {
