@@ -11,53 +11,33 @@ import {
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Badge, Card } from "@/components/ui";
-
-type ApiTask = {
-  _id: string;
-  title: string;
-  description: string;
-  subjectId: string;
-  type: string;
-  dueDate: string;
-  priority: "low" | "medium" | "high";
-  status: "pending" | "completed";
-};
-
-type ApiSubject = {
-  _id: string;
-  name: string;
-  code: string;
-};
+import { completeTask, getSubjects, getTasks } from "@/lib/frontend-data";
+import type { Subject, Task } from "@/types";
 
 export default function TaskList({ limit }: { limit?: number }) {
-  const [tasks, setTasks] = useState<ApiTask[]>([]);
-  const [subjects, setSubjects] = useState<ApiSubject[]>([]);
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function loadTasks() {
       try {
-        const [tasksResponse, subjectsResponse] = await Promise.all([
-          fetch("/api/tasks"),
-          fetch("/api/subject"),
+        const [taskData, subjectData] = await Promise.all([
+          getTasks(),
+          getSubjects(),
         ]);
-        const tasksData = await tasksResponse.json();
-        const subjectsData = await subjectsResponse.json();
-        if (!tasksResponse.ok) {
-          throw new Error(tasksData.error || "Unable to load tasks.");
-        }
-        if (!subjectsResponse.ok) {
-          throw new Error(subjectsData.error || "Unable to load subjects.");
-        }
-        setTasks(tasksData.tasks);
-        setSubjects(subjectsData.subjects);
+        setTasks(taskData);
+        setSubjects(subjectData);
       } catch (loadError) {
         setError(
           loadError instanceof Error
             ? loadError.message
             : "Unable to load tasks.",
         );
+      } finally {
+        setLoading(false);
       }
     }
 
@@ -76,6 +56,10 @@ export default function TaskList({ limit }: { limit?: number }) {
     );
   }
 
+  if (loading) {
+    return <p className="text-sm text-(--muted)">Loading tasks...</p>;
+  }
+
   if (visibleTasks.length === 0) {
     return <p className="text-sm text-(--muted)">No tasks yet.</p>;
   }
@@ -84,19 +68,19 @@ export default function TaskList({ limit }: { limit?: number }) {
     <div className="space-y-2">
       {visibleTasks.map((task) => {
         const completed = task.status === "completed";
-        const expanded = expandedTaskId === task._id;
-        const subject = subjects.find((item) => item._id === task.subjectId);
+        const expanded = expandedTaskId === task.id;
+        const subject = subjects.find((item) => item.id === task.subjectId);
         return (
           <Card
-            key={task._id}
+            key={task.id}
             className={`cursor-pointer p-4 transition-[transform,box-shadow,border-color, background] duration-300 ease-out hover:-translate-y-0.5 hover:bg-blue-50 hover:border-blue-900 hover:shadow-[0_16px_34px_rgba(20,89,230,0.12)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--primary) ${completed ? "opacity-65" : ""}`}
             tabIndex={0}
             aria-expanded={expanded}
-            onClick={() => setExpandedTaskId(expanded ? null : task._id)}
+              onClick={() => setExpandedTaskId(expanded ? null : task.id)}
             onKeyDown={(event) => {
               if (event.key === "Enter" || event.key === " ") {
                 event.preventDefault();
-                setExpandedTaskId(expanded ? null : task._id);
+                  setExpandedTaskId(expanded ? null : task.id);
               }
             }}
           >
@@ -106,18 +90,33 @@ export default function TaskList({ limit }: { limit?: number }) {
                 aria-label={
                   completed ? `Reopen ${task.title}` : `Complete ${task.title}`
                 }
-                onClick={(event) => {
+                onClick={async (event) => {
                   event.stopPropagation();
+                  const nextCompleted = !completed;
                   setTasks((items) =>
                     items.map((item) =>
-                      item._id === task._id
+                      item.id === task.id
                         ? {
                             ...item,
-                            status: completed ? "pending" : "completed",
+                            status: nextCompleted ? "completed" : "pending",
                           }
                         : item,
                     ),
                   );
+                  try {
+                    await completeTask(task.id, nextCompleted);
+                  } catch (mutationError) {
+                    setTasks((items) =>
+                      items.map((item) =>
+                        item.id === task.id ? task : item,
+                      ),
+                    );
+                    setError(
+                      mutationError instanceof Error
+                        ? mutationError.message
+                        : "Unable to update task.",
+                    );
+                  }
                 }}
                 className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${completed ? "border-(--accent) bg-(--accent) text-white" : "border-[#b7c1bb] text-transparent hover:border-(--accent)"}`}
               >
@@ -131,7 +130,7 @@ export default function TaskList({ limit }: { limit?: number }) {
                     {task.title}
                   </p>
                   <Link
-                    href={`/tasks/${task._id}/edit`}
+                    href={`/tasks/${task.id}/edit`}
                     aria-label={`Edit ${task.title}`}
                     onClick={(event) => event.stopPropagation()}
                     className="shrink-0 rounded-lg p-1 text-(--muted) hover:bg-(--surface-muted) hover:text-(--primary-strong)"

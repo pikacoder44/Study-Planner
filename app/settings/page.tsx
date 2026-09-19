@@ -1,4 +1,5 @@
 "use client";
+import { useEffect, useState } from "react";
 import AppShell from "@/components/AppShell";
 import {
   Badge,
@@ -9,7 +10,17 @@ import {
   Select,
   PageHeader,
 } from "@/components/ui";
+import { getProfile } from "@/lib/frontend-data";
+
+type Profile = { username?: string; email?: string; role?: string };
+
 export default function SettingsPage() {
+  const [profile, setProfile] = useState<Profile>({});
+
+  useEffect(() => {
+    void getProfile<Profile>().then(({ user }) => setProfile(user)).catch(() => undefined);
+  }, []);
+
   return (
     <AppShell>
       <PageHeader
@@ -26,17 +37,17 @@ export default function SettingsPage() {
                 This information is shown in your planner.
               </p>
             </div>
-            <Badge tone="blue">Student</Badge>
+            <Badge tone="blue">{profile.role ?? "Student"}</Badge>
           </div>
           <div className="mt-5 grid gap-5 sm:grid-cols-2">
             <Field label="Name">
-              <Input defaultValue="Hashir Khan" />
+              <Input defaultValue={profile.username ?? ""} />
             </Field>
             <Field label="Email">
-              <Input defaultValue="hashir@example.com" type="email" />
+              <Input defaultValue={profile.email ?? ""} type="email" />
             </Field>
             <Field label="Role">
-              <Select defaultValue="student">
+              <Select defaultValue={profile.role ?? "student"}>
                 <option value="student">Student</option>
                 <option value="teacher">Teacher</option>
               </Select>

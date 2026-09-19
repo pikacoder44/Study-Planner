@@ -5,6 +5,7 @@ import React, { useState, FormEvent } from "react";
 import { Button, Card, Field, Input } from "@/components/ui";
 import AuthShell from "@/components/AuthShell";
 import { useRouter } from "next/navigation";
+import { login } from "@/lib/frontend-data";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -19,28 +20,14 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username, password }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json().catch(() => null);
-        const errors = data?.errors;
-        setError(
-          Array.isArray(errors)
-            ? errors.join(" ")
-            : typeof errors === "string"
-              ? errors
-              : "Unable to log in. Please try again.",
-        );
-        return;
-      }
-
+      await login({ username, password });
       router.push("/dashboard");
-    } catch {
-      setError("Network error. Please try again.");
+    } catch (loginError) {
+      setError(
+        loginError instanceof Error
+          ? loginError.message
+          : "Unable to log in. Please try again.",
+      );
     } finally {
       setIsSubmitting(false);
     }

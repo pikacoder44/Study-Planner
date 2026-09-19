@@ -1,8 +1,29 @@
+"use client";
+
 import { CalendarDays, MapPin, Plus } from "lucide-react";
+import { useEffect, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { Badge, Button, Card, PageHeader } from "@/components/ui";
-import { exams, subjects } from "@/lib/mock-data";
+import { getExams, getSubjects } from "@/lib/frontend-data";
+import type { Exam, Subject } from "@/types";
 export default function ExamsPage() {
+  const [exams, setExams] = useState<Exam[]>([]);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    Promise.all([getExams(), getSubjects()])
+      .then(([examData, subjectData]) => {
+        setExams(examData);
+        setSubjects(subjectData);
+      })
+      .catch((loadError) => {
+        setError(loadError instanceof Error ? loadError.message : "Unable to load exams.");
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <AppShell>
       <PageHeader
@@ -16,6 +37,9 @@ export default function ExamsPage() {
           </Button>
         }
       />
+      {loading && <p className="text-sm text-(--muted)">Loading exams...</p>}
+      {error && <p role="alert" className="rounded-xl bg-(--danger-soft) p-4 text-sm text-(--danger)">{error}</p>}
+      {!loading && !error && exams.length === 0 && <p className="text-sm text-(--muted)">No exams scheduled.</p>}
       <div className="grid gap-4 md:grid-cols-2">
         {exams.map((exam, index) => (
           <Card

@@ -1,8 +1,29 @@
+"use client";
+
 import { Clock3, Plus } from "lucide-react";
+import { useEffect, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { Button, Card, PageHeader } from "@/components/ui";
-import { studySessions, subjects } from "@/lib/mock-data";
+import { getStudySessions, getSubjects } from "@/lib/frontend-data";
+import type { StudySession, Subject } from "@/types";
 export default function StudySessionsPage() {
+  const [studySessions, setStudySessions] = useState<StudySession[]>([]);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    Promise.all([getStudySessions(), getSubjects()])
+      .then(([sessionData, subjectData]) => {
+        setStudySessions(sessionData);
+        setSubjects(subjectData);
+      })
+      .catch((loadError) => {
+        setError(loadError instanceof Error ? loadError.message : "Unable to load study sessions.");
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <AppShell>
       <PageHeader
@@ -16,6 +37,9 @@ export default function StudySessionsPage() {
           </Button>
         }
       />
+      {loading && <p className="text-sm text-(--muted)">Loading study sessions...</p>}
+      {error && <p role="alert" className="rounded-xl bg-(--danger-soft) p-4 text-sm text-(--danger)">{error}</p>}
+      {!loading && !error && studySessions.length === 0 && <p className="text-sm text-(--muted)">No study sessions yet.</p>}
       <div className="grid gap-4 lg:grid-cols-[0.7fr_1.3fr]">
         <Card className="p-5">
           <p className="text-xs font-bold uppercase tracking-wider text-(--muted)">

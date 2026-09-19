@@ -4,7 +4,8 @@ import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import AppShell from "@/components/AppShell";
-import type { ISubject } from "@/models/Subject";
+import { getSubjects, getTasks, updateTask } from "@/lib/frontend-data";
+import type { Subject, Task } from "@/types";
 import {
   Button,
   Card,
@@ -14,16 +15,6 @@ import {
   Select,
 } from "@/components/ui";
 
-type Task = {
-  _id: string;
-  title: string;
-  description: string;
-  subjectId: string;
-  type: string;
-  dueDate: string;
-  priority: "low" | "medium" | "high";
-};
-
 function toDateInputValue(value: string) {
   return value.slice(0, 10);
 }
@@ -32,7 +23,7 @@ export default function EditTaskPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const [task, setTask] = useState<Task | null>(null);
-  const [subjects, setSubjects] = useState<ISubject[]>([]);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [saving, setSaving] = useState(false);
@@ -47,28 +38,16 @@ export default function EditTaskPage() {
   useEffect(() => {
     async function loadTask() {
       try {
-        const [tasksResponse, subjectsResponse] = await Promise.all([
-          fetch("/api/tasks"),
-          fetch("/api/subject"),
+        const [tasks, subjectsData] = await Promise.all([
+          getTasks(),
+          getSubjects(),
         ]);
-        const tasksData = await tasksResponse.json();
-        const subjectsData = await subjectsResponse.json();
-
-        if (!tasksResponse.ok) {
-          throw new Error(tasksData.error || "Unable to load task.");
-        }
-        if (!subjectsResponse.ok) {
-          throw new Error(subjectsData.error || "Unable to load subjects.");
-        }
-
-        const selectedTask = tasksData.tasks.find(
-          (item: Task) => item._id === id,
-        );
+        const selectedTask = tasks.find((item) => item.id === id);
         if (!selectedTask) {
           throw new Error("Task not found.");
         }
         setTask(selectedTask);
-        setSubjects(subjectsData.subjects || []);
+        setSubjects(subjectsData);
       } catch (loadError) {
         setError(
           loadError instanceof Error
@@ -90,10 +69,7 @@ export default function EditTaskPage() {
     const formData = new FormData(event.currentTarget);
 
     try {
-      const response = await fetch("/api/tasks/update", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      await updateTask(id, {
           taskId: id,
           title: formData.get("title"),
           description: formData.get("description"),
@@ -101,12 +77,7 @@ export default function EditTaskPage() {
           type: formData.get("type"),
           dueDate: formData.get("dueDate"),
           priority: formData.get("priority"),
-        }),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || "Unable to update task.");
-      }
+        } as Partial<Task>);
       router.push("/tasks");
     } catch (submitError) {
       setError(
@@ -146,8 +117,8 @@ export default function EditTaskPage() {
                 <Select name="subjectId" defaultValue={task.subjectId} required>
                   {subjects.map((subject) => (
                     <option
-                      key={String(subject._id)}
-                      value={String(subject._id)}
+                      key={subject.id}
+                      value={subject.id}
                     >
                       {subject.name} ({subject.code})
                     </option>

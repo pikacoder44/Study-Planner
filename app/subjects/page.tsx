@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import AppShell from "@/components/AppShell";
 import SubjectCard from "@/components/SubjectCard";
 import { Button, PageHeader } from "@/components/ui";
+import { getSubjects } from "@/lib/frontend-data";
 import type { Subject } from "@/types";
 
 export default function SubjectsPage() {
@@ -16,29 +17,7 @@ export default function SubjectsPage() {
   useEffect(() => {
     async function loadSubjects() {
       try {
-        const response = await fetch("/api/subject");
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.error || "Unable to load subjects.");
-        }
-        setItems(
-          data.subjects.map(
-            (subject: {
-              _id: string;
-              name: string;
-              code: string;
-              color: string;
-              description?: string;
-            }) => ({
-              id: subject._id,
-              name: subject.name,
-              code: subject.code,
-              color: subject.color,
-              description: subject.description ?? "No description added yet.",
-              progress: 0,
-            }),
-          ),
-        );
+        setItems(await getSubjects());
       } catch (loadError) {
         setError(
           loadError instanceof Error

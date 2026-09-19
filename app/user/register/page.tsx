@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 import AuthShell from "@/components/AuthShell";
 import { Button, Card, Field, Input, Select } from "@/components/ui";
+import { register } from "@/lib/frontend-data";
 
 const RegisterUser = () => {
   const [username, setUsername] = useState("");
@@ -20,30 +21,14 @@ const RegisterUser = () => {
     setErrors([]);
 
     try {
-      const response = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password, confirmPassword, role }),
-      });
-
-      if (response.ok) {
-        router.push("/dashboard");
-        return;
-      }
-
-      const data = await response.json().catch(() => null);
-      const responseErrors = data?.errors;
-      setErrors(
-        Array.isArray(responseErrors)
-          ? responseErrors
-          : typeof responseErrors === "string"
-            ? [responseErrors]
-            : ["Something went wrong. Please try again."],
-      );
-    } catch {
-      setErrors(["Network error. Please try again."]);
+      await register({ username, password, confirmPassword, role });
+      router.push("/dashboard");
+    } catch (registerError) {
+      setErrors([
+        registerError instanceof Error
+          ? registerError.message
+          : "Something went wrong. Please try again.",
+      ]);
     } finally {
       setIsSubmitting(false);
     }

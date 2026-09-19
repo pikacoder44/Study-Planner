@@ -2,7 +2,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AppShell from "@/components/AppShell";
-import type { ISubject } from "@/models/Subject";
+import { createTask, getSubjects } from "@/lib/frontend-data";
+import type { Subject } from "@/types";
 import { useState, useEffect } from "react";
 import {
   Button,
@@ -14,7 +15,7 @@ import {
 } from "@/components/ui";
 export default function NewTaskPage() {
   const router = useRouter();
-  const [subjects, setSubjects] = useState<ISubject[]>([]);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState("");
   const today = new Date();
@@ -27,16 +28,11 @@ export default function NewTaskPage() {
   useEffect(() => {
     let isMounted = true;
 
-    async function getSubjects() {
+    async function loadSubjects() {
       try {
-        const response = await fetch("/api/subject", {
-          headers: { "Content-Type": "application/json" },
-        });
-        if (response.ok) {
-          const data = await response.json();
-          if (isMounted) {
-            setSubjects(data.subjects || []);
-          }
+        const data = await getSubjects();
+        if (isMounted) {
+          setSubjects(data);
         }
       } catch (error) {
         console.error("Error fetching subjects:", error);
@@ -47,7 +43,7 @@ export default function NewTaskPage() {
       }
     }
 
-    getSubjects();
+    void loadSubjects();
 
     return () => {
       isMounted = false;
@@ -59,22 +55,14 @@ export default function NewTaskPage() {
     setError("");
     const formData = new FormData(event.currentTarget);
     try {
-      const response = await fetch("/api/tasks", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      await createTask({
           title: formData.get("title"),
           description: formData.get("description"),
           subjectId: formData.get("subjectId"),
           type: formData.get("type"),
           dueDate: formData.get("dueDate"),
           priority: formData.get("priority"),
-        }),
-      });
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || "Unable to create task.");
-      }
+        } as Parameters<typeof createTask>[0]);
       router.push("/tasks");
     } catch (submitError) {
       setError(
@@ -115,7 +103,7 @@ export default function NewTaskPage() {
                   {loading ? "Loading subjects..." : "Select a subject"}
                 </option>
                 {subjects.map((subject) => (
-                  <option key={String(subject._id)} value={String(subject._id)}>
+                  <option key={subject.id} value={subject.id}>
                     {subject.name} ({subject.code})
                   </option>
                 ))}

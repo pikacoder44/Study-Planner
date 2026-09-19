@@ -1,7 +1,27 @@
+"use client";
+
 import { Copy, Plus, Share2, Users } from "lucide-react";
+import { useEffect, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { Badge, Button, Card, PageHeader } from "@/components/ui";
+import { getClasses, getSubjects } from "@/lib/frontend-data";
+import type { Class, Subject } from "@/types";
 export default function TeacherPage() {
+  const [classes, setClasses] = useState<Class[]>([]);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    Promise.all([getClasses(), getSubjects()])
+      .then(([classData, subjectData]) => {
+        setClasses(classData);
+        setSubjects(subjectData);
+      })
+      .catch((loadError) => setError(loadError instanceof Error ? loadError.message : "Unable to load timetable."))
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <AppShell>
       <PageHeader
@@ -22,25 +42,27 @@ export default function TeacherPage() {
             <Badge tone="green">Active</Badge>
           </div>
           <div className="mt-4 divide-y divide-[var(--border)]">
-            {[
-              ["Monday", "10:00 - 11:30", "Software Architecture", "Room 302"],
-              ["Wednesday", "14:00 - 15:30", "Web Engineering", "Studio 1"],
-              ["Friday", "09:00 - 10:30", "Database Systems", "Room 204"],
-            ].map(([day, time, name, room]) => (
-              <div key={day} className="flex flex-wrap items-center gap-4 py-4">
+            {loading && <p className="py-4 text-sm text-(--muted)">Loading timetable...</p>}
+            {error && <p role="alert" className="py-4 text-sm text-(--danger)">{error}</p>}
+            {!loading && !error && classes.length === 0 && <p className="py-4 text-sm text-(--muted)">No timetable entries yet.</p>}
+            {classes.map((item) => {
+              const subject = subjects.find((entry) => entry.id === item.subjectId);
+              return (
+              <div key={item.id} className="flex flex-wrap items-center gap-4 py-4">
                 <div className="w-24">
-                  <p className="text-sm font-bold">{day}</p>
-                  <p className="mt-1 text-xs text-[var(--muted)]">{time}</p>
+                  <p className="text-sm font-bold">{item.dayOfWeek}</p>
+                  <p className="mt-1 text-xs text-[var(--muted)]">{item.startTime} - {item.endTime}</p>
                 </div>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold">{name}</p>
-                  <p className="mt-1 text-xs text-[var(--muted)]">{room}</p>
+                  <p className="text-sm font-semibold">{subject?.name ?? "Unknown subject"}</p>
+                  <p className="mt-1 text-xs text-[var(--muted)]">{item.room}</p>
                 </div>
                 <button className="text-sm font-semibold text-[var(--accent)]">
                   Edit
                 </button>
               </div>
-            ))}
+              );
+            })}
           </div>
         </Card>
         <div className="space-y-4">

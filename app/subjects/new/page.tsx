@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
+import { createSubject } from "@/lib/frontend-data";
 import { useRouter } from "next/navigation";
 import {
   Button,
@@ -24,14 +25,8 @@ export default function NewSubjectPage() {
       description: formData.get("description"),
     };
     try {
-      const response = await fetch("/api/subject", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (response.ok) {
-        router.push("/subjects");
-      }
+      await createSubject(data as Parameters<typeof createSubject>[0]);
+      router.push("/subjects");
     } catch (error) {
       console.error("Error creating subject:", error);
     }

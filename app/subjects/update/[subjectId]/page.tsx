@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
+import { getSubject, updateSubject } from "@/lib/frontend-data";
 import { useState, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import {
@@ -29,19 +30,11 @@ export default function UpdateSubjectPage() {
 
     const fetchSubject = async () => {
       try {
-        const response = await fetch(`/api/subject/${subjectId}`, {
-          method: "GET",
-          headers: { "Content-Type": "application/json" },
-        });
-        const data = await response.json();
-        if (!response.ok) {
-          console.error("Error fetching subject:", data.error);
-          return;
-        }
-        setName(data.subject.name || "");
-        setCode(data.subject.code || "");
-        setColor(data.subject.color || "");
-        setDescription(data.subject.description || "");
+        const subject = await getSubject(subjectId);
+        setName(subject.name);
+        setCode(subject.code);
+        setColor(subject.color);
+        setDescription(subject.description);
       } catch (error) {
         console.error("Error fetching subject:", error);
       }
@@ -61,14 +54,11 @@ export default function UpdateSubjectPage() {
       description: formData.get("description"),
     };
     try {
-      const response = await fetch(`/api/subject/${subjectId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-      });
-      if (response.ok) {
-        router.push("/subjects");
-      }
+      await updateSubject(
+        subjectId,
+        data as Parameters<typeof updateSubject>[1],
+      );
+      router.push("/subjects");
     } catch (error) {
       console.error("Error updating subject:", error);
     }

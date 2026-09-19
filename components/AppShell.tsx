@@ -17,8 +17,8 @@ import {
   Users,
   X,
 } from "lucide-react";
-import { useState, type ReactNode } from "react";
-import { currentUser } from "@/lib/mock-data";
+import { useEffect, useState, type ReactNode } from "react";
+import { getProfile, logout } from "@/lib/frontend-data";
 
 const mainLinks = [
   ["Dashboard", "/dashboard", LayoutDashboard],
@@ -35,6 +35,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [profileName, setProfileName] = useState("Profile");
   const todayLabel = new Intl.DateTimeFormat("en-US", {
     weekday: "long",
     month: "long",
@@ -42,10 +43,16 @@ export default function AppShell({ children }: { children: ReactNode }) {
     year: "numeric",
   }).format(new Date());
 
+  useEffect(() => {
+    void getProfile<{ username?: string }>()
+      .then(({ user }) => setProfileName(user.username || "Profile"))
+      .catch(() => undefined);
+  }, []);
+
   const handleLogout = async () => {
     setLoggingOut(true);
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
+      await logout();
     } finally {
       router.push("/login");
     }
@@ -175,10 +182,10 @@ export default function AppShell({ children }: { children: ReactNode }) {
               className="flex items-center gap-2 rounded-xl border border-(--border) bg-white px-2.5 py-1.5 hover:border-(--primary)"
             >
               <span className="flex h-8 w-8 items-center justify-center rounded-full bg-(--primary-soft) text-xs font-bold text-(--primary-strong)">
-                HK
+                {profileName.slice(0, 2).toUpperCase()}
               </span>
               <span className="hidden text-sm font-semibold sm:block">
-                {currentUser.name}
+                {profileName}
               </span>
               <ArrowUpRight
                 size={14}

@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import {
   BookOpen,
@@ -8,23 +10,12 @@ import {
   MapPin,
   Plus,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 import AppShell from "@/components/AppShell";
 import TaskList from "@/components/TaskList";
 import { Badge, Button, Card, PageHeader } from "@/components/ui";
-import {
-  classes,
-  currentUser,
-  exams,
-  subjects,
-  studySessions,
-  tasks,
-} from "@/lib/mock-data";
-
-const todaySchedule = [
-  ["09:00", "Software Architecture", "Independent review", "Study"],
-  ["11:00", "Database Systems", "Room 204", "Class"],
-  ["14:00", "Architecture assignment", "Due tomorrow", "Task"],
-] as const;
+import { getClasses, getDashboard, getSubjects } from "@/lib/frontend-data";
+import type { Class, Exam, StudySession, Subject, Task } from "@/types";
 
 // Icon chips reuse the sidebar logo's gradient treatment so every section
 // header feels like it belongs to the same system, not a one-off accent.
@@ -35,17 +26,44 @@ const CHIP = {
 } as const;
 
 export default function DashboardPage() {
-  const pendingTasks = tasks.filter((task) => task.status === "pending");
-  const upcomingExams = exams
-    .filter((exam) => exam.examDate >= "2026-08-19")
-    .slice(0, 2);
+  const [dashboard, setDashboard] = useState<Awaited<ReturnType<typeof getDashboard>> | null>(null);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [classes, setClasses] = useState<Class[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    Promise.all([getDashboard(), getSubjects(), getClasses()])
+      .then(([dashboardData, subjectData, classData]) => {
+        setDashboard(dashboardData);
+        setSubjects(subjectData);
+        setClasses(classData);
+      })
+      .catch((loadError) => setError(loadError instanceof Error ? loadError.message : "Unable to load dashboard."))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const tasks: Task[] = dashboard?.dueTodayTasks ?? [];
+  const exams: Exam[] = dashboard?.upcomingExams ?? [];
+  const studySessions: StudySession[] = dashboard?.recentStudySessions ?? [];
+  const pendingTasks = dashboard?.statistics.pendingTasks ?? tasks.filter((task) => task.status === "pending").length;
+  const upcomingExams = exams.slice(0, 2);
   const upcomingClasses = classes.slice(0, 3);
+  const todaySchedule = (dashboard?.todaySchedule ?? []).map((item) => [
+    String(item.startTime ?? ""),
+    String(item.title ?? ""),
+    String(item.room ?? item.priority ?? ""),
+    String(item.type ?? ""),
+  ] as const);
+  const userName = "there";
 
   return (
     <AppShell>
+      {loading && <p className="text-sm text-(--muted)">Loading dashboard...</p>}
+      {error && <p role="alert" className="rounded-xl bg-(--danger-soft) p-4 text-sm text-(--danger)">{error}</p>}
       <PageHeader
-        eyebrow="Wednesday, August 19"
-        title={`Good morning, ${currentUser.name.split(" ")[0]}`}
+        eyebrow={dashboard?.date ?? new Date().toISOString().slice(0, 10)}
+        title={`Good morning, ${userName}`}
         description="Here is what you have planned today, and what deserves your attention next."
         action={
           <Link href="/tasks/new">
@@ -62,7 +80,7 @@ export default function DashboardPage() {
           icon={<Check size={17} />}
           tone="primary"
           label="Pending tasks"
-          value={`${pendingTasks.length}`}
+          value={`${pendingTasks}`}
           detail="1 needs attention today"
         />
         <QuickStat
@@ -76,8 +94,8 @@ export default function DashboardPage() {
           icon={<Clock3 size={17} />}
           tone="support"
           label="Study time"
-          value="9h 45m"
-          detail="Across 4 sessions"
+          value={`${Math.floor((dashboard?.statistics.studyMinutes ?? 0) / 60)}h ${(dashboard?.statistics.studyMinutes ?? 0) % 60}m`}
+          detail={`Across ${studySessions.length} sessions`}
         />
       </div>
 

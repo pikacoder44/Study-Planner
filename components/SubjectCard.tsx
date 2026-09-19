@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowUpRight, MoreHorizontal, Pencil, Trash2 } from "lucide-react";
 import { Badge } from "@/components/ui";
+import { deleteSubject } from "@/lib/frontend-data";
 import type { Subject } from "@/types";
 
 interface SubjectCardProps {
@@ -77,20 +78,9 @@ export default function SubjectCard({
     setIsOpen(false);
 
     try {
-      const response = await fetch(`/api/subject/${subjectId}`, {
-        method: "DELETE",
-      });
-
-      if (response.ok) {
-        if (onDeleteSuccess) {
-          onDeleteSuccess(subjectId);
-        } else {
-          router.refresh();
-        }
-      } else {
-        const data = await response.json();
-        alert(data.error || data.message || "Failed to delete subject");
-      }
+      await deleteSubject(subjectId);
+      if (onDeleteSuccess) onDeleteSuccess(subjectId);
+      else router.refresh();
     } catch (error) {
       console.error("Error deleting subject:", error);
       alert("An error occurred while deleting the subject");

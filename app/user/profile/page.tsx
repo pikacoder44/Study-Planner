@@ -27,6 +27,7 @@ import {
   type ReactNode,
 } from "react";
 import AppShell from "@/components/AppShell";
+import { getProfile } from "@/lib/frontend-data";
 import {
   Badge,
   Button,
@@ -164,26 +165,8 @@ export default function UserProfilePage() {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch("/api/userprofile/getprofile", {
-          method: "GET",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        });
-
-        const data = await response.json();
-        if (!response.ok) {
-          const rawErrors = data?.errors;
-          const message = Array.isArray(rawErrors)
-            ? rawErrors.join(" ")
-            : typeof rawErrors === "string"
-              ? rawErrors
-              : "Failed to fetch profile.";
-          throw new Error(message);
-        }
-
-        const fetchedUser = data.user as UserProfileResponse;
+        const data = await getProfile<UserProfileResponse>();
+        const fetchedUser = data.user;
         setUser(fetchedUser);
 
         const stored = window.localStorage.getItem(

@@ -1,9 +1,30 @@
+"use client";
+
 import { AlertTriangle, Plus } from "lucide-react";
+import { useEffect, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { Button, Card, PageHeader } from "@/components/ui";
-import { classes, subjects } from "@/lib/mock-data";
+import { getClasses, getSubjects } from "@/lib/frontend-data";
+import type { Class, Subject } from "@/types";
 const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 export default function ClassesPage() {
+  const [classes, setClasses] = useState<Class[]>([]);
+  const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    Promise.all([getClasses(), getSubjects()])
+      .then(([classData, subjectData]) => {
+        setClasses(classData);
+        setSubjects(subjectData);
+      })
+      .catch((loadError) => {
+        setError(loadError instanceof Error ? loadError.message : "Unable to load classes.");
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
   return (
     <AppShell>
       <PageHeader
@@ -17,6 +38,8 @@ export default function ClassesPage() {
           </Button>
         }
       />
+      {loading && <p className="text-sm text-(--muted)">Loading classes...</p>}
+      {error && <p role="alert" className="rounded-xl bg-(--danger-soft) p-4 text-sm text-(--danger)">{error}</p>}
       <div className="grid gap-3 md:grid-cols-5">
         {days.map((day) => (
           <Card key={day} className="min-h-48 overflow-hidden">
@@ -24,7 +47,7 @@ export default function ClassesPage() {
               <p className="text-sm font-bold">{day}</p>
             </div>
             <div className="space-y-2 p-3">
-              {classes
+              {!loading && !error && classes
                 .filter((item) => item.dayOfWeek === day)
                 .map((item) => {
                   const subject = subjects.find(
@@ -46,6 +69,9 @@ export default function ClassesPage() {
                     </div>
                   );
                 })}
+              {!loading && !error && classes.filter((item) => item.dayOfWeek === day).length === 0 && (
+                <p className="p-3 text-xs text-(--muted)">No classes scheduled.</p>
+              )}
             </div>
           </Card>
         ))}
