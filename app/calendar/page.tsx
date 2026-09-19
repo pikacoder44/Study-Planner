@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { motion } from "motion/react";
 import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { Badge, Button, Card, PageHeader } from "@/components/ui";
@@ -56,25 +57,29 @@ export default function CalendarPage() {
         description="Classes, deadlines, exams, and study sessions in one quiet view."
         action={
           <div className="flex gap-2">
-            <Button
-              variant="secondary"
-              aria-label="Previous month"
-              onClick={() => setMonth(new Date(year, monthIndex - 1, 1))}
-            >
-              <ChevronLeft size={17} />
-            </Button>
-            <Button
-              variant="secondary"
-              aria-label="Next month"
-              onClick={() => setMonth(new Date(year, monthIndex + 1, 1))}
-            >
-              <ChevronRight size={17} />
-            </Button>
+            <motion.div whileTap={{ scale: 0.96 }}>
+              <Button
+                variant="secondary"
+                aria-label="Previous month"
+                onClick={() => setMonth(new Date(year, monthIndex - 1, 1))}
+              >
+                <ChevronLeft size={17} />
+              </Button>
+            </motion.div>
+            <motion.div whileTap={{ scale: 0.96 }}>
+              <Button
+                variant="secondary"
+                aria-label="Next month"
+                onClick={() => setMonth(new Date(year, monthIndex + 1, 1))}
+              >
+                <ChevronRight size={17} />
+              </Button>
+            </motion.div>
           </div>
         }
       />
       <Card className="overflow-hidden">
-        <div className="flex items-center justify-between border-b border-(--border) px-4 py-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 px-4 py-4">
           <h2 className="font-bold">
             {month.toLocaleDateString("en-US", {
               month: "long",
@@ -102,29 +107,31 @@ export default function CalendarPage() {
           {Array.from({ length: firstDay }).map((_, index) => (
             <div
               key={`empty-${index}`}
-              className="min-h-36 border-r border-b border-(--border)"
+              className="min-h-32 border-r border-b border-zinc-800/70"
             />
           ))}
           {days.map((day) => (
             <div
               key={day.toISOString()}
-              className="min-h-36 border-r border-b border-(--border) p-3 last:border-r-0"
+              className="min-h-32 border-r border-b border-zinc-800/70 p-3 last:border-r-0"
             >
               <p className="text-xs font-bold text-(--muted)">
                 {day.getDate()}
               </p>
               <div className="mt-4 space-y-2">
                 {eventsForDay(day).map((event) => (
-                  <div
+                  <motion.div
+                    initial={{ opacity: 0, y: 4 }}
+                    animate={{ opacity: 1, y: 0 }}
                     key={event.title}
-                    className="rounded-md bg-(--surface-muted) p-2"
+                    className="rounded-lg border border-zinc-800 bg-zinc-900/80 p-2"
                   >
                     <p className="text-[10px] font-bold text-(--accent)">
                       {event.time ??
                         ("startTime" in event ? String(event.startTime) : "")}
                     </p>
                     <p className="mt-1 text-xs font-semibold">{event.title}</p>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </div>

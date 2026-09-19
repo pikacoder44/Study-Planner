@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Plus } from "lucide-react";
+import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import AppShell from "@/components/AppShell";
 import SubjectCard from "@/components/SubjectCard";
@@ -61,7 +62,15 @@ export default function SubjectsPage() {
           No subjects yet. Add your first subject to get started.
         </p>
       )}
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+      <motion.div
+        initial="hidden"
+        animate="show"
+        variants={{
+          hidden: {},
+          show: { transition: { staggerChildren: 0.05 } },
+        }}
+        className="grid gap-4 md:grid-cols-2 xl:grid-cols-3"
+      >
         {items.map((subject) => (
           <SubjectCard
             key={subject.id}
@@ -73,7 +82,7 @@ export default function SubjectsPage() {
             }}
           />
         ))}
-      </div>
+      </motion.div>
     </AppShell>
   );
 }

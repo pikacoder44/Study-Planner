@@ -10,6 +10,7 @@ import {
   MapPin,
   Plus,
 } from "lucide-react";
+import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import AppShell from "@/components/AppShell";
 import TaskList from "@/components/TaskList";
@@ -26,43 +27,71 @@ const CHIP = {
 } as const;
 
 export default function DashboardPage() {
-  const [dashboard, setDashboard] = useState<Awaited<ReturnType<typeof getDashboard>> | null>(null);
+  const [dashboard, setDashboard] = useState<Awaited<
+    ReturnType<typeof getDashboard>
+  > | null>(null);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [classes, setClasses] = useState<Class[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
+    const frame = window.requestAnimationFrame(() => setHasMounted(true));
     Promise.all([getDashboard(), getSubjects(), getClasses()])
       .then(([dashboardData, subjectData, classData]) => {
         setDashboard(dashboardData);
         setSubjects(subjectData);
         setClasses(classData);
       })
-      .catch((loadError) => setError(loadError instanceof Error ? loadError.message : "Unable to load dashboard."))
+      .catch((loadError) =>
+        setError(
+          loadError instanceof Error
+            ? loadError.message
+            : "Unable to load dashboard.",
+        ),
+      )
       .finally(() => setLoading(false));
+    return () => window.cancelAnimationFrame(frame);
   }, []);
 
   const tasks: Task[] = dashboard?.dueTodayTasks ?? [];
   const exams: Exam[] = dashboard?.upcomingExams ?? [];
   const studySessions: StudySession[] = dashboard?.recentStudySessions ?? [];
-  const pendingTasks = dashboard?.statistics.pendingTasks ?? tasks.filter((task) => task.status === "pending").length;
+  const pendingTasks =
+    dashboard?.statistics.pendingTasks ??
+    tasks.filter((task) => task.status === "pending").length;
   const upcomingExams = exams.slice(0, 2);
   const upcomingClasses = classes.slice(0, 3);
-  const todaySchedule = (dashboard?.todaySchedule ?? []).map((item) => [
-    String(item.startTime ?? ""),
-    String(item.title ?? ""),
-    String(item.room ?? item.priority ?? ""),
-    String(item.type ?? ""),
-  ] as const);
+  const todaySchedule = (dashboard?.todaySchedule ?? []).map(
+    (item) =>
+      [
+        String(item.startTime ?? ""),
+        String(item.title ?? ""),
+        String(item.room ?? item.priority ?? ""),
+        String(item.type ?? ""),
+      ] as const,
+  );
   const userName = "there";
 
   return (
     <AppShell>
-      {loading && <p className="text-sm text-(--muted)">Loading dashboard...</p>}
-      {error && <p role="alert" className="rounded-xl bg-(--danger-soft) p-4 text-sm text-(--danger)">{error}</p>}
+      {loading && (
+        <p className="text-sm text-(--muted)">Loading dashboard...</p>
+      )}
+      {error && (
+        <p
+          role="alert"
+          className="rounded-xl bg-(--danger-soft) p-4 text-sm text-(--danger)"
+        >
+          {error}
+        </p>
+      )}
       <PageHeader
-        eyebrow={dashboard?.date ?? new Date().toISOString().slice(0, 10)}
+        eyebrow={
+          dashboard?.date ??
+          (hasMounted ? new Date().toISOString().slice(0, 10) : "Today")
+        }
         title={`Good morning, ${userName}`}
         description="Here is what you have planned today, and what deserves your attention next."
         action={
@@ -75,13 +104,28 @@ export default function DashboardPage() {
         }
       />
 
-      <div className="mb-10 grid gap-4 sm:grid-cols-3">
+      <motion.div
+        initial="hidden"
+        animate="show"
+        variants={{
+          hidden: {},
+          show: { transition: { staggerChildren: 0.05 } },
+        }}
+        className="mb-10 grid gap-px overflow-hidden rounded-xl border border-zinc-800 bg-zinc-800 sm:grid-cols-2 xl:grid-cols-4"
+      >
         <QuickStat
           icon={<Check size={17} />}
           tone="primary"
           label="Pending tasks"
           value={`${pendingTasks}`}
           detail="1 needs attention today"
+        />
+        <QuickStat
+          icon={<CalendarDays size={17} />}
+          tone="danger"
+          label="Overdue"
+          value="0"
+          detail="You are on track"
         />
         <QuickStat
           icon={<GraduationCap size={17} />}
@@ -97,7 +141,7 @@ export default function DashboardPage() {
           value={`${Math.floor((dashboard?.statistics.studyMinutes ?? 0) / 60)}h ${(dashboard?.statistics.studyMinutes ?? 0) % 60}m`}
           detail={`Across ${studySessions.length} sessions`}
         />
-      </div>
+      </motion.div>
 
       <div className="grid gap-10 xl:grid-cols-[1.15fr_0.85fr]">
         <div className="space-y-10">
@@ -116,9 +160,7 @@ export default function DashboardPage() {
                     {time}
                   </span>
                   <div>
-                    <p className="text-sm font-bold text-foreground">
-                      {title}
-                    </p>
+                    <p className="text-sm font-bold text-foreground">{title}</p>
                     <p className="mt-1 text-xs text-(--muted)">{detail}</p>
                   </div>
                   <Badge
@@ -169,7 +211,7 @@ export default function DashboardPage() {
             <Card className="divide-y divide-(--border) p-0">
               {studySessions.slice(0, 3).map((session) => (
                 <div
-                  key={session.id}
+                  key={session.id || session._id}
                   className="flex items-center gap-4 px-5 py-4"
                 >
                   <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-(--support-soft) text-(--support)">
@@ -339,7 +381,10 @@ function QuickStat({
   detail: string;
 }) {
   return (
-    <Card className="flex items-start gap-4 p-5">
+    <motion.div
+      variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }}
+      className="flex items-start gap-4 bg-zinc-950/60 p-5"
+    >
       <span
         className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white shadow-(--shadow-card) ${CHIP[tone]}`}
       >
@@ -356,7 +401,7 @@ function QuickStat({
         </div>
         <p className="mt-0.5 text-xs text-(--muted)">{detail}</p>
       </div>
-    </Card>
+    </motion.div>
   );
 }
 

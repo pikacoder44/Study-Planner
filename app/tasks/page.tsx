@@ -55,6 +55,18 @@ export default function TasksPage() {
         </div>
       </Card>
 
+      <div className="mb-5 flex gap-1 overflow-x-auto border-b border-zinc-800">
+        {["All", "Pending", "Completed", "Priority"].map((tab, index) => (
+          <button
+            key={tab}
+            type="button"
+            className={`whitespace-nowrap border-b-2 px-3 py-2 text-sm font-medium ${index === 0 ? "border-violet-400 text-zinc-100" : "border-transparent text-zinc-500 hover:text-zinc-300"}`}
+          >
+            {tab}
+          </button>
+        ))}
+      </div>
+
       <TaskList />
 
       {query && (

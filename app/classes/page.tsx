@@ -1,9 +1,10 @@
 "use client";
 
-import { AlertTriangle, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import AppShell from "@/components/AppShell";
+
 import { Button, Card, PageHeader } from "@/components/ui";
 import { getClasses, getSubjects } from "@/lib/frontend-data";
 import type { Class, Subject } from "@/types";
@@ -14,6 +15,24 @@ export default function ClassesPage() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const formatTime12Hour = (timeStr?: string) => {
+    if (!timeStr) return "";
+
+    // Handle strings like "14:30" or "14:30:00"
+    const parts = timeStr.split(":");
+    if (parts.length < 2) return timeStr; // Return as-is if string format is unexpected
+
+    let hours = parseInt(parts[0], 10);
+    const minutes = parts[1];
+
+    if (isNaN(hours)) return timeStr;
+
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    hours = hours ? hours : 12; // convert 0 to 12
+
+    return `${hours}:${minutes} ${ampm}`;
+  };
 
   useEffect(() => {
     Promise.all([getClasses(), getSubjects()])
@@ -34,7 +53,6 @@ export default function ClassesPage() {
   return (
     <AppShell>
       <PageHeader
-        eyebrow="Weekly rhythm"
         title="Classes"
         description="A simple timetable for the places you need to be."
         action={
@@ -55,9 +73,9 @@ export default function ClassesPage() {
       )}
       <div className="grid gap-3 md:grid-cols-5">
         {days.map((day) => (
-          <Card key={day} className="min-h-48 overflow-hidden">
-            <div className="border-b border-(--border) bg-(--surface-muted) px-4 py-3">
-              <p className="text-sm font-bold">{day}</p>
+          <Card key={day} className="group min-h-48 overflow-hidden hover:scale-105 hover:bg-white hover:text-black transition-all ease-in-out">
+            <div className=" border-b border-(--border) bg-(--surface-muted) px-4 py-3">
+              <p className="text-sm font-bold group-hover:text-white">{day}</p>
             </div>
             <div className="space-y-2 p-3">
               {!loading &&
@@ -71,15 +89,16 @@ export default function ClassesPage() {
                     return (
                       <div
                         key={item.id}
-                        className="rounded-md border-l-4 bg-[#f8faf8] p-3"
+                        className="rounded-md border-l-4 p-3"
                         style={{ borderColor: subject?.color }}
                       >
                         <p className="text-sm font-bold">{subject?.code}</p>
                         <p className="mt-1 text-xs text-(--muted)">
-                          {item.startTime} - {item.endTime}
+                          {formatTime12Hour(item.startTime)} -{" "}
+                          {formatTime12Hour(item.endTime)}
                         </p>
                         <p className="mt-1 text-xs text-(--muted)">
-                          {item.room}
+                          Room No: {item.room}
                         </p>
                       </div>
                     );
@@ -96,16 +115,6 @@ export default function ClassesPage() {
           </Card>
         ))}
       </div>
-      <Card className="mt-6 flex items-start gap-3 border-[#eadfca] bg-[#fffaf1] p-4">
-        <AlertTriangle size={18} className="mt-0.5 text-[#9b783d]" />
-        <div>
-          <p className="text-sm font-bold">Conflict checking is enabled</p>
-          <p className="mt-1 text-sm text-(--muted)">
-            New timetable entries will be checked against overlapping classes
-            before they are saved.
-          </p>
-        </div>
-      </Card>
     </AppShell>
   );
 }

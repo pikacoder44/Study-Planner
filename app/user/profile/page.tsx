@@ -86,13 +86,13 @@ const manrope = Manrope({
 });
 
 const pageTheme = {
-  "--profile-bg": "#f6f4ef",
-  "--profile-surface": "#fbf9f3",
-  "--profile-ink": "#16211d",
-  "--profile-muted": "#5e6863",
-  "--profile-line": "#d7ded7",
-  "--profile-accent": "#1f7a63",
-  "--profile-accent-soft": "#d9eee7",
+  "--profile-bg": "#09090b",
+  "--profile-surface": "rgba(24, 24, 27, 0.8)",
+  "--profile-ink": "#f4f4f5",
+  "--profile-muted": "#a1a1aa",
+  "--profile-line": "#27272a",
+  "--profile-accent": "#a78bfa",
+  "--profile-accent-soft": "rgba(139, 92, 246, 0.14)",
 } as CSSProperties;
 
 const mockAcademicStats = {
@@ -266,42 +266,42 @@ export default function UserProfilePage() {
       <div style={pageTheme} className={manrope.className}>
         <PageHeader
           eyebrow="Profile"
-          title="Personal study identity"
-          description="A focused, personal overview of who you are academically, what progress looks like right now, and what to refine next."
+          title="Personal Study Identity"
+          description="A focused overview of who you are academically, what progress looks like right now, and what to refine next."
         />
 
         {loading ? (
-          <div className="flex min-h-[52vh] items-center justify-center rounded-3xl border border-(--profile-line) bg-(--profile-surface)">
+          <div className="flex min-h-[52vh] items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/80">
             <p className="flex items-center gap-2 text-sm font-semibold text-(--profile-muted)">
               <LoaderCircle className="animate-spin" size={18} />
               Loading profile...
             </p>
           </div>
         ) : error ? (
-          <Card className="rounded-3xl border-[#d7b8b1] bg-[#fff7f5] p-6">
+          <Card className="border-rose-500/30 bg-rose-500/10 p-6">
             <div className="flex items-start gap-3">
               <AlertCircle className="mt-0.5 text-[#a85a55]" size={20} />
               <div>
-                <p className="text-sm font-bold text-[#8d4b46]">
+                <p className="text-sm font-bold text-rose-200">
                   Could not load profile
                 </p>
-                <p className="mt-1 text-sm text-[#8d4b46]">{error}</p>
+                <p className="mt-1 text-sm text-rose-300">{error}</p>
               </div>
             </div>
           </Card>
         ) : !user ? (
-          <Card className="rounded-3xl p-6">
+          <Card className="p-6">
             <p className="text-sm text-(--profile-muted)">No profile found.</p>
           </Card>
         ) : (
           <div className="space-y-8">
             <section
-              className={`rounded-3xl border border-(--profile-line) bg-(--profile-surface) p-6 shadow-[0_24px_40px_rgba(22,33,29,0.06)] transition duration-700 sm:p-8 ${isReady ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
+              className={`rounded-xl border border-zinc-800 bg-zinc-900/80 p-6 shadow-(--shadow-card) transition duration-700 hover:border-zinc-700 sm:p-8 ${isReady ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
             >
               <div className="grid gap-7 lg:grid-cols-[1fr_auto] lg:items-start">
                 <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
-                  <div className="group relative h-28 w-28 overflow-hidden rounded-3xl border border-(--profile-line) bg-[linear-gradient(160deg,#1d8a70,#17634f)] p-px">
-                    <div className="flex h-full w-full items-center justify-center rounded-[1.35rem] bg-[#103d32] text-3xl font-bold tracking-[-0.02em] text-[#ddf4ec] transition duration-300 group-hover:scale-[1.04]">
+                  <div className="group relative h-24 w-24 overflow-hidden rounded-xl border border-violet-400/30 bg-violet-500/15 p-px">
+                    <div className="flex h-full w-full items-center justify-center rounded-[0.65rem] bg-zinc-950 text-3xl font-bold tracking-[-0.02em] text-violet-200 transition duration-300 group-hover:scale-[1.04]">
                       {initials}
                     </div>
                   </div>
@@ -342,7 +342,7 @@ export default function UserProfilePage() {
                     <PencilLine size={16} />
                     Edit profile
                   </Button>
-                  <div className="rounded-2xl border border-(--profile-line) bg-white px-4 py-3">
+                  <div className="rounded-lg border border-zinc-800 bg-zinc-950/60 px-4 py-3">
                     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-(--profile-muted)">
                       Profile completeness
                     </p>
@@ -362,11 +362,11 @@ export default function UserProfilePage() {
 
             <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
               <Card
-                className={`rounded-3xl border-(--profile-line) bg-(--profile-surface) p-6 transition duration-700 delay-75 ${isReady ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
+                className={`rounded-xl border border-zinc-800 bg-zinc-900/80 p-6 transition duration-700 delay-75 hover:border-zinc-700 ${isReady ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
               >
                 <div className="flex items-center justify-between gap-4">
                   <h3 className="text-lg font-bold tracking-[-0.02em] text-(--profile-ink)">
-                    Academic overview
+                    Academic Overview
                   </h3>
                   <span className="text-xs font-semibold uppercase tracking-[0.14em] text-(--profile-muted)">
                     This week
@@ -374,7 +374,7 @@ export default function UserProfilePage() {
                 </div>
 
                 <div className="mt-5 grid gap-5 sm:grid-cols-[1fr_auto] sm:items-end">
-                  <div className="rounded-2xl border border-(--profile-line) bg-white p-5">
+                  <div className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-5">
                     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-(--profile-muted)">
                       Focused study
                     </p>
@@ -422,11 +422,11 @@ export default function UserProfilePage() {
               </Card>
 
               <Card
-                className={`rounded-3xl border-(--profile-line) bg-(--profile-surface) p-6 transition duration-700 delay-150 ${isReady ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
+                className={`rounded-xl border border-zinc-800 bg-zinc-900/80 p-6 transition duration-700 delay-150 hover:border-zinc-700 ${isReady ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
               >
                 <div className="flex items-center justify-between gap-4">
                   <h3 className="text-lg font-bold tracking-[-0.02em] text-(--profile-ink)">
-                    Account details
+                    Account Details
                   </h3>
                   <button
                     type="button"
@@ -437,7 +437,7 @@ export default function UserProfilePage() {
                     <ArrowRight size={15} />
                   </button>
                 </div>
-                <dl className="mt-5 divide-y divide-(--profile-line) rounded-2xl border border-(--profile-line) bg-white">
+                <dl className="mt-5 divide-y divide-zinc-800/50">
                   <ProfileRow label="Username" value={user.username} />
                   <ProfileRow label="Role" value={user.role} />
                   <ProfileRow
@@ -453,11 +453,11 @@ export default function UserProfilePage() {
                     value={plannerProfile.semester || "Not set"}
                   />
                 </dl>
-                <div className="mt-5 rounded-2xl border border-(--profile-line) bg-(--profile-accent-soft) px-4 py-3">
-                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#2d5c4f]">
+                <div className="mt-5 rounded-lg border border-violet-400/20 bg-violet-500/10 px-4 py-3">
+                  <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-300">
                     Daily target
                   </p>
-                  <p className="mt-1 text-sm text-[#2d5c4f]">
+                  <p className="mt-1 text-sm text-zinc-300">
                     {plannerProfile.dailyStudyGoalHours}h planned with a{" "}
                     {focusCycle}-minute cycle
                   </p>
@@ -466,21 +466,21 @@ export default function UserProfilePage() {
             </div>
 
             <Card
-              className={`rounded-3xl border-(--profile-line) bg-(--profile-surface) p-6 transition duration-700 delay-200 ${isReady ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
+              className={`rounded-xl border border-zinc-800 bg-zinc-900/80 p-6 transition duration-700 delay-200 hover:border-zinc-700 ${isReady ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
             >
               <div className="flex items-center justify-between gap-4">
                 <h3 className="text-lg font-bold tracking-[-0.02em] text-(--profile-ink)">
-                  Recent study activity
+                  Recent Study Activity
                 </h3>
                 <Badge tone="neutral">Last 48 hours</Badge>
               </div>
-              <div className="mt-5 divide-y divide-(--profile-line) rounded-2xl border border-(--profile-line) bg-white">
+              <div className="mt-5 divide-y divide-zinc-800/50">
                 {mockRecentActivity.map((item) => (
                   <div
                     key={item.id}
                     className="grid gap-2 px-4 py-4 sm:grid-cols-[auto_1fr_auto] sm:items-center"
                   >
-                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl bg-(--profile-accent-soft) text-(--profile-accent)">
+                    <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-violet-500/15 text-violet-300">
                       <Flame size={16} />
                     </span>
                     <div>
@@ -499,7 +499,7 @@ export default function UserProfilePage() {
               </div>
             </Card>
 
-            <div className="flex items-center justify-between rounded-2xl border border-dashed border-(--profile-line) bg-(--profile-bg) px-4 py-3">
+            <div className="flex items-center justify-between rounded-lg border border-dashed border-zinc-800 bg-zinc-950/40 px-4 py-3">
               <p className="text-xs text-(--profile-muted)">
                 {saveState === "saved"
                   ? "Preferences saved locally on this device."
@@ -517,7 +517,7 @@ export default function UserProfilePage() {
                 onClick={() => setEditing(false)}
               >
                 <aside
-                  className="ml-auto h-full w-full max-w-xl overflow-y-auto border-l border-(--profile-line) bg-(--profile-surface) p-5 shadow-[0_20px_40px_rgba(0,0,0,0.2)] sm:p-6"
+                  className="ml-auto h-full w-full max-w-xl overflow-y-auto border-l border-zinc-800 bg-zinc-950 p-5 shadow-2xl sm:p-6"
                   onClick={(event) => event.stopPropagation()}
                 >
                   <div className="mb-6 flex items-start justify-between gap-4">
@@ -526,13 +526,13 @@ export default function UserProfilePage() {
                         Edit
                       </p>
                       <h4 className="mt-1 text-2xl font-bold tracking-[-0.03em] text-(--profile-ink)">
-                        Profile details
+                        Profile Details
                       </h4>
                     </div>
                     <button
                       type="button"
                       onClick={() => setEditing(false)}
-                      className="rounded-xl border border-(--profile-line) p-2 text-(--profile-muted) hover:bg-white"
+                      className="rounded-lg border border-zinc-800 p-2 text-zinc-400 hover:bg-zinc-900"
                       aria-label="Close profile editor"
                     >
                       <X size={18} />
@@ -579,7 +579,7 @@ export default function UserProfilePage() {
                           handleDraftChange("bio", event.target.value)
                         }
                         rows={4}
-                        className="w-full rounded-xl border border-(--profile-line) bg-white px-3 py-2.5 text-sm text-(--profile-ink) outline-none placeholder:text-[#8f9a94] focus:border-(--profile-accent) focus:ring-2 focus:ring-[#1f7a63]/15"
+                        className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2.5 text-sm text-zinc-100 outline-none placeholder:text-zinc-600 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20"
                         placeholder="Example: I focus best in evening blocks and review concepts right after class."
                       />
                     </Field>
@@ -764,15 +764,15 @@ export default function UserProfilePage() {
 function ProfileRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4 px-4 py-3">
-      <dt className="text-sm text-(--profile-muted)">{label}</dt>
-      <dd className="text-sm font-semibold text-(--profile-ink)">{value}</dd>
+      <dt className="text-sm text-zinc-400">{label}</dt>
+      <dd className="text-sm font-semibold text-zinc-100">{value}</dd>
     </div>
   );
 }
 
 function Tag({ icon, value }: { icon: ReactNode; value: string }) {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-(--profile-line) bg-white px-2.5 py-1 text-xs font-medium text-(--profile-muted)">
+    <span className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-950/60 px-2.5 py-1 text-xs font-medium text-zinc-400">
       {icon}
       {value}
     </span>
@@ -789,14 +789,14 @@ function MiniMetric({
   value: string;
 }) {
   return (
-    <div className="flex min-w-40 items-center justify-between gap-3 rounded-xl border border-(--profile-line) bg-white px-3 py-2.5">
-      <span className="inline-flex items-center gap-2 text-xs text-(--profile-muted)">
-        <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-(--profile-accent-soft) text-(--profile-accent)">
+    <div className="flex min-w-40 items-center justify-between gap-3 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-2.5">
+      <span className="inline-flex items-center gap-2 text-xs text-zinc-400">
+        <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-violet-500/15 text-violet-300">
           {icon}
         </span>
         {label}
       </span>
-      <span className="text-base font-bold text-(--profile-ink)">{value}</span>
+      <span className="text-base font-bold text-zinc-100">{value}</span>
     </div>
   );
 }
@@ -811,12 +811,12 @@ function InfoBlock({
   value: string;
 }) {
   return (
-    <div className="rounded-2xl border border-(--profile-line) bg-white px-4 py-3">
-      <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-(--profile-muted)">
+    <div className="rounded-lg border border-zinc-800 bg-zinc-950/60 px-4 py-3">
+      <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400">
         {icon}
         {title}
       </p>
-      <p className="mt-2 text-sm font-semibold text-(--profile-ink)">{value}</p>
+      <p className="mt-2 text-sm font-semibold text-zinc-100">{value}</p>
     </div>
   );
 }
