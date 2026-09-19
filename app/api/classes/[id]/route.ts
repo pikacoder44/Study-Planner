@@ -92,7 +92,7 @@ export const PATCH = withAuth<Context>(
       const allowedFields = [
         "subjectId",
         "title",
-        "daysOfWeek",
+        "dayOfWeek",
         "startTime",
         "endTime",
         "room",

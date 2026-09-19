@@ -5,9 +5,7 @@ import { withAuth } from "@/lib/with-auth";
 export const GET = withAuth(async (request: NextRequest, { userId }) => {
   try {
     // Filter classes by the authenticated user's ID
-    const classes = await ClassModel.find({ userId: userId }).sort({
-      classDate: 1,
-    });
+    const classes = await ClassModel.find({ userId }).sort({ startTime: 1 });
     return NextResponse.json(classes);
   } catch (error) {
     console.error("Error fetching classes:", error);
@@ -38,7 +36,16 @@ export const POST = withAuth(async (request: NextRequest, { userId }) => {
       );
     }
 
-    const newClass = await ClassModel.create({ userId, subjectId, title, dayOfWeek, startTime, endTime, room, isActive });
+    const newClass = await ClassModel.create({
+      userId,
+      subjectId,
+      title,
+      dayOfWeek,
+      startTime,
+      endTime,
+      room,
+      isActive: isActive ?? true,
+    });
     return NextResponse.json(newClass, { status: 201 });
   } catch (error) {
     console.error("Error creating class:", error);

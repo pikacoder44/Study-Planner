@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import bcrypt from "bcryptjs";
 import User from "@/models/User";
 import { withAuth } from "@/lib/with-auth";
 
@@ -20,9 +19,9 @@ export const GET = withAuth(async (request, { userId }) => {
   }
 });
 
-const ALLOWED_FIELDS = ["username", "password"];
+const ALLOWED_FIELDS = ["username"];
 
-export const PUT = withAuth(async (request, { userId }) => {
+export const PATCH = withAuth(async (request, { userId }) => {
   try {
     let body: Record<string, unknown>;
     try {
@@ -43,12 +42,6 @@ export const PUT = withAuth(async (request, { userId }) => {
         { error: "No valid fields provided to update" },
         { status: 400 },
       );
-    }
-
-    // Hash the password if included in update payload
-    if (typeof safeUpdates.password === "string") {
-      const salt = await bcrypt.genSalt(10);
-      safeUpdates.password = await bcrypt.hash(safeUpdates.password, salt);
     }
 
     const updatedUser = await User.findByIdAndUpdate(
@@ -79,3 +72,5 @@ export const PUT = withAuth(async (request, { userId }) => {
     );
   }
 });
+
+export const PUT = PATCH;
