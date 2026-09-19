@@ -2,32 +2,53 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { motion } from "motion/react";
+import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { Badge, Button, Card, PageHeader } from "@/components/ui";
 import { getCalendarRange } from "@/lib/frontend-data";
 import type { CalendarEvent } from "@/types";
 
-// Helper to assign distinct background tones and contrasting text per event type
+// Dynamic style mapping: Soft idle state -> Solid, high-contrast filled state on hover
 function getEventStyle(type: string) {
   const normalizedType = type?.toLowerCase() || "";
 
   switch (normalizedType) {
     case "class":
-      return "bg-blue-500/15 border-blue-500/30 text-blue-200 hover:bg-blue-500/25";
+      return "bg-blue-500/15 border-blue-500/30 text-blue-300 hover:bg-blue-600 hover:text-white hover:border-blue-500 shadow-sm";
     case "study":
     case "study_session":
-      return "bg-amber-500/15 border-amber-500/30 text-amber-200 hover:bg-amber-500/25";
+      return "bg-amber-500/15 border-amber-500/30 text-amber-300 hover:bg-amber-500 hover:text-zinc-950 hover:border-amber-400 shadow-sm";
     case "exam":
-      return "bg-rose-500/15 border-rose-500/30 text-rose-200 hover:bg-rose-500/25";
+      return "bg-rose-500/15 border-rose-500/30 text-rose-300 hover:bg-rose-600 hover:text-white hover:border-rose-500 shadow-sm";
     case "task":
-      return "bg-emerald-500/15 border-emerald-500/30 text-emerald-200 hover:bg-emerald-500/25";
+      return "bg-emerald-500/15 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500 hover:text-zinc-950 hover:border-emerald-400 shadow-sm";
     default:
-      return "bg-purple-500/15 border-purple-500/30 text-purple-200 hover:bg-purple-500/25";
+      return "bg-purple-500/15 border-purple-500/30 text-purple-300 hover:bg-purple-600 hover:text-white hover:border-purple-500 shadow-sm";
+  }
+}
+
+// Map event types to their dedicated application routes
+function getEventRoute(type: string) {
+  const normalizedType = type?.toLowerCase() || "";
+
+  switch (normalizedType) {
+    case "class":
+      return "/classes";
+    case "study":
+    case "study_session":
+      return "/study-sessions";
+    case "exam":
+      return "/exams";
+    case "task":
+      return "/tasks";
+    default:
+      return "/calendar";
   }
 }
 
 export default function CalendarPage() {
+  const router = useRouter();
   const [month, setMonth] = useState(new Date());
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [loading, setLoading] = useState(true);
@@ -143,6 +164,7 @@ export default function CalendarPage() {
                 <div className="mt-2 space-y-1.5">
                   {dayEvents.map((event, idx) => {
                     const styleClass = getEventStyle(event.type);
+                    const route = getEventRoute(event.type);
                     const eventTime =
                       event.time ??
                       ("startTime" in event ? String(event.startTime) : "");
@@ -151,19 +173,23 @@ export default function CalendarPage() {
                       <motion.div
                         initial={{ opacity: 0, y: 4 }}
                         animate={{ opacity: 1, y: 0 }}
+                        whileHover={{ scale: 1.03 }}
+                        whileTap={{ scale: 0.97 }}
+                        transition={{ duration: 0.15, ease: "easeOut" }}
                         key={
                           (event as { _id?: string; id?: string }).id ||
                           (event as { _id?: string; id?: string })._id ||
                           `${event.title}-${idx}`
                         }
-                        className={`rounded-md border p-2 transition-colors ${styleClass}`}
+                        onClick={() => router.push(route)}
+                        className={`cursor-pointer rounded-md border p-2 transition-all duration-200 ${styleClass}`}
                       >
                         {eventTime && (
-                          <p className="text-[10px] font-semibold opacity-80">
+                          <p className="text-[10px] font-semibold opacity-90">
                             {eventTime}
                           </p>
                         )}
-                        <p className="mt-0.5 text-xs font-medium leading-tight truncate">
+                        <p className="mt-0.5 text-xs font-semibold leading-tight truncate">
                           {event.title}
                         </p>
                       </motion.div>
