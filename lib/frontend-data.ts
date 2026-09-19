@@ -154,7 +154,7 @@ export async function updateSubject(
 ): Promise<Subject> {
   const data = await request<{ subject: Record<string, unknown> }>(
     `/api/subject/${id}`,
-    { method: "PATCH", body: JSON.stringify(updates) },
+    { method: "PUT", body: JSON.stringify(updates) },
   );
   invalidate(
     "subjects",
@@ -208,7 +208,7 @@ export async function updateTask(
 ): Promise<Task> {
   const data = await request<{ task: Record<string, unknown> }>(
     `/api/tasks/${id}`,
-    { method: "PATCH", body: JSON.stringify(updates) },
+    { method: "PUT", body: JSON.stringify(updates) },
   );
   invalidate("tasks", "task", "calendar", "dashboard", "analytics");
   return taskFromApi(data.task);
@@ -307,30 +307,33 @@ export async function getStudySessions(): Promise<StudySession[]> {
 }
 
 export async function getStudySession(id: string): Promise<StudySession> {
-  return request<StudySession>(`/api/study-sessions/${id}`);
+  const data = await request<{ session: StudySession }>(
+    `/api/study-sessions/${id}`,
+  );
+  return data.session;
 }
 
 export async function createStudySession(
   input: Omit<StudySession, "id">,
 ): Promise<StudySession> {
-  const data = await request<StudySession>("/api/study-sessions", {
+  const data = await request<{ session: StudySession }>("/api/study-sessions", {
     method: "POST",
     body: JSON.stringify(input),
   });
   invalidate("study-sessions", "dashboard", "analytics");
-  return data;
+  return data.session;
 }
 
 export async function updateStudySession(
   id: string,
   updates: Partial<Omit<StudySession, "id">>,
 ): Promise<StudySession> {
-  const data = await request<StudySession>(`/api/study-sessions/${id}`, {
+  const data = await request<{ session: StudySession }>(`/api/study-sessions/${id}`, {
     method: "PATCH",
     body: JSON.stringify(updates),
   });
   invalidate("study-sessions", "dashboard", "analytics");
-  return data;
+  return data.session;
 }
 
 export async function deleteStudySession(id: string): Promise<void> {
@@ -352,24 +355,24 @@ export async function getCalendarRange(
 export async function createCalendarEvent(
   input: Omit<CalendarEvent, "id">,
 ): Promise<CalendarEvent> {
-  const data = await request<CalendarEvent>("/api/calendar/events", {
+  const data = await request<{ event: CalendarEvent }>("/api/calendar/events", {
     method: "POST",
     body: JSON.stringify(input),
   });
   invalidate("calendar", "dashboard");
-  return data;
+  return data.event;
 }
 
 export async function updateCalendarEvent(
   id: string,
   updates: Partial<Omit<CalendarEvent, "id">>,
 ): Promise<CalendarEvent> {
-  const data = await request<CalendarEvent>(`/api/calendar/events/${id}`, {
+  const data = await request<{ event: CalendarEvent }>(`/api/calendar/events/${id}`, {
     method: "PATCH",
     body: JSON.stringify(updates),
   });
   invalidate("calendar", "dashboard");
-  return data;
+  return data.event;
 }
 
 export async function deleteCalendarEvent(id: string): Promise<void> {
@@ -432,4 +435,11 @@ export async function changePassword(input: {
 
 export async function getProfile<T>(): Promise<{ user: T }> {
   return request<{ user: T }>("/api/auth/profile");
+}
+
+export async function updateProfile<T>(updates: { username: string }): Promise<{ user: T }> {
+  return request<{ user: T }>("/api/auth/profile", {
+    method: "PATCH",
+    body: JSON.stringify(updates),
+  });
 }
