@@ -2,12 +2,14 @@
 
 import { AlertTriangle, Plus } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import AppShell from "@/components/AppShell";
 import { Button, Card, PageHeader } from "@/components/ui";
 import { getClasses, getSubjects } from "@/lib/frontend-data";
 import type { Class, Subject } from "@/types";
 const days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"];
 export default function ClassesPage() {
+  const router = useRouter();
   const [classes, setClasses] = useState<Class[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
@@ -32,7 +34,7 @@ export default function ClassesPage() {
         title="Classes"
         description="A simple timetable for the places you need to be."
         action={
-          <Button>
+          <Button onClick={() => router.push("/classes/add")}>
             <Plus size={17} />
             Add class
           </Button>
