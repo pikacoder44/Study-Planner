@@ -14,7 +14,12 @@ export interface ICalendarEvent extends Document {
 
 const CalendarEventSchema = new Schema<ICalendarEvent>(
   {
-    userId: { type: Schema.Types.ObjectId, ref: "User", required: true, index: true },
+    userId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+      index: true,
+    },
     title: { type: String, required: true, trim: true },
     date: { type: String, required: true, match: /^\d{4}-\d{2}-\d{2}$/ },
     startTime: { type: String, match: /^\d{2}:\d{2}$/ },
