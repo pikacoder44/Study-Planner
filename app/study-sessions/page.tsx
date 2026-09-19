@@ -5,12 +5,14 @@ import { useEffect, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { Button, Card, PageHeader } from "@/components/ui";
 import { getStudySessions, getSubjects } from "@/lib/frontend-data";
+import { useRouter } from "next/navigation";
 import type { StudySession, Subject } from "@/types";
 export default function StudySessionsPage() {
   const [studySessions, setStudySessions] = useState<StudySession[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     Promise.all([getStudySessions(), getSubjects()])
@@ -19,7 +21,11 @@ export default function StudySessionsPage() {
         setSubjects(subjectData);
       })
       .catch((loadError) => {
-        setError(loadError instanceof Error ? loadError.message : "Unable to load study sessions.");
+        setError(
+          loadError instanceof Error
+            ? loadError.message
+            : "Unable to load study sessions.",
+        );
       })
       .finally(() => setLoading(false));
   }, []);
@@ -31,15 +37,26 @@ export default function StudySessionsPage() {
         title="Study sessions"
         description="Plan deliberate blocks of focus and see where your time is going."
         action={
-          <Button>
+          <Button onClick={() => router.push("/study-sessions/schedule")} variant="primary">
             <Plus size={17} />
             Schedule session
           </Button>
         }
       />
-      {loading && <p className="text-sm text-(--muted)">Loading study sessions...</p>}
-      {error && <p role="alert" className="rounded-xl bg-(--danger-soft) p-4 text-sm text-(--danger)">{error}</p>}
-      {!loading && !error && studySessions.length === 0 && <p className="text-sm text-(--muted)">No study sessions yet.</p>}
+      {loading && (
+        <p className="text-sm text-(--muted)">Loading study sessions...</p>
+      )}
+      {error && (
+        <p
+          role="alert"
+          className="rounded-xl bg-(--danger-soft) p-4 text-sm text-(--danger)"
+        >
+          {error}
+        </p>
+      )}
+      {!loading && !error && studySessions.length === 0 && (
+        <p className="text-sm text-(--muted)">No study sessions yet.</p>
+      )}
       <div className="grid gap-4 lg:grid-cols-[0.7fr_1.3fr]">
         <Card className="p-5">
           <p className="text-xs font-bold uppercase tracking-wider text-(--muted)">
