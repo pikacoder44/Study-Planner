@@ -1,11 +1,11 @@
 "use client";
 
-import { CalendarDays, MapPin, Plus } from "lucide-react";
+import { CalendarDays, MapPin, Plus, CheckCircle2, XCircle, Trash2, RotateCcw } from "lucide-react";
 import { useEffect, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { useRouter } from "next/navigation";
 import { Badge, Button, Card, PageHeader } from "@/components/ui";
-import { getExams, getSubjects } from "@/lib/frontend-data";
+import { getExams, getSubjects, updateExam, deleteExam } from "@/lib/frontend-data";
 import type { Exam, Subject } from "@/types";
 
 export default function ExamsPage() {
@@ -73,7 +73,14 @@ export default function ExamsPage() {
     };
   };
 
-  const getExamBadgeDetails = (dateStr: string) => {
+  const getExamBadgeDetails = (dateStr: string, status?: string) => {
+    if (status === "cancelled") {
+      return { label: "Cancelled", tone: "neutral" as const, isPast: true };
+    }
+    if (status === "completed") {
+      return { label: "Completed", tone: "neutral" as const, isPast: false };
+    }
+
     if (!dateStr) return { label: "Upcoming", tone: "red" as const, isPast: false };
 
     const examDate = new Date(dateStr);
@@ -101,6 +108,43 @@ export default function ExamsPage() {
     };
   };
 
+  const handleStatusUpdate = async (id: string, newStatus: "completed" | "cancelled" | "upcoming") => {
+    setExams((prev) =>
+      prev.map((item) => {
+        const itemId = item.id || (item as unknown as { _id: string })._id;
+        return itemId === id ? { ...item, status: newStatus } : item;
+      })
+    );
+
+    try {
+      await updateExam(id, { status: newStatus });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to update status.");
+      const original = await getExams();
+      setExams(original);
+    }
+  };
+
+  const handleDelete = async (id: string) => {
+    setExams((prev) =>
+      prev.filter((item) => (item.id || (item as unknown as { _id: string })._id) !== id)
+    );
+
+    try {
+      await deleteExam(id);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to delete exam.");
+      const original = await getExams();
+      setExams(original);
+    }
+  };
+
+  // Sort exams: active first, completed second, cancelled at the bottom
+  const sortedExams = [...exams].sort((a, b) => {
+    const score = (status?: string) => (status === "cancelled" ? 2 : status === "completed" ? 1 : 0);
+    return score(a.status) - score(b.status);
+  });
+
   return (
     <AppShell>
       <PageHeader
@@ -127,9 +171,13 @@ export default function ExamsPage() {
         <p className="text-sm text-(--muted)">No exams scheduled.</p>
       )}
       <div className="grid gap-4 md:grid-cols-2">
-        {exams.map((exam) => {
+        {sortedExams.map((exam) => {
+          const examId = exam.id || (exam as unknown as { _id: string })._id;
+          const isCancelled = exam.status === "cancelled";
+          const isCompleted = exam.status === "completed";
+
           const { month, day } = parseExamDate(exam.examDate);
-          const { label, tone, isPast } = getExamBadgeDetails(exam.examDate);
+          const { label, tone } = getExamBadgeDetails(exam.examDate, exam.status);
 
           const subject = subjects.find(
             (s) =>
@@ -146,38 +194,170 @@ export default function ExamsPage() {
 
           return (
             <Card
-              key={exam.id || (exam as { _id?: string })._id}
-              className={`p-5 ${isPast ? "opacity-70" : ""}`}
+              key={examId}
+              className={`group relative p-5 transition-all overflow-hidden ${
+                isCancelled
+                  ? "border-red-900/60 bg-red-950/20 text-red-500 opacity-90"
+                  : isCompleted
+                  ? "border-emerald-800/60 bg-emerald-950/20 text-emerald-400"
+                  : ""
+              }`}
             >
+              {/* Card Contents */}
               <div className="flex items-start justify-between gap-4">
                 <div>
-                  <Badge tone={tone}>{label}</Badge>
-                  <h2 className="mt-4 text-lg font-bold">{exam.title}</h2>
-                  <p className="mt-1 text-sm font-semibold text-(--accent)">
+                  <Badge tone={isCancelled ? "neutral" : isCompleted ? "emerald" : tone}>
+                    {label}
+                  </Badge>
+                  <h2
+                    className={`mt-4 text-lg font-bold ${
+                      isCancelled
+                        ? "text-red-400 line-through decoration-red-400/80"
+                        : isCompleted
+                        ? "text-emerald-400"
+                        : ""
+                    }`}
+                  >
+                    {exam.title}
+                  </h2>
+                  <p
+                    className={`mt-1 text-sm font-semibold ${
+                      isCancelled
+                        ? "text-red-400/80 line-through decoration-red-400/60"
+                        : isCompleted
+                        ? "text-emerald-400/80"
+                        : "text-(--accent)"
+                    }`}
+                  >
                     {subject?.code || exam.subjectName}
                   </p>
                 </div>
-                <div className="rounded-md bg-[#f6e9e7] px-3 py-2 text-center shrink-0">
-                  <p className="text-xs font-bold uppercase text-[#9a514b]">
+                <div
+                  className={`rounded-md px-3 py-2 text-center shrink-0 ${
+                    isCancelled
+                      ? "bg-red-900/40 border border-red-800/50"
+                      : isCompleted
+                      ? "bg-emerald-900/40 border border-emerald-800/50"
+                      : "bg-[#f6e9e7]"
+                  }`}
+                >
+                  <p
+                    className={`text-xs font-bold uppercase ${
+                      isCancelled
+                        ? "text-red-400 line-through decoration-red-400/80"
+                        : isCompleted
+                        ? "text-emerald-300"
+                        : "text-[#9a514b]"
+                    }`}
+                  >
                     {month}
                   </p>
-                  <p className="text-xl font-bold text-[#9a514b]">{day}</p>
+                  <p
+                    className={`text-xl font-bold ${
+                      isCancelled
+                        ? "text-red-300 line-through decoration-red-300/80"
+                        : isCompleted
+                        ? "text-emerald-200"
+                        : "text-[#9a514b]"
+                    }`}
+                  >
+                    {day}
+                  </p>
                 </div>
               </div>
-              <div className="mt-5 grid gap-3 border-t border-(--border) pt-4 text-sm text-(--muted) sm:grid-cols-2">
-                <span className="flex items-center gap-2">
-                  <CalendarDays size={16} />
+
+              <div
+                className={`mt-5 grid gap-3 border-t pt-4 text-sm sm:grid-cols-2 ${
+                  isCancelled
+                    ? "border-red-900/40 text-red-400/80"
+                    : isCompleted
+                    ? "border-emerald-800/40 text-emerald-400/80"
+                    : "border-(--border) text-(--muted)"
+                }`}
+              >
+                <span className={`flex items-center gap-2 ${isCancelled ? "line-through decoration-red-400/60" : ""}`}>
+                  <CalendarDays size={16} className="shrink-0" />
                   {timeText}
                 </span>
-                <span className="flex items-center gap-2">
-                  <MapPin size={16} />
+                <span className={`flex items-center gap-2 ${isCancelled ? "line-through decoration-red-400/60" : ""}`}>
+                  <MapPin size={16} className="shrink-0" />
                   {exam.location || "Location not set"}
                 </span>
               </div>
+
               {exam.description && (
-                <p className="mt-4 text-sm leading-6 text-(--muted)">
+                <p
+                  className={`mt-4 text-sm leading-6 ${
+                    isCancelled
+                      ? "text-red-400/70 line-through decoration-red-400/50"
+                      : isCompleted
+                      ? "text-emerald-400/70"
+                      : "text-(--muted)"
+                  }`}
+                >
                   {exam.description}
                 </p>
+              )}
+
+              {/* CANCELLED STATE: Large Central Action Blocks */}
+              {isCancelled ? (
+                <div className="relative z-20 mt-6 grid grid-cols-2 gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => handleStatusUpdate(examId, "upcoming")}
+                    className="flex flex-col items-center justify-center gap-2 rounded-xl border border-zinc-700 bg-zinc-900/90 py-3.5 px-4 text-zinc-100 shadow-lg transition-all duration-200 hover:border-zinc-500 hover:bg-zinc-800 hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                  >
+                    <RotateCcw size={20} className="text-zinc-300" />
+                    <span className="text-sm font-bold tracking-wide">Reopen Exam</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(examId)}
+                    className="flex flex-col items-center justify-center gap-2 rounded-xl border border-rose-800/80 bg-rose-950/70 py-3.5 px-4 text-rose-200 shadow-lg transition-all duration-200 hover:border-rose-600 hover:bg-rose-900 hover:text-white hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+                  >
+                    <Trash2 size={20} className="text-rose-400" />
+                    <span className="text-sm font-bold tracking-wide">Delete Exam</span>
+                  </button>
+                </div>
+              ) : isCompleted ? (
+                /* COMPLETED STATE: Green highlight & Reopen option only */
+                <div className="mt-5 flex items-center justify-between border-t border-emerald-800/40 pt-3">
+                  <span className="flex items-center gap-1.5 text-xs font-semibold text-emerald-400">
+                    <CheckCircle2 size={16} /> Exam completed
+                  </span>
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => handleStatusUpdate(examId, "upcoming")}
+                    className="text-xs h-8 px-3 gap-1.5 text-zinc-300 hover:text-white border-emerald-800/50 bg-emerald-950/30"
+                  >
+                    <RotateCcw size={14} /> Reopen
+                  </Button>
+                </div>
+              ) : (
+                /* ACTIVE STATE: Standard Status Buttons */
+                <div className="mt-5 flex items-center gap-2 border-t border-zinc-800/60 pt-3">
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => handleStatusUpdate(examId, "completed")}
+                    className="text-xs h-8 px-3 gap-1.5 hover:border-emerald-600/50 hover:text-emerald-400"
+                  >
+                    <CheckCircle2 size={14} className="text-emerald-400" />
+                    Mark completed
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="secondary"
+                    onClick={() => handleStatusUpdate(examId, "cancelled")}
+                    className="text-xs h-8 px-3 gap-1.5 text-rose-400 hover:text-rose-300 hover:bg-rose-950/30 hover:border-rose-800/50"
+                  >
+                    <XCircle size={14} className="text-rose-400" />
+                    Mark cancel
+                  </Button>
+                </div>
               )}
             </Card>
           );
