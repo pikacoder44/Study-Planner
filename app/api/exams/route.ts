@@ -30,15 +30,27 @@ export const POST = withAuth(async (request: NextRequest, { userId }) => {
       );
     }
 
-    const {
-      subjectName,
-      subjectId,
-      title,
-      examDate,
-      description,
-      status,
-      priority
-    } = body;
+    const subjectName =
+      typeof body.subjectName === "string" ? body.subjectName : undefined;
+    const subjectId =
+      typeof body.subjectId === "string" ? body.subjectId : undefined;
+    const title = typeof body.title === "string" ? body.title : undefined;
+    const examDate =
+      typeof body.examDate === "string" ? body.examDate : undefined;
+    const description =
+      typeof body.description === "string" ? body.description : undefined;
+    const status =
+      body.status === "upcoming" ||
+      body.status === "completed" ||
+      body.status === "cancelled"
+        ? body.status
+        : undefined;
+    const priority =
+      body.priority === "low" ||
+      body.priority === "medium" ||
+      body.priority === "high"
+        ? body.priority
+        : undefined;
 
     if (!title || !examDate) {
       return NextResponse.json(
@@ -56,7 +68,7 @@ export const POST = withAuth(async (request: NextRequest, { userId }) => {
       examDate,
       description,
       status,
-      priority
+      priority,
     });
 
     return NextResponse.json(newExam, { status: 201 });
