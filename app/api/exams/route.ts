@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import Exam from "@/models/Exam";
 import { withAuth } from "@/lib/with-auth";
+import { connectDB } from "@/lib/db"; // Ensure your DB connection helper is called
 
 // Get all exams for the authenticated user
 export const GET = withAuth(async (request: NextRequest, { userId }) => {
   try {
-    // Filter exams by the authenticated user's ID
+    await connectDB();
     const exams = await Exam.find({ userId }).sort({ examDate: 1 });
     return NextResponse.json(exams, { status: 200 });
   } catch (error) {
@@ -20,6 +21,7 @@ export const GET = withAuth(async (request: NextRequest, { userId }) => {
 // Create a new exam attached to the authenticated user
 export const POST = withAuth(async (request: NextRequest, { userId }) => {
   try {
+    await connectDB();
     let body: Record<string, unknown>;
     try {
       body = await request.json();
@@ -30,27 +32,32 @@ export const POST = withAuth(async (request: NextRequest, { userId }) => {
       );
     }
 
-    const subjectName =
-      typeof body.subjectName === "string" ? body.subjectName : undefined;
-    const subjectId =
-      typeof body.subjectId === "string" ? body.subjectId : undefined;
     const title = typeof body.title === "string" ? body.title : undefined;
     const examDate =
       typeof body.examDate === "string" ? body.examDate : undefined;
+    const subjectName =
+      typeof body.subjectName === "string" ? body.subjectName : "";
+    const subjectId =
+      typeof body.subjectId === "string" ? body.subjectId : undefined;
+    const startTime = typeof body.startTime === "string" ? body.startTime : "";
+    const endTime = typeof body.endTime === "string" ? body.endTime : "";
+    const location = typeof body.location === "string" ? body.location : "";
     const description =
-      typeof body.description === "string" ? body.description : undefined;
+      typeof body.description === "string" ? body.description : "";
+
     const status =
       body.status === "upcoming" ||
       body.status === "completed" ||
       body.status === "cancelled"
         ? body.status
-        : undefined;
+        : "upcoming";
+
     const priority =
       body.priority === "low" ||
       body.priority === "medium" ||
       body.priority === "high"
         ? body.priority
-        : undefined;
+        : "medium";
 
     if (!title || !examDate) {
       return NextResponse.json(
@@ -59,13 +66,15 @@ export const POST = withAuth(async (request: NextRequest, { userId }) => {
       );
     }
 
-    // Attach userId to ensure ownership
     const newExam = await Exam.create({
       userId,
+      title,
+      examDate: new Date(examDate),
       subjectName,
       subjectId,
-      title,
-      examDate,
+      startTime,
+      endTime,
+      location,
       description,
       status,
       priority,
