@@ -64,8 +64,9 @@ export default function DashboardPage() {
   const upcomingExams = exams.slice(0, 2);
   const upcomingClasses = classes.slice(0, 3);
   const todaySchedule = (dashboard?.todaySchedule ?? []).map(
-    (item) =>
+    (item, index) =>
       [
+        String(item.id ?? `${item.type ?? "schedule"}-${index}`),
         String(item.startTime ?? ""),
         String(item.title ?? ""),
         String(item.room ?? item.priority ?? ""),
@@ -151,9 +152,9 @@ export default function DashboardPage() {
             tone="primary"
           >
             <Card className="divide-y divide-(--border) p-0">
-              {todaySchedule.map(([time, title, detail, type]) => (
+              {todaySchedule.map(([id, time, title, detail, type]) => (
                 <div
-                  key={title}
+                  key={id}
                   className="grid grid-cols-[4.5rem_1fr_auto] items-center gap-4 px-5 py-4"
                 >
                   <span className="text-sm font-bold text-(--primary-strong)">
@@ -209,9 +210,9 @@ export default function DashboardPage() {
             }
           >
             <Card className="divide-y divide-(--border) p-0">
-              {studySessions.slice(0, 3).map((session) => (
+              {studySessions.slice(0, 3).map((session, index) => (
                 <div
-                  key={session.id || session._id}
+                  key={session.id || `study-session-${index}`}
                   className="flex items-center gap-4 px-5 py-4"
                 >
                   <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-(--support-soft) text-(--support)">
@@ -256,7 +257,7 @@ export default function DashboardPage() {
             <div className="space-y-3">
               {upcomingExams.map((exam, index) => (
                 <Card
-                  key={exam.id}
+                  key={exam.id || `exam-${index}`}
                   className="relative overflow-hidden p-4 pl-5"
                 >
                   <span
@@ -308,7 +309,10 @@ export default function DashboardPage() {
                   (subjectItem) => subjectItem.id === item.subjectId,
                 );
                 return (
-                  <div key={item.id} className="px-5 py-4">
+                  <div
+                    key={item.id || `class-${item.dayOfWeek}-${item.startTime}`}
+                    className="px-5 py-4"
+                  >
                     <div className="flex items-center justify-between">
                       <p className="text-sm font-bold text-foreground">
                         {subject?.code}

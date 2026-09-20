@@ -303,14 +303,14 @@ export async function getStudySessions(): Promise<StudySession[]> {
   const data = await request<{ sessions: StudySession[] }>(
     "/api/study-sessions",
   );
-  return data.sessions;
+  return data.sessions.map(withId) as StudySession[];
 }
 
 export async function getStudySession(id: string): Promise<StudySession> {
   const data = await request<{ session: StudySession }>(
     `/api/study-sessions/${id}`,
   );
-  return data.session;
+  return withId(data.session) as StudySession;
 }
 
 export async function createStudySession(
@@ -321,19 +321,22 @@ export async function createStudySession(
     body: JSON.stringify(input),
   });
   invalidate("study-sessions", "dashboard", "analytics");
-  return data.session;
+  return withId(data.session) as StudySession;
 }
 
 export async function updateStudySession(
   id: string,
   updates: Partial<Omit<StudySession, "id">>,
 ): Promise<StudySession> {
-  const data = await request<{ session: StudySession }>(`/api/study-sessions/${id}`, {
-    method: "PATCH",
-    body: JSON.stringify(updates),
-  });
+  const data = await request<{ session: StudySession }>(
+    `/api/study-sessions/${id}`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(updates),
+    },
+  );
   invalidate("study-sessions", "dashboard", "analytics");
-  return data.session;
+  return withId(data.session) as StudySession;
 }
 
 export async function deleteStudySession(id: string): Promise<void> {
@@ -367,10 +370,13 @@ export async function updateCalendarEvent(
   id: string,
   updates: Partial<Omit<CalendarEvent, "id">>,
 ): Promise<CalendarEvent> {
-  const data = await request<{ event: CalendarEvent }>(`/api/calendar/events/${id}`, {
-    method: "PATCH",
-    body: JSON.stringify(updates),
-  });
+  const data = await request<{ event: CalendarEvent }>(
+    `/api/calendar/events/${id}`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(updates),
+    },
+  );
   invalidate("calendar", "dashboard");
   return data.event;
 }
@@ -383,7 +389,25 @@ export async function deleteCalendarEvent(id: string): Promise<void> {
 // --------------------------- Dashboard & Analytics ---------------------------
 
 export async function getDashboard(): Promise<Dashboard> {
-  return request<Dashboard>("/api/dashboard");
+  const data = await request<Dashboard>("/api/dashboard");
+  return {
+    ...data,
+    dueTodayTasks: data.dueTodayTasks.map((task) =>
+      withId(task as Task & { _id?: string }),
+    ) as Task[],
+    overdueTasks: data.overdueTasks.map((task) =>
+      withId(task as Task & { _id?: string }),
+    ) as Task[],
+    upcomingExams: data.upcomingExams.map((exam) =>
+      withId(exam as Exam & { _id?: string }),
+    ) as Exam[],
+    upcomingStudySessions: data.upcomingStudySessions.map((session) =>
+      withId(session as StudySession & { _id?: string }),
+    ) as StudySession[],
+    recentStudySessions: data.recentStudySessions.map((session) =>
+      withId(session as StudySession & { _id?: string }),
+    ) as StudySession[],
+  };
 }
 
 export async function getAnalytics(
@@ -437,7 +461,9 @@ export async function getProfile<T>(): Promise<{ user: T }> {
   return request<{ user: T }>("/api/auth/profile");
 }
 
-export async function updateProfile<T>(updates: { username: string }): Promise<{ user: T }> {
+export async function updateProfile<T>(updates: {
+  username: string;
+}): Promise<{ user: T }> {
   return request<{ user: T }>("/api/auth/profile", {
     method: "PATCH",
     body: JSON.stringify(updates),

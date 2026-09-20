@@ -128,7 +128,13 @@ export default function StudySessionsPage() {
                 ?.name ?? "General";
 
             return (
-              <Card key={session.id} className="flex items-center gap-4 p-4">
+              <Card
+                key={
+                  session.id ||
+                  `${session.date}-${session.startTime}-${session.title}`
+                }
+                className="flex items-center gap-4 p-4"
+              >
                 <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-(--background-soft) text-(--accent)">
                   <Clock3 size={19} />
                 </span>
@@ -136,29 +142,32 @@ export default function StudySessionsPage() {
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-bold">{session.title}</p>
                   <p className="mt-1 text-xs text-(--muted)">
-                    of <span className="font-bold">{subjectName}</span> at <span className="font-bold">{formatDateOnly(session.date)}</span>
+                    of <span className="font-bold">{subjectName}</span> at{" "}
+                    <span className="font-bold">
+                      {formatDateOnly(session.date)}
+                    </span>
                   </p>
                   <p className="text-sm font-bold text-(--accent) items-center mt-2">
                     {formatTime12Hour(session.startTime)} -{" "}
                     {formatTime12Hour(session.endTime)}
                   </p>
                 </div>
-                  <button
-                    type="button"
-                    className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-md bg-(--background-soft) text-(--danger) transition-all duration-200 ease-in-out hover:scale-110 hover:bg-red-500 hover:text-white active:scale-95"
-                    aria-label="Delete study session block"
-                    onClick={() => {
-                      if (
-                        window.confirm(
-                          "Are you sure you want to delete this study session?",
-                        )
-                      ) {
-                        handleDelete(session.id);
-                      }
-                    }}
-                  >
-                    <Trash2 size={19} />
-                  </button>
+                <button
+                  type="button"
+                  className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-md bg-(--background-soft) text-(--danger) transition-all duration-200 ease-in-out hover:scale-110 hover:bg-red-500 hover:text-white active:scale-95"
+                  aria-label="Delete study session block"
+                  onClick={() => {
+                    if (
+                      window.confirm(
+                        "Are you sure you want to delete this study session?",
+                      )
+                    ) {
+                      handleDelete(session.id);
+                    }
+                  }}
+                >
+                  <Trash2 size={19} />
+                </button>
               </Card>
             );
           })}
