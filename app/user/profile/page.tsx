@@ -271,7 +271,7 @@ export default function UserProfilePage() {
         />
 
         {loading ? (
-          <div className="flex min-h-[52vh] items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900/80">
+          <div className="flex min-h-[52vh] items-center justify-center rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900/80 dark:shadow-none">
             <p className="flex items-center gap-2 text-sm font-semibold text-(--profile-muted)">
               <LoaderCircle className="animate-spin" size={18} />
               Loading profile...
@@ -296,12 +296,12 @@ export default function UserProfilePage() {
         ) : (
           <div className="space-y-8">
             <section
-              className={`rounded-xl border border-zinc-800 bg-zinc-900/80 p-6 shadow-(--shadow-card) transition duration-700 hover:border-zinc-700 sm:p-8 ${isReady ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
+              className={`rounded-xl border border-zinc-200 bg-white p-6 shadow-sm transition duration-700 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900/80 dark:shadow-(--shadow-card) dark:hover:border-zinc-700 sm:p-8 ${isReady ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
             >
               <div className="grid gap-7 lg:grid-cols-[1fr_auto] lg:items-start">
                 <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
                   <div className="group relative h-24 w-24 overflow-hidden rounded-xl border border-violet-400/30 bg-violet-500/15 p-px">
-                    <div className="flex h-full w-full items-center justify-center rounded-[0.65rem] bg-zinc-950 text-3xl font-bold tracking-[-0.02em] text-violet-200 transition duration-300 group-hover:scale-[1.04]">
+                    <div className="flex h-full w-full items-center justify-center rounded-[0.65rem] bg-violet-100 text-3xl font-bold tracking-[-0.02em] text-violet-700 transition duration-300 group-hover:scale-[1.04] dark:bg-zinc-950 dark:text-violet-200">
                       {initials}
                     </div>
                   </div>
@@ -342,7 +342,7 @@ export default function UserProfilePage() {
                     <PencilLine size={16} />
                     Edit profile
                   </Button>
-                  <div className="rounded-lg border border-zinc-800 bg-zinc-950/60 px-4 py-3">
+                  <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-950/60">
                     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-(--profile-muted)">
                       Profile completeness
                     </p>
@@ -362,7 +362,7 @@ export default function UserProfilePage() {
 
             <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
               <Card
-                className={`rounded-xl border border-zinc-800 bg-zinc-900/80 p-6 transition duration-700 delay-75 hover:border-zinc-700 ${isReady ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
+                className={`rounded-xl border border-zinc-200 bg-white p-6 shadow-sm transition duration-700 delay-75 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900/80 dark:shadow-(--shadow-card) dark:hover:border-zinc-700 ${isReady ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
               >
                 <div className="flex items-center justify-between gap-4">
                   <h3 className="text-lg font-bold tracking-[-0.02em] text-(--profile-ink)">
@@ -374,7 +374,7 @@ export default function UserProfilePage() {
                 </div>
 
                 <div className="mt-5 grid gap-5 sm:grid-cols-[1fr_auto] sm:items-end">
-                  <div className="rounded-lg border border-zinc-800 bg-zinc-950/60 p-5">
+                  <div className="rounded-lg border border-zinc-200 bg-zinc-50 p-5 dark:border-zinc-800 dark:bg-zinc-950/60">
                     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-(--profile-muted)">
                       Focused study
                     </p>
@@ -422,7 +422,7 @@ export default function UserProfilePage() {
               </Card>
 
               <Card
-                className={`rounded-xl border border-zinc-800 bg-zinc-900/80 p-6 transition duration-700 delay-150 hover:border-zinc-700 ${isReady ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
+                className={`rounded-xl border border-zinc-200 bg-white p-6 shadow-sm transition duration-700 delay-150 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900/80 dark:shadow-(--shadow-card) dark:hover:border-zinc-700 ${isReady ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
               >
                 <div className="flex items-center justify-between gap-4">
                   <h3 className="text-lg font-bold tracking-[-0.02em] text-(--profile-ink)">
@@ -457,7 +457,7 @@ export default function UserProfilePage() {
                   <p className="text-xs font-semibold uppercase tracking-[0.14em] text-violet-300">
                     Daily target
                   </p>
-                  <p className="mt-1 text-sm text-zinc-300">
+                  <p className="mt-1 text-sm text-zinc-700 dark:text-zinc-300">
                     {plannerProfile.dailyStudyGoalHours}h planned with a{" "}
                     {focusCycle}-minute cycle
                   </p>
@@ -466,7 +466,7 @@ export default function UserProfilePage() {
             </div>
 
             <Card
-              className={`rounded-xl border border-zinc-800 bg-zinc-900/80 p-6 transition duration-700 delay-200 hover:border-zinc-700 ${isReady ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
+              className={`rounded-xl border border-zinc-200 bg-white p-6 shadow-sm transition duration-700 delay-200 hover:border-zinc-300 dark:border-zinc-800 dark:bg-zinc-900/80 dark:shadow-(--shadow-card) dark:hover:border-zinc-700 ${isReady ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
             >
               <div className="flex items-center justify-between gap-4">
                 <h3 className="text-lg font-bold tracking-[-0.02em] text-(--profile-ink)">
@@ -499,7 +499,7 @@ export default function UserProfilePage() {
               </div>
             </Card>
 
-            <div className="flex items-center justify-between rounded-lg border border-dashed border-zinc-800 bg-zinc-950/40 px-4 py-3">
+            <div className="flex items-center justify-between rounded-lg border border-dashed border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-950/40">
               <p className="text-xs text-(--profile-muted)">
                 {saveState === "saved"
                   ? "Preferences saved locally on this device."
@@ -517,7 +517,7 @@ export default function UserProfilePage() {
                 onClick={() => setEditing(false)}
               >
                 <aside
-                  className="ml-auto h-full w-full max-w-xl overflow-y-auto border-l border-zinc-800 bg-zinc-950 p-5 shadow-2xl sm:p-6"
+                  className="ml-auto h-full w-full max-w-xl overflow-y-auto border-l border-zinc-200 bg-white p-5 shadow-2xl dark:border-zinc-800 dark:bg-zinc-950 sm:p-6"
                   onClick={(event) => event.stopPropagation()}
                 >
                   <div className="mb-6 flex items-start justify-between gap-4">
@@ -532,7 +532,7 @@ export default function UserProfilePage() {
                     <button
                       type="button"
                       onClick={() => setEditing(false)}
-                      className="rounded-lg border border-zinc-800 p-2 text-zinc-400 hover:bg-zinc-900"
+                      className="rounded-lg border border-zinc-200 p-2 text-zinc-600 hover:bg-zinc-100 dark:border-zinc-800 dark:text-zinc-400 dark:hover:bg-zinc-900"
                       aria-label="Close profile editor"
                     >
                       <X size={18} />
@@ -579,7 +579,7 @@ export default function UserProfilePage() {
                           handleDraftChange("bio", event.target.value)
                         }
                         rows={4}
-                        className="w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2.5 text-sm text-zinc-100 outline-none placeholder:text-zinc-600 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20"
+                        className="w-full rounded-lg border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-900 outline-none placeholder:text-zinc-500 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder:text-zinc-600"
                         placeholder="Example: I focus best in evening blocks and review concepts right after class."
                       />
                     </Field>
@@ -764,15 +764,17 @@ export default function UserProfilePage() {
 function ProfileRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4 px-4 py-3">
-      <dt className="text-sm text-zinc-400">{label}</dt>
-      <dd className="text-sm font-semibold text-zinc-100">{value}</dd>
+      <dt className="text-sm text-zinc-600 dark:text-zinc-400">{label}</dt>
+      <dd className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+        {value}
+      </dd>
     </div>
   );
 }
 
 function Tag({ icon, value }: { icon: ReactNode; value: string }) {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-950/60 px-2.5 py-1 text-xs font-medium text-zinc-400">
+    <span className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-xs font-medium text-zinc-600 dark:border-zinc-800 dark:bg-zinc-950/60 dark:text-zinc-400">
       {icon}
       {value}
     </span>
@@ -789,14 +791,16 @@ function MiniMetric({
   value: string;
 }) {
   return (
-    <div className="flex min-w-40 items-center justify-between gap-3 rounded-lg border border-zinc-800 bg-zinc-950/60 px-3 py-2.5">
-      <span className="inline-flex items-center gap-2 text-xs text-zinc-400">
+    <div className="flex min-w-40 items-center justify-between gap-3 rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2.5 dark:border-zinc-800 dark:bg-zinc-950/60">
+      <span className="inline-flex items-center gap-2 text-xs text-zinc-600 dark:text-zinc-400">
         <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-violet-500/15 text-violet-300">
           {icon}
         </span>
         {label}
       </span>
-      <span className="text-base font-bold text-zinc-100">{value}</span>
+      <span className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+        {value}
+      </span>
     </div>
   );
 }
@@ -811,12 +815,14 @@ function InfoBlock({
   value: string;
 }) {
   return (
-    <div className="rounded-lg border border-zinc-800 bg-zinc-950/60 px-4 py-3">
-      <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-400">
+    <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-950/60">
+      <p className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-[0.12em] text-zinc-600 dark:text-zinc-400">
         {icon}
         {title}
       </p>
-      <p className="mt-2 text-sm font-semibold text-zinc-100">{value}</p>
+      <p className="mt-2 text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+        {value}
+      </p>
     </div>
   );
 }

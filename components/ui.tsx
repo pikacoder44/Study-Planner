@@ -23,18 +23,19 @@ export function Button({
   void onDragEnd;
   const styles = {
     primary:
-      "bg-violet-500 text-white shadow-lg shadow-violet-950/30 hover:bg-violet-400",
+      "bg-(--primary) text-white shadow-md hover:opacity-90",
     secondary:
-      "border border-zinc-800 bg-zinc-900/70 text-zinc-200 hover:border-zinc-700 hover:bg-zinc-800",
-    ghost: "text-zinc-400 hover:bg-zinc-800 hover:text-zinc-100",
+      "border border-(--border) bg-(--surface) text-(--foreground) shadow-xs hover:bg-(--surface-muted)",
+    ghost:
+      "text-(--muted) hover:bg-(--surface-muted) hover:text-(--foreground)",
     danger:
-      "bg-rose-500 text-white shadow-lg shadow-rose-950/30 hover:bg-rose-400",
+      "bg-(--danger) text-white shadow-md hover:opacity-90",
   };
   return (
     <motion.button
       whileTap={{ scale: 0.98 }}
       className={cn(
-        "inline-flex min-h-10 items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400 disabled:cursor-not-allowed disabled:opacity-50",
+        "inline-flex min-h-10 items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--primary) disabled:cursor-not-allowed disabled:opacity-50",
         styles[variant],
         className,
       )}
@@ -57,7 +58,7 @@ export function Card({
       {...props}
       style={style}
       className={cn(
-        "rounded-xl border border-zinc-800/80 bg-zinc-900/60 shadow-(--shadow-card) backdrop-blur-sm",
+        "rounded-xl border border-(--border) bg-(--surface) text-(--foreground) shadow-xs backdrop-blur-sm",
         className,
       )}
     >
@@ -71,14 +72,15 @@ export function Badge({
   tone = "neutral",
 }: {
   children: ReactNode;
-  tone?: "neutral" | "blue" | "green" | "amber" | "red";
+  tone?: "neutral" | "blue" | "green" | "amber" | "red" | "emerald";
 }) {
   const tones = {
-    neutral: "bg-zinc-800 text-zinc-300",
-    blue: "bg-violet-500/15 text-violet-300",
-    green: "bg-emerald-500/15 text-emerald-300",
-    amber: "bg-amber-500/15 text-amber-300",
-    red: "bg-rose-500/15 text-rose-300",
+    neutral: "bg-(--surface-muted) text-(--muted)",
+    blue: "bg-violet-500/15 text-(--primary-strong)",
+    green: "bg-emerald-500/15 text-(--support)",
+    emerald: "bg-emerald-500/15 text-(--support)",
+    amber: "bg-amber-500/15 text-(--amber)",
+    red: "bg-rose-500/15 text-(--danger)",
   };
   return (
     <span
@@ -97,7 +99,7 @@ export function Input(props: InputHTMLAttributes<HTMLInputElement>) {
     <input
       {...props}
       className={cn(
-        "h-11 w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 text-sm text-foreground outline-none placeholder:text-zinc-600 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20",
+        "h-11 w-full rounded-lg border border-(--border) bg-(--surface) px-3 text-sm text-(--foreground) outline-none placeholder:text-(--muted) focus:border-(--primary) focus:ring-2 focus:ring-(--primary-soft)",
         props.className,
       )}
     />
@@ -109,7 +111,7 @@ export function Select(props: SelectHTMLAttributes<HTMLSelectElement>) {
     <select
       {...props}
       className={cn(
-        "h-11 w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 text-sm text-foreground outline-none focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20",
+        "h-11 w-full rounded-lg border border-(--border) bg-(--surface) px-3 text-sm text-(--foreground) outline-none focus:border-(--primary) focus:ring-2 focus:ring-(--primary-soft)",
         props.className,
       )}
     />
@@ -121,7 +123,7 @@ export function Textarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
     <textarea
       {...props}
       className={cn(
-        "min-h-28 w-full rounded-lg border border-zinc-800 bg-zinc-900 px-3 py-2.5 text-sm text-foreground outline-none placeholder:text-zinc-600 focus:border-violet-500 focus:ring-2 focus:ring-violet-500/20",
+        "min-h-28 w-full rounded-lg border border-(--border) bg-(--surface) px-3 py-2.5 text-sm text-(--foreground) outline-none placeholder:text-(--muted) focus:border-(--primary) focus:ring-2 focus:ring-(--primary-soft)",
         props.className,
       )}
     />
@@ -138,7 +140,7 @@ export function Field({
   hint?: string;
 }) {
   return (
-    <label className="flex flex-col gap-2 text-sm font-semibold text-foreground">
+    <label className="flex flex-col gap-2 text-sm font-semibold text-(--foreground)">
       <span className="tracking-[-0.01em]">{label}</span>
       {children}
       {hint && (
@@ -168,11 +170,11 @@ export function PageHeader({
     >
       <div>
         {eyebrow && (
-          <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-violet-400">
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.16em] text-(--primary-strong)">
             {eyebrow}
           </p>
         )}
-        <h1 className="text-3xl font-extrabold tracking-[-0.04em] text-foreground sm:text-[2.1rem]">
+        <h1 className="text-3xl font-extrabold tracking-[-0.04em] text-(--foreground) sm:text-[2.1rem]">
           {title}
         </h1>
         {description && (

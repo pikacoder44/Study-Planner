@@ -154,7 +154,7 @@ export default function StudySessionsPage() {
                 </div>
                 <button
                   type="button"
-                  className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-md bg-(--background-soft) text-(--danger) transition-all duration-200 ease-in-out hover:scale-110 hover:bg-red-500 hover:text-white active:scale-95"
+                  className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-md bg-(--background-soft) text-(--danger) transition-all duration-200 ease-in-out hover:scale-110 hover:bg-red-500 hover:text-slate-900 active:scale-95 dark:hover:text-white"
                   aria-label="Delete study session block"
                   onClick={() => {
                     if (

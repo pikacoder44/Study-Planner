@@ -15,7 +15,7 @@ export default function Home() {
           href="/"
           className="flex items-center gap-2.5 text-base font-bold"
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-accent text-white">
+          <span className="flex h-9 w-9 items-center justify-center rounded-md bg-accent text-white dark:text-white">
             <BookOpen size={19} />
           </span>
           Study Planner
@@ -29,7 +29,7 @@ export default function Home() {
           </Link>
           <Link
             href="/register"
-            className="rounded-md bg-accent px-4 py-2.5 text-sm font-semibold text-white hover:bg--accent-strong"
+            className="rounded-md bg-accent px-4 py-2.5 text-sm font-semibold text-white hover:bg--accent-strong dark:text-white"
           >
             Create account
           </Link>
@@ -50,7 +50,7 @@ export default function Home() {
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/register"
-              className="inline-flex items-center gap-2 rounded-md bg-accent px-5 py-3 text-sm font-semibold text-white hover:bg-accent-strong"
+              className="inline-flex items-center gap-2 rounded-md bg-accent px-5 py-3 text-sm font-semibold text-white hover:bg-accent-strong dark:text-white"
             >
               Start planning
               <ArrowRight size={17} />

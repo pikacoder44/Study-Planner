@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { getProfile, logout } from "@/lib/frontend-data";
+import ThemeToggle from "@/components/ThemeToggle";
 
 const mainLinks = [
   ["Dashboard", "/dashboard", LayoutDashboard],
@@ -75,15 +76,15 @@ export default function AppShell({ children }: { children: ReactNode }) {
           className="flex items-center gap-2.5"
           onClick={() => setMobileOpen(false)}
         >
-          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-violet-500 text-white shadow-lg shadow-violet-950/30">
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-(--primary) text-white shadow-md">
             <BookOpen size={19} />
           </span>
-          <span className="text-base font-extrabold tracking-[-0.03em] text-foreground">
+          <span className="text-base font-extrabold tracking-[-0.03em] text-(--foreground)">
             Study Planner
           </span>
         </Link>
         <button
-          className="rounded-lg p-2 text-zinc-500 hover:bg-zinc-800 lg:hidden"
+          className="rounded-lg p-2 text-(--muted) hover:bg-(--surface-muted) hover:text-(--foreground) lg:hidden"
           onClick={() => setMobileOpen(false)}
           aria-label="Close navigation"
         >
@@ -98,10 +99,14 @@ export default function AppShell({ children }: { children: ReactNode }) {
               key={href}
               href={href}
               onClick={() => setMobileOpen(false)}
-              className={`group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium ${active ? "bg-zinc-800 text-zinc-100" : "text-zinc-500 hover:bg-zinc-900 hover:text-zinc-200"}`}
+              className={`group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium ${
+                active
+                  ? "bg-(--surface-muted) text-(--foreground) font-bold"
+                  : "text-(--muted) hover:bg-(--surface-muted) hover:text-(--foreground)"
+              }`}
             >
               {active && (
-                <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-violet-400" />
+                <span className="absolute left-0 top-1/2 h-5 w-0.5 -translate-y-1/2 rounded-full bg-(--primary)" />
               )}
               <Icon size={18} strokeWidth={active ? 2.4 : 1.8} />
               {label}
@@ -109,11 +114,15 @@ export default function AppShell({ children }: { children: ReactNode }) {
           );
         })}
       </nav>
-      <div className="my-7 border-t border-zinc-800" />
+      <div className="my-7 border-t border-(--border)" />
       <Link
         href="/settings"
         onClick={() => setMobileOpen(false)}
-        className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium ${pathname.startsWith("/settings") ? "bg-zinc-800 text-zinc-100" : "text-zinc-500 hover:bg-zinc-900 hover:text-zinc-200"}`}
+        className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium ${
+          pathname.startsWith("/settings")
+            ? "bg-(--surface-muted) text-(--foreground) font-bold"
+            : "text-(--muted) hover:bg-(--surface-muted) hover:text-(--foreground)"
+        }`}
       >
         <Settings size={18} />
         Settings
@@ -121,7 +130,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
       <Link
         href="/teacher"
         onClick={() => setMobileOpen(false)}
-        className="mt-2 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-zinc-500 hover:bg-zinc-900 hover:text-zinc-200"
+        className="mt-2 flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-(--muted) hover:bg-(--surface-muted) hover:text-(--foreground)"
       >
         <GraduationCap size={18} />
         Teacher view
@@ -131,36 +140,37 @@ export default function AppShell({ children }: { children: ReactNode }) {
         type="button"
         onClick={handleLogout}
         disabled={loggingOut}
-        className="mt-2 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-zinc-500 hover:bg-zinc-900 hover:text-zinc-200 disabled:opacity-60"
+        className="mt-2 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-(--muted) hover:bg-(--surface-muted) hover:text-(--foreground) disabled:opacity-60"
       >
         {loggingOut ? "Signing out..." : "Sign out"}
       </button>
 
-      <div className="mt-8 rounded-xl border border-zinc-800 bg-zinc-900/60 p-4">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-500">
+      <div className="mt-8 rounded-xl border border-(--border) bg-(--surface) p-4 shadow-xs">
+        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-(--muted)">
           Focus status
         </p>
-        <p className="mt-2 text-sm font-bold tracking-[-0.01em] text-zinc-200">
+        <p className="mt-2 text-sm font-bold tracking-[-0.01em] text-(--foreground)">
           68% of weekly study goal
         </p>
-        <div className="mt-3 h-1.5 rounded-full bg-white/90">
-          <div className="h-full w-[68%] rounded-full bg-emerald-400" />
+        <div className="mt-3 h-1.5 rounded-full bg-(--surface-muted)">
+          <div className="h-full w-[68%] rounded-full bg-(--support)" />
         </div>
       </div>
     </>
   );
+
   return (
-    <div className="min-h-screen bg-background text-foreground">
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-68 border-r border-zinc-800/80 bg-zinc-950/80 px-5 py-6 backdrop-blur-md lg:block">
+    <div className="min-h-screen bg-background) text-(--foreground)">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-68 border-r border-(--border) bg-(--surface) px-5 py-6 backdrop-blur-md lg:block">
         {navigation}
       </aside>
       {mobileOpen && (
         <div
-          className="fixed inset-0 z-40 bg-[#0d1b35]/35 backdrop-blur-[2px] lg:hidden"
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-[2px] lg:hidden"
           onClick={() => setMobileOpen(false)}
         >
           <aside
-            className="h-full w-[min(86vw,320px)] border-r border-zinc-800 bg-zinc-950 px-5 py-6 backdrop-blur-md"
+            className="h-full w-[min(86vw,320px)] border-r border-(--border) bg-(--surface) px-5 py-6 backdrop-blur-md"
             onClick={(event) => event.stopPropagation()}
           >
             {navigation}
@@ -168,32 +178,33 @@ export default function AppShell({ children }: { children: ReactNode }) {
         </div>
       )}
       <div className="lg:pl-68">
-        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-zinc-800/80 bg-zinc-950/80 px-5 backdrop-blur-md sm:px-8">
+        <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-(--border) bg-(--surface)/90 px-5 backdrop-blur-md sm:px-8">
           <button
-            className="rounded-lg p-2 text-zinc-500 hover:bg-zinc-900 lg:hidden"
+            className="rounded-lg p-2 text-(--muted) hover:bg-(--surface-muted) hover:text-(--foreground) lg:hidden"
             onClick={() => setMobileOpen(true)}
             aria-label="Open navigation"
           >
             <Menu size={21} />
           </button>
-          <div className="hidden text-sm font-medium text-zinc-500 lg:block">
+          <div className="hidden text-sm font-medium text-(--muted) lg:block">
             {todayLabel || "Today"}
           </div>
           <div className="ml-auto flex items-center gap-3">
+            <ThemeToggle />
             <button
-              className="rounded-lg border border-transparent p-2 text-zinc-500 hover:border-zinc-800 hover:bg-zinc-900"
+              className="rounded-lg border border-transparent p-2 text-(--muted) hover:border-(--border) hover:bg-(--surface-muted) hover:text-(--foreground)"
               aria-label="Notifications"
             >
               <Bell size={19} />
             </button>
             <Link
               href="/user/profile"
-              className="flex items-center gap-2 rounded-lg border border-zinc-800 bg-zinc-900 px-2.5 py-1.5 hover:border-zinc-700"
+              className="flex items-center gap-2 rounded-lg border border-(--border) bg-(--surface) px-2.5 py-1.5 hover:border-(--primary)"
             >
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-violet-500/15 text-xs font-bold text-violet-300">
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-(--primary-soft) text-xs font-bold text-(--primary-strong)">
                 {profileName.slice(0, 2).toUpperCase()}
               </span>
-              <span className="hidden text-sm font-semibold sm:block">
+              <span className="hidden text-sm font-semibold text-(--foreground) sm:block">
                 {profileName}
               </span>
               <ArrowUpRight

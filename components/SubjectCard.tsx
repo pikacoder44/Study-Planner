@@ -96,8 +96,8 @@ export default function SubjectCard({
       animate={{ opacity: 1, y: 0 }}
       whileHover={{ y: -2, scale: 1.01 }}
       style={{
-        backgroundColor: `color-mix(in srgb, ${accentColor} 8%, #18181b)`,
-        borderColor: `color-mix(in srgb, ${accentColor} 35%, #27272a)`,
+        backgroundColor: `color-mix(in srgb, ${accentColor} 8%, var(--surface))`,
+        borderColor: `color-mix(in srgb, ${accentColor} 35%, var(--border))`,
       }}
       className={`rounded-xl border p-5 shadow-(--shadow-card) backdrop-blur-md ${
         isDeleting ? "pointer-events-none opacity-50" : ""
@@ -121,18 +121,18 @@ export default function SubjectCard({
             type="button"
             disabled={isDeleting}
             onClick={() => setIsOpen((prev) => !prev)}
-            className="rounded-xl p-1.5 text-zinc-500 transition hover:bg-white/5 hover:text-zinc-100 disabled:opacity-50"
+            className="rounded-xl p-1.5 text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-white/5 dark:hover:text-zinc-100 disabled:opacity-50"
             aria-label={`More options for ${subject.name}`}
           >
             <MoreHorizontal size={18} />
           </button>
 
           {isOpen && (
-            <div className="absolute right-0 z-20 mt-1 w-36 origin-top-right rounded-lg border border-zinc-800 bg-zinc-900 p-1 shadow-xl">
+            <div className="absolute right-0 z-20 mt-1 w-36 origin-top-right rounded-lg border border-zinc-200 bg-white p-1 shadow-xl dark:border-zinc-800 dark:bg-zinc-900">
               <button
                 type="button"
                 onClick={handleEdit}
-                className="flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-200 hover:bg-zinc-800"
+                className="flex w-full items-center gap-2 rounded-lg px-3 py-1.5 text-xs font-medium text-zinc-800 hover:bg-zinc-100 dark:text-zinc-200 dark:hover:bg-zinc-800"
               >
                 <Pencil size={14} />
                 Edit
@@ -159,7 +159,7 @@ export default function SubjectCard({
           <span className="text-(--muted)]">Progress</span>
           <span className="text-foreground">{subject.progress}%</span>
         </div>
-        <div className="h-1.5 overflow-hidden rounded-full bg-black/10">
+        <div className="h-1.5 overflow-hidden rounded-full bg-slate-200 dark:bg-black/10">
           <div
             className="h-full rounded-full transition-all"
             style={{
@@ -174,7 +174,7 @@ export default function SubjectCard({
         <Badge tone="blue">{subject.nextClass ?? "No class scheduled"}</Badge>
         <Link
           href={`/subjects/${subjectId}`}
-          className="flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-semibold text-violet-300 hover:bg-white/5"
+          className="flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-semibold text-violet-700 hover:bg-violet-500/10 dark:text-violet-300 dark:hover:bg-white/5"
         >
           Details
           <ArrowUpRight size={15} />

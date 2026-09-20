@@ -15,16 +15,16 @@ function getEventStyle(type: string) {
 
   switch (normalizedType) {
     case "class":
-      return "bg-blue-500/15 border-blue-500/30 text-blue-300 hover:bg-blue-600 hover:text-white hover:border-blue-500 shadow-sm";
+      return "bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-600 hover:text-slate-900 hover:border-blue-500 shadow-sm dark:bg-blue-500/15 dark:border-blue-500/30 dark:text-blue-300 dark:hover:text-white";
     case "study":
     case "study_session":
-      return "bg-amber-500/15 border-amber-500/30 text-amber-300 hover:bg-amber-500 hover:text-zinc-950 hover:border-amber-400 shadow-sm";
+      return "bg-amber-500/15 border-amber-500/30 text-amber-700 hover:bg-amber-500 hover:text-zinc-950 hover:border-amber-400 shadow-sm dark:text-amber-300";
     case "exam":
-      return "bg-rose-500/15 border-rose-500/30 text-rose-300 hover:bg-rose-600 hover:text-white hover:border-rose-500 shadow-sm";
+      return "bg-rose-50 border-rose-200 text-rose-700 hover:bg-rose-600 hover:text-slate-900 hover:border-rose-500 shadow-sm dark:bg-rose-500/15 dark:border-rose-500/30 dark:text-rose-300 dark:hover:text-white";
     case "task":
-      return "bg-emerald-500/15 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500 hover:text-zinc-950 hover:border-emerald-400 shadow-sm";
+      return "bg-emerald-500/15 border-emerald-500/30 text-emerald-700 hover:bg-emerald-500 hover:text-zinc-950 hover:border-emerald-400 shadow-sm dark:text-emerald-300";
     default:
-      return "bg-purple-500/15 border-purple-500/30 text-purple-300 hover:bg-purple-600 hover:text-white hover:border-purple-500 shadow-sm";
+      return "bg-purple-50 border-purple-200 text-purple-700 hover:bg-purple-600 hover:text-slate-900 hover:border-purple-500 shadow-sm dark:bg-purple-500/15 dark:border-purple-500/30 dark:text-purple-300 dark:hover:text-white";
   }
 }
 
@@ -120,8 +120,8 @@ export default function CalendarPage() {
         }
       />
       <Card className="overflow-hidden">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-800 px-4 py-4">
-          <h2 className="font-bold text-zinc-100">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-zinc-200 px-4 py-4 dark:border-zinc-800">
+          <h2 className="font-bold text-zinc-900 dark:text-zinc-100">
             {month.toLocaleDateString("en-US", {
               month: "long",
               year: "numeric",
@@ -134,7 +134,9 @@ export default function CalendarPage() {
           </div>
         </div>
         {loading && (
-          <p className="p-4 text-sm text-zinc-400">Loading calendar...</p>
+          <p className="p-4 text-sm text-zinc-600 dark:text-zinc-400">
+            Loading calendar...
+          </p>
         )}
         {error && (
           <p role="alert" className="p-4 text-sm text-rose-400">
@@ -142,13 +144,15 @@ export default function CalendarPage() {
           </p>
         )}
         {!loading && !error && events.length === 0 && (
-          <p className="p-4 text-sm text-zinc-400">No events in this month.</p>
+          <p className="p-4 text-sm text-zinc-600 dark:text-zinc-400">
+            No events in this month.
+          </p>
         )}
         <div className="grid min-w-180 grid-cols-7">
           {Array.from({ length: firstDay }).map((_, index) => (
             <div
               key={`empty-${index}`}
-              className="min-h-32 border-r border-b border-zinc-800/70 bg-zinc-950/20"
+              className="min-h-32 border-r border-b border-zinc-200/70 bg-zinc-50/70 dark:border-zinc-800/70 dark:bg-zinc-950/20"
             />
           ))}
           {days.map((day) => {
@@ -156,9 +160,9 @@ export default function CalendarPage() {
             return (
               <div
                 key={day.toISOString()}
-                className="min-h-32 border-r border-b border-zinc-800/70 p-2.5 last:border-r-0"
+                className="min-h-32 border-r border-b border-zinc-200/70 p-2.5 last:border-r-0 dark:border-zinc-800/70"
               >
-                <p className="text-xs font-semibold text-zinc-400">
+                <p className="text-xs font-semibold text-zinc-600 dark:text-zinc-400">
                   {day.getDate()}
                 </p>
                 <div className="mt-2 space-y-1.5">

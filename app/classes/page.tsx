@@ -94,7 +94,9 @@ export default function ClassesPage() {
 
       {loading && (
         <div className="flex items-center justify-center p-12">
-          <p className="text-sm text-zinc-400">Loading your timetable...</p>
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            Loading your timetable...
+          </p>
         </div>
       )}
 
@@ -110,7 +112,7 @@ export default function ClassesPage() {
       {!loading && !error && (
         <div className="space-y-6">
           {/* Day Navigation Tabs */}
-          <div className="flex items-center gap-1.5 overflow-x-auto border-b border-zinc-800/80 pb-3 no-scrollbar">
+          <div className="flex items-center gap-1.5 overflow-x-auto border-b border-zinc-200/80 pb-3 no-scrollbar dark:border-zinc-800/80">
             {["All", ...ALL_DAYS].map((day) => {
               const isActive = selectedDay === day;
               const dayClassCount =
@@ -127,7 +129,7 @@ export default function ClassesPage() {
                   className={`relative flex items-center gap-2 rounded-lg px-3.5 py-2 text-xs font-semibold transition-all duration-200 cursor-pointer ${
                     isActive
                       ? "bg-zinc-100 text-zinc-950 shadow-sm"
-                      : "text-zinc-400 hover:bg-zinc-800/50 hover:text-zinc-200"
+                      : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-800/50 dark:hover:text-zinc-200"
                   }`}
                 >
                   <span>{day}</span>
@@ -135,8 +137,8 @@ export default function ClassesPage() {
                     <span
                       className={`rounded-full px-1.5 py-0.5 text-[10px] font-bold ${
                         isActive
-                          ? "bg-zinc-900/10 text-zinc-950"
-                          : "bg-zinc-800 text-zinc-400"
+                          ? "bg-slate-900/10 text-slate-950"
+                          : "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
                       }`}
                     >
                       {dayClassCount}
@@ -158,14 +160,14 @@ export default function ClassesPage() {
               className="space-y-3"
             >
               {filteredClasses.length === 0 ? (
-                <Card className="flex flex-col items-center justify-center p-12 text-center border-dashed border-zinc-800 bg-zinc-900/30">
-                  <div className="rounded-full bg-zinc-800/60 p-3 text-zinc-400">
+                <Card className="flex flex-col items-center justify-center border-dashed border-zinc-200 bg-zinc-50 p-12 text-center dark:border-zinc-800 dark:bg-zinc-900/30">
+                  <div className="rounded-full bg-zinc-100 p-3 text-zinc-600 dark:bg-zinc-800/60 dark:text-zinc-400">
                     <CalendarDays size={22} />
                   </div>
-                  <h3 className="mt-3 text-sm font-semibold text-zinc-200">
+                  <h3 className="mt-3 text-sm font-semibold text-zinc-900 dark:text-zinc-200">
                     No classes scheduled
                   </h3>
-                  <p className="mt-1 text-xs text-zinc-400">
+                  <p className="mt-1 text-xs text-zinc-600 dark:text-zinc-400">
                     You have no scheduled lectures for{" "}
                     {selectedDay === "All" ? "any day" : selectedDay}.
                   </p>
@@ -191,7 +193,7 @@ export default function ClassesPage() {
                         whileHover={{ y: -2, scale: 1.01 }}
                         transition={{ duration: 0.15 }}
                       >
-                        <Card className="relative overflow-hidden border border-zinc-800/80 bg-zinc-900/60 p-4 transition-all duration-200 hover:border-zinc-700 hover:bg-zinc-900 hover:shadow-lg">
+                        <Card className="relative overflow-hidden border border-zinc-200 bg-white p-4 shadow-sm transition-all duration-200 hover:border-zinc-300 hover:shadow-lg dark:border-zinc-800/80 dark:bg-zinc-900/60 dark:shadow-none dark:hover:border-zinc-700 dark:hover:bg-zinc-900">
                           {/* Accent bar indicating subject color */}
                           <div
                             className="absolute top-0 left-0 h-full w-1.5"
@@ -212,23 +214,23 @@ export default function ClassesPage() {
                                 {subject?.code || "COURSE"}
                               </span>
                               {selectedDay === "All" && (
-                                <span className="text-[11px] font-medium text-zinc-400">
+                                <span className="text-[11px] font-medium text-zinc-600 dark:text-zinc-400">
                                   {item.dayOfWeek}
                                 </span>
                               )}
                             </div>
 
                             {/* Title */}
-                            <h3 className="mt-2.5 text-sm font-semibold text-zinc-100 truncate">
+                            <h3 className="mt-2.5 truncate text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                               {subject?.name || "Class Session"}
                             </h3>
 
                             {/* Metadata Rows: Time & Room */}
-                            <div className="mt-3 space-y-1.5 text-xs text-zinc-400">
+                            <div className="mt-3 space-y-1.5 text-xs text-zinc-600 dark:text-zinc-400">
                               <div className="flex items-center gap-2">
                                 <Clock
                                   size={13}
-                                  className="text-zinc-500 shrink-0"
+                                  className="shrink-0 text-zinc-500 dark:text-zinc-500"
                                 />
                                 <span>
                                   {formatTime12Hour(item.startTime)} -{" "}
@@ -239,7 +241,7 @@ export default function ClassesPage() {
                                 <div className="flex items-center gap-2">
                                   <MapPin
                                     size={13}
-                                    className="text-zinc-500 shrink-0"
+                                    className="shrink-0 text-zinc-500 dark:text-zinc-500"
                                   />
                                   <span>Room: {item.room}</span>
                                 </div>

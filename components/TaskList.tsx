@@ -89,7 +89,9 @@ export default function TaskList({ limit }: { limit?: number }) {
               animate="show"
               exit={{ opacity: 0, height: 0, marginBottom: 0 }}
               whileHover={{ y: -2, scale: 1.01 }}
-              className={`cursor-pointer rounded-xl border border-zinc-800/80 bg-zinc-900/60 p-4 shadow-(--shadow-card) backdrop-blur-sm hover:border-zinc-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-violet-400 ${completed ? "opacity-65" : ""}`}
+              className={`cursor-pointer rounded-xl bg-(--surface) p-4 shadow-xs hover:border-(--primary-strong) focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-(--primary) ${
+                completed ? "opacity-60" : ""
+              }`}
               tabIndex={0}
               aria-expanded={expanded}
               onClick={() => setExpandedTaskId(expanded ? null : task.id)}
@@ -137,14 +139,21 @@ export default function TaskList({ limit }: { limit?: number }) {
                       );
                     }
                   }}
-                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border ${completed ? "border-violet-400 bg-violet-500 text-white" : "border-zinc-600 text-transparent hover:border-violet-400"}`}
+                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border transition-colors ${
+                    completed
+                      ? "border-(--primary) bg-(--primary) text-white"
+                      : "border-(--muted) text-transparent hover:border-(--primary)"
+                  }`}
                 >
                   <Check size={13} strokeWidth={3} />
                 </motion.button>
+
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
                     <p
-                      className={`truncate text-sm font-semibold ${completed ? "line-through" : ""}`}
+                      className={`truncate text-sm font-semibold text-(--foreground) ${
+                        completed ? "line-through text-(--muted)" : ""
+                      }`}
                     >
                       {task.title}
                     </p>
@@ -169,6 +178,7 @@ export default function TaskList({ limit }: { limit?: number }) {
                     <span className="capitalize">{task.type}</span>
                   </div>
                 </div>
+
                 <span className="flex shrink-0 items-center gap-1 text-xs font-semibold text-(--danger)">
                   <CalendarDays size={13} />
                   {new Date(task.dueDate).toLocaleDateString()}
@@ -192,8 +202,11 @@ export default function TaskList({ limit }: { limit?: number }) {
                   )}
                 </span>
               </div>
+
               <div
-                className={`overflow-hidden transition-[max-height,opacity,margin] duration-400 ease-[cubic-bezier(0.22,1,0.36,1)] ${expanded ? "mt-4 max-h-72 opacity-100" : "max-h-0 opacity-0"}`}
+                className={`overflow-hidden transition-[max-height,opacity,margin] duration-300 ease-out ${
+                  expanded ? "mt-4 max-h-72 opacity-100" : "max-h-0 opacity-0"
+                }`}
                 aria-hidden={!expanded}
               >
                 <div className="border-t border-(--border) pt-4">

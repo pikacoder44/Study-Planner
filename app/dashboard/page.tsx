@@ -18,12 +18,10 @@ import { Badge, Button, Card, PageHeader } from "@/components/ui";
 import { getClasses, getDashboard, getSubjects } from "@/lib/frontend-data";
 import type { Class, Exam, StudySession, Subject, Task } from "@/types";
 
-// Icon chips reuse the sidebar logo's gradient treatment so every section
-// header feels like it belongs to the same system, not a one-off accent.
 const CHIP = {
-  primary: "bg-[linear-gradient(145deg,var(--primary),var(--primary-strong))]",
-  support: "bg-[linear-gradient(145deg,var(--support),#0c8988)]",
-  danger: "bg-[linear-gradient(145deg,var(--danger),#b23955)]",
+  primary: "bg-[linear-gradient(145deg,var(--primary),var(--primary-strong))] text-white",
+  support: "bg-[linear-gradient(145deg,var(--support),#0c8988)] text-white",
+  danger: "bg-[linear-gradient(145deg,var(--danger),#b23955)] text-white",
 } as const;
 
 export default function DashboardPage() {
@@ -112,7 +110,7 @@ export default function DashboardPage() {
           hidden: {},
           show: { transition: { staggerChildren: 0.05 } },
         }}
-        className="mb-10 grid gap-px overflow-hidden rounded-xl border border-zinc-800 bg-zinc-800 sm:grid-cols-2 xl:grid-cols-4"
+        className="mb-10 grid gap-px overflow-hidden rounded-xl border border-(--border) bg-(--border) sm:grid-cols-2 xl:grid-cols-4"
       >
         <QuickStat
           icon={<Check size={17} />}
@@ -151,7 +149,7 @@ export default function DashboardPage() {
             icon={<CalendarDays size={16} />}
             tone="primary"
           >
-            <Card className="divide-y divide-(--border) p-0">
+            <Card className="divide-y divide-(--border) p-0 bg-(--surface) border border-(--border)">
               {todaySchedule.map(([id, time, title, detail, type]) => (
                 <div
                   key={id}
@@ -161,7 +159,7 @@ export default function DashboardPage() {
                     {time}
                   </span>
                   <div>
-                    <p className="text-sm font-bold text-foreground">{title}</p>
+                    <p className="text-sm font-bold text-(--foreground)">{title}</p>
                     <p className="mt-1 text-xs text-(--muted)">{detail}</p>
                   </div>
                   <Badge
@@ -193,7 +191,9 @@ export default function DashboardPage() {
               </Link>
             }
           >
-            <TaskList limit={3} />
+            <div className="rounded-xl border border-(--border) bg-(--surface) p-2 shadow-xs">
+              <TaskList limit={3} />
+            </div>
           </DashboardSection>
 
           <DashboardSection
@@ -209,7 +209,7 @@ export default function DashboardPage() {
               </Link>
             }
           >
-            <Card className="divide-y divide-(--border) p-0">
+            <Card className="divide-y divide-(--border) p-0 bg-(--surface) border border-(--border) shadow-xs">
               {studySessions.slice(0, 3).map((session, index) => (
                 <div
                   key={session.id || `study-session-${index}`}
@@ -219,7 +219,7 @@ export default function DashboardPage() {
                     <BookOpen size={16} />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-bold text-foreground">
+                    <p className="truncate text-sm font-bold text-(--foreground)">
                       {session.title}
                     </p>
                     <p className="mt-1 text-xs text-(--muted)">
@@ -258,7 +258,7 @@ export default function DashboardPage() {
               {upcomingExams.map((exam, index) => (
                 <Card
                   key={exam.id || `exam-${index}`}
-                  className="relative overflow-hidden p-4 pl-5"
+                  className="relative overflow-hidden p-4 pl-5 bg-(--surface) border border-(--border) shadow-xs"
                 >
                   <span
                     className={`absolute inset-y-0 left-0 w-1.5 ${
@@ -274,7 +274,7 @@ export default function DashboardPage() {
                           )?.code
                         }
                       </p>
-                      <p className="mt-1 text-sm font-bold text-foreground">
+                      <p className="mt-1 text-sm font-bold text-(--foreground)">
                         {exam.title}
                       </p>
                     </div>
@@ -283,7 +283,8 @@ export default function DashboardPage() {
                     </Badge>
                   </div>
                   <p className="mt-3 text-xs text-(--muted)">
-                    {exam.examDate} · {exam.startTime} · {exam.location}
+                    {formatDashboardDate(exam.examDate)} · {exam.startTime} ·{" "}
+                    {exam.location}
                   </p>
                 </Card>
               ))}
@@ -303,7 +304,7 @@ export default function DashboardPage() {
               </Link>
             }
           >
-            <Card className="divide-y divide-(--border) p-0">
+            <Card className="divide-y divide-(--border) p-0 bg-(--surface) border border-(--border) shadow-xs">
               {upcomingClasses.map((item) => {
                 const subject = subjects.find(
                   (subjectItem) => subjectItem.id === item.subjectId,
@@ -314,14 +315,14 @@ export default function DashboardPage() {
                     className="px-5 py-4"
                   >
                     <div className="flex items-center justify-between">
-                      <p className="text-sm font-bold text-foreground">
+                      <p className="text-sm font-bold text-(--foreground)">
                         {subject?.code}
                       </p>
                       <span className="text-xs font-semibold text-(--primary-strong)">
                         {item.dayOfWeek}
                       </span>
                     </div>
-                    <p className="mt-1 text-sm text-foreground">
+                    <p className="mt-1 text-sm text-(--foreground)">
                       {subject?.name}
                     </p>
                     <p className="mt-2 flex items-center gap-1 text-xs text-(--muted)">
@@ -342,10 +343,10 @@ export default function DashboardPage() {
             icon={<Clock3 size={16} />}
             tone="support"
           >
-            <Card className="p-5">
+            <Card className="p-5 bg-(--surface) border border-(--border) shadow-xs">
               <div className="flex items-end justify-between">
                 <div>
-                  <p className="text-3xl font-extrabold tracking-[-0.03em] text-foreground">
+                  <p className="text-3xl font-extrabold tracking-[-0.03em] text-(--foreground)">
                     9h 45m
                   </p>
                   <p className="mt-1 text-xs text-(--muted)">
@@ -361,7 +362,7 @@ export default function DashboardPage() {
               </div>
               <div className="mt-3 flex justify-between text-xs text-(--muted)">
                 <span>Goal: 14 hours</span>
-                <span className="font-semibold text-foreground">68%</span>
+                <span className="font-semibold text-(--foreground)">68%</span>
               </div>
             </Card>
           </DashboardSection>
@@ -387,10 +388,10 @@ function QuickStat({
   return (
     <motion.div
       variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0 } }}
-      className="flex items-start gap-4 bg-zinc-950/60 p-5"
+      className="flex items-start gap-4 bg-(--surface) p-5 shadow-xs"
     >
       <span
-        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-white shadow-(--shadow-card) ${CHIP[tone]}`}
+        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl shadow-(--shadow-card) ${CHIP[tone]}`}
       >
         {icon}
       </span>
@@ -399,14 +400,27 @@ function QuickStat({
           {label}
         </p>
         <div className="mt-1 flex items-baseline gap-2">
-          <span className="text-2xl font-extrabold tracking-[-0.03em] text-foreground">
+          <span className="text-2xl font-extrabold tracking-[-0.03em] text-(--foreground)">
             {value}
           </span>
         </div>
-        <p className="mt-0.5 text-xs text-(--muted)">{detail}</p>
+        <p className="mt-0.5 text-xs text-(--muted)">
+          {detail}
+        </p>
       </div>
     </motion.div>
   );
+}
+
+function formatDashboardDate(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(date);
 }
 
 function DashboardSection({
@@ -425,9 +439,9 @@ function DashboardSection({
   return (
     <section>
       <div className="mb-4 flex items-center justify-between">
-        <h2 className="flex items-center gap-2.5 text-lg font-extrabold tracking-[-0.02em] text-foreground">
+        <h2 className="flex items-center gap-2.5 text-lg font-extrabold tracking-[-0.02em] text-(--foreground)">
           <span
-            className={`flex h-7 w-7 items-center justify-center rounded-lg text-white ${CHIP[tone]}`}
+            className={`flex h-7 w-7 items-center justify-center rounded-lg ${CHIP[tone]}`}
           >
             {icon}
           </span>
