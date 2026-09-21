@@ -414,9 +414,13 @@ export async function getDashboard(): Promise<Dashboard> {
     dueSoonTasks: data.dueSoonTasks.map((task) =>
       withId(task as Task & { _id?: string }),
     ) as Task[],
-    upcomingExams: data.upcomingExams.map((exam) =>
-      withId(exam as Exam & { _id?: string }),
-    ) as Exam[],
+    upcomingExams: data.upcomingExams.map((exam) => {
+      const item = withId(exam as Exam & { _id?: string });
+      return {
+        ...item,
+        location: (exam as Record<string, unknown>).location ?? "",
+      } as Exam;
+    }),
     upcomingStudySessions: data.upcomingStudySessions.map((session) =>
       withId(session as StudySession & { _id?: string }),
     ) as StudySession[],
