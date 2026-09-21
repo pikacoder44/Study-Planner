@@ -1,6 +1,7 @@
 "use client";
 
-import { Clock3, Trash2, Plus } from "lucide-react";
+import Link from "next/link";
+import { Clock3, Pencil, Trash2, Plus } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import AppShell from "@/components/AppShell";
 import { Button, Card, PageHeader } from "@/components/ui";
@@ -152,6 +153,13 @@ export default function StudySessionsPage() {
                     {formatTime12Hour(session.endTime)}
                   </p>
                 </div>
+                <Link
+                  href={`/study-sessions/update/${session.id}`}
+                  aria-label="Edit study session"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md bg-(--background-soft) text-(--muted) transition-all duration-200 hover:scale-110 hover:bg-(--primary-soft) hover:text-(--primary) active:scale-95"
+                >
+                  <Pencil size={18} />
+                </Link>
                 <button
                   type="button"
                   className="flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-md bg-(--background-soft) text-(--danger) transition-all duration-200 ease-in-out hover:scale-110 hover:bg-red-500 hover:text-slate-900 active:scale-95 dark:hover:text-white"
