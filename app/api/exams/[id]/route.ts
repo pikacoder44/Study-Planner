@@ -96,6 +96,9 @@ export const PATCH = withAuth<Context>(
         "subjectName",
         "subjectId",
         "examDate",
+        "startTime",
+        "endTime",
+        "location",
         "status",
         "priority",
       ];
@@ -106,7 +109,6 @@ export const PATCH = withAuth<Context>(
         }
       }
 
-      // Validate subjectId if it is being updated
       if (
         updateData.subjectId &&
         typeof updateData.subjectId === "string" &&
