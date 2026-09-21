@@ -19,6 +19,7 @@ import {
   X,
 } from "lucide-react";
 import { Manrope } from "next/font/google";
+import Link from "next/link";
 import {
   useEffect,
   useMemo,
@@ -338,10 +339,14 @@ export default function UserProfilePage() {
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <Button className="min-w-36" onClick={openEditor}>
-                    <PencilLine size={16} />
-                    Edit profile
-                  </Button>
+                  <Link
+                    href={`/user/profile/update/${user._id ?? user.username}`}
+                  >
+                    <Button className="min-w-36">
+                      <PencilLine size={16} />
+                      Edit profile
+                    </Button>
+                  </Link>
                   <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-950/60">
                     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-(--profile-muted)">
                       Profile completeness
