@@ -86,7 +86,7 @@ export const PUT = withAuth<Context>(async (req, { userId }, { params }) => {
     const updatedSubject = await Subject.findOneAndUpdate(
       { _id: subjectId, userId },
       { name, code, color, description },
-      { new: true, runValidators: true },
+      { returnDocument:"after", runValidators: true },
     );
 
     if (!updatedSubject) {

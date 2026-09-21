@@ -116,7 +116,7 @@ export const PATCH = withAuth<Context>(
       const session = await StudySession.findOneAndUpdate(
         { _id: id, userId },
         { $set: updates },
-        { new: true, runValidators: true },
+        { returnDocument:"after", runValidators: true },
       );
       return NextResponse.json({ session: serializeSession(session!) });
     } catch (error) {

@@ -117,7 +117,7 @@ export const PUT = withAuth<Context>(
       const updatedTask = await Task.findOneAndUpdate(
         { _id: taskId, userId },
         { $set: safeUpdates },
-        { new: true, runValidators: true },
+        { returnDocument: "after", runValidators: true },
       );
       if (!updatedTask) {
         return NextResponse.json({ error: "Task not found." }, { status: 404 });

@@ -75,7 +75,7 @@ export const PATCH = withAuth<Context>(
       const updatedEvent = await CalendarEvent.findOneAndUpdate(
         { _id: id, userId },
         { $set: updates },
-        { new: true, runValidators: true },
+        { returnDocument:"after", runValidators: true },
       );
       return NextResponse.json({ event: updatedEvent });
     } catch (error) {

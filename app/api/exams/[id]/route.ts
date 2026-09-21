@@ -130,7 +130,7 @@ export const PATCH = withAuth<Context>(
       const exam = await Exam.findOneAndUpdate(
         { _id: id, userId },
         { $set: updateData },
-        { new: true, runValidators: true },
+        { returnDocument:"after", runValidators: true },
       );
 
       if (!exam) {

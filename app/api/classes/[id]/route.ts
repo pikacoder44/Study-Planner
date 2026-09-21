@@ -127,7 +127,7 @@ export const PATCH = withAuth<Context>(
       const classData = await ClassModel.findOneAndUpdate(
         { _id: id, userId },
         { $set: updateData },
-        { new: true, runValidators: true },
+        { returnDocument:"after", runValidators: true },
       );
 
       if (!classData) {
