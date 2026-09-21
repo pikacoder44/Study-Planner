@@ -23,13 +23,13 @@ export default function Home() {
         <div className="flex items-center gap-2">
           <Link
             href="/login"
-            className="rounded-md px-3 py-2 text-sm font-semibold text-muted hover:bg-white"
+            className="rounded-md px-3 py-2 text-sm font-semibold text-muted hover:bg-white hover:text-black hover:scale-106 transition-all duration-300"
           >
             Log in
           </Link>
           <Link
             href="/register"
-            className="rounded-md bg-accent px-4 py-2.5 text-sm font-semibold text-white hover:bg--accent-strong dark:text-white"
+            className="rounded-md bg-accent px-4 py-2.5 text-sm font-semibold hover:bg-blue-500 hover:scale-106 transition-all duration-300"
           >
             Create account
           </Link>
@@ -41,7 +41,8 @@ export default function Home() {
             A clearer academic week
           </p>
           <h1 className="max-w-xl text-5xl font-bold leading-[1.08] tracking-tighter text-ink sm:text-6xl">
-            Make room for the work that matters.
+            Make <span className="text-blue-500">room</span> for the work that{" "}
+            <span className="text-green-500">matters.</span>
           </h1>
           <p className="mt-6 max-w-lg text-lg leading-8 text-muted">
             Plan tasks, classes, exams, and focused study time in one calm
@@ -57,13 +58,17 @@ export default function Home() {
             </Link>
             <Link
               href="/dashboard"
-              className="rounded-md border border-border bg-white px-5 py-3 text-sm font-semibold text-ink hover:bg-surface-muted"
+              className="group relative inline-flex items-center justify-center overflow-hidden rounded-md border border-amber-300/60 bg-linear-to-r from-amber-400 via-yellow-300 to-amber-500 px-5 py-3 text-sm font-bold text-amber-950 shadow-md shadow-amber-500/20 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg hover:shadow-amber-500/40 active:scale-[0.98]"
             >
-              View demo
+              <span className="animate-shine pointer-events-none absolute inset-0 -top-4 -bottom-4 w-1/2 bg-linear-to-r from-transparent via-white/70 to-transparent" />
+
+              <span className="relative z-10 flex items-center gap-1.5 drop-shadow-xs">
+                View demo
+              </span>
             </Link>
           </div>
         </div>
-        <div className="rounded-xl border border-border bg-white p-4 shadow-[0_12px_35px_rgba(30,42,48,0.07 sm:p-6">
+        <div className="rounded-xl border border-border dark:text-black bg-white p-4 shadow-[0_12px_35px_rgba(30,42,48,0.07)] sm:p-6">
           <div className="flex items-center justify-between border-b border-border pb-5">
             <div>
               <p className="text-xs font-semibold text-muted">
@@ -104,10 +109,10 @@ export default function Home() {
             ].map((item) => (
               <div
                 key={item}
-                className="flex items-center gap-3 border-t border-border py-3 text-sm"
+                className="flex items-center gap-3 border-t border-border py-3 text-sm "
               >
                 <span className="h-2 w-2 rounded-full bg-accent" />
-                <span>{item}</span>
+                <span className="">{item}</span>
               </div>
             ))}
           </div>
@@ -144,8 +149,8 @@ function Metric({
   value: string;
 }) {
   return (
-    <div className="rounded-lg border border-border bg-white p-3">
-      <span className="flex h-7 w-7 items-center justify-center rounded-md bg-[#e8eff1] text-accent">
+    <div className="rounded-lg border border-border bg-blue-500/70 hover:bg-blue-800 cursor-pointer text-white shadow-sm shadow-blue-400 hover:scale-105 p-3 transition-all duration-300 ease-in-out">
+      <span className="flex h-7 w-7 items-center justify-center rounded-md bg-[#e8eff1] text-black">
         {icon}
       </span>
       <p className="mt-3 text-xs text-muted">{label}</p>
@@ -164,7 +169,7 @@ function Feature({
 }) {
   return (
     <div className="flex gap-3">
-      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#e8eff1] text-accent">
+      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#e8eff1] text-black">
         {icon}
       </span>
       <div>

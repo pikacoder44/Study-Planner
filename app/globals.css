@@ -49,6 +49,19 @@
     linear-gradient(180deg, #09090b 0%, #0f0f12 48%, #09090b 100%);
 }
 
+@keyframes shine {
+  0% {
+    transform: translateX(-100%) rotate(25deg);
+  }
+  100% {
+    transform: translateX(200%) rotate(25deg);
+  }
+}
+
+.animate-shine {
+  animation: shine 3s infinite ease-in-out;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--ink);
