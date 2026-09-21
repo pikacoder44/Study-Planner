@@ -1,12 +1,20 @@
 "use client";
 
-import { MapPin, Plus, Clock, CalendarDays } from "lucide-react";
+import Link from "next/link";
+import {
+  MapPin,
+  Plus,
+  Clock,
+  CalendarDays,
+  Pencil,
+  Trash2,
+} from "lucide-react";
 import { motion, AnimatePresence } from "motion/react";
 import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import AppShell from "@/components/AppShell";
 import { Button, Card, PageHeader } from "@/components/ui";
-import { getClasses, getSubjects } from "@/lib/frontend-data";
+import { deleteClass, getClasses, getSubjects } from "@/lib/frontend-data";
 import type { Class, Subject } from "@/types";
 
 const ALL_DAYS = [
@@ -73,6 +81,21 @@ export default function ClassesPage() {
       (item) => item.dayOfWeek?.toLowerCase() === selectedDay.toLowerCase(),
     );
   }, [classes, selectedDay]);
+
+  const handleDelete = async (classId: string) => {
+    const previousClasses = classes;
+    setClasses((current) => current.filter((item) => item.id !== classId));
+    try {
+      await deleteClass(classId);
+    } catch (deleteError) {
+      setClasses(previousClasses);
+      setError(
+        deleteError instanceof Error
+          ? deleteError.message
+          : "Failed to delete class.",
+      );
+    }
+  };
 
   return (
     <AppShell>
@@ -218,6 +241,35 @@ export default function ClassesPage() {
                                   {item.dayOfWeek}
                                 </span>
                               )}
+                            </div>
+
+                            <div className="mt-4 flex justify-end gap-2">
+                              <Link
+                                href={`/classes/update/${item.id}`}
+                                aria-label="Edit class"
+                                className="inline-flex h-9 w-9 items-center justify-center rounded-md text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
+                              >
+                                <Pencil size={16} />
+                              </Link>
+                              <button
+                                type="button"
+                                aria-label="Delete class"
+                                className="inline-flex h-9 w-9 items-center justify-center rounded-md text-rose-500 transition hover:bg-rose-50 dark:hover:bg-rose-950/40"
+                                onClick={() => {
+                                  const classId =
+                                    item.id || (item as { _id?: string })._id;
+                                  if (
+                                    classId &&
+                                    window.confirm(
+                                      "Are you sure you want to delete this class?",
+                                    )
+                                  ) {
+                                    void handleDelete(classId);
+                                  }
+                                }}
+                              >
+                                <Trash2 size={16} />
+                              </button>
                             </div>
 
                             {/* Title */}
