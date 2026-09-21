@@ -21,10 +21,20 @@ export type Dashboard = {
   todaySchedule: Array<Record<string, unknown>>;
   dueTodayTasks: Task[];
   overdueTasks: Task[];
+  priorityTasks: Task[];
+  dueSoonTasks: Task[];
   upcomingExams: Exam[];
   upcomingStudySessions: StudySession[];
   recentStudySessions: StudySession[];
-  statistics: Record<string, number>;
+  statistics: Record<string, number> & {
+    weeklyProgress: {
+      completionRate: number;
+      completedTasks: number;
+      totalTasks: number;
+      studyMinutes: number;
+      goalMinutes: number;
+    };
+  };
 };
 
 export type Analytics = {
@@ -396,6 +406,12 @@ export async function getDashboard(): Promise<Dashboard> {
       withId(task as Task & { _id?: string }),
     ) as Task[],
     overdueTasks: data.overdueTasks.map((task) =>
+      withId(task as Task & { _id?: string }),
+    ) as Task[],
+    priorityTasks: data.priorityTasks.map((task) =>
+      withId(task as Task & { _id?: string }),
+    ) as Task[],
+    dueSoonTasks: data.dueSoonTasks.map((task) =>
       withId(task as Task & { _id?: string }),
     ) as Task[],
     upcomingExams: data.upcomingExams.map((exam) =>
