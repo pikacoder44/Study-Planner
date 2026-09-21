@@ -396,7 +396,7 @@ export async function deleteCalendarEvent(id: string): Promise<void> {
   invalidate("calendar", "dashboard");
 }
 
-// --------------------------- Dashboard & Analytics ---------------------------
+// --------------------------- Dashboard ---------------------------
 
 export async function getDashboard(): Promise<Dashboard> {
   const data = await request<Dashboard>("/api/dashboard");
@@ -430,14 +430,6 @@ export async function getDashboard(): Promise<Dashboard> {
   };
 }
 
-export async function getAnalytics(
-  from: string,
-  to: string,
-): Promise<Analytics> {
-  return request<Analytics>(
-    `/api/analytics/overview?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`,
-  );
-}
 
 // --------------------------- Auth Routes ---------------------------
 
