@@ -23,26 +23,39 @@ export const GET = withAuth(async (_request, { userId }) => {
     const startOfToday = new Date(`${today}T00:00:00.000Z`);
     const endOfToday = new Date(`${today}T23:59:59.999Z`);
     const now = new Date();
+    const startOfWeek = new Date(startOfToday);
+    const dayOfWeek = startOfWeek.getUTCDay();
+    const daysSinceMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+    startOfWeek.setUTCDate(startOfWeek.getUTCDate() - daysSinceMonday);
+    const endOfWeek = new Date(startOfWeek);
+    endOfWeek.setUTCDate(endOfWeek.getUTCDate() + 7);
+    const endOfSoon = new Date(endOfToday);
+    endOfSoon.setUTCDate(endOfSoon.getUTCDate() + 7);
 
-    const [tasks, exams, sessions, classes, customEvents] = await Promise.all([
-      Task.find({ userId }).sort({ dueDate: 1 }),
-      Exam.find({
-        userId,
-        examDate: { $gte: startOfToday },
-        status: { $ne: "cancelled" },
-      })
-        .sort({ examDate: 1 })
-        .limit(10),
-      StudySession.find({ userId, startTime: { $gte: startOfToday } })
-        .sort({ startTime: 1 })
-        .limit(10),
-      ClassModel.find({
-        userId,
-        dayOfWeek: dayNames[now.getUTCDay()],
-        isActive: true,
-      }).sort({ startTime: 1 }),
-      CalendarEvent.find({ userId, date: today }).sort({ startTime: 1 }),
-    ]);
+    const [tasks, exams, sessions, weekSessions, classes, customEvents] =
+      await Promise.all([
+        Task.find({ userId }).sort({ dueDate: 1 }),
+        Exam.find({
+          userId,
+          examDate: { $gte: startOfToday },
+          status: { $ne: "cancelled" },
+        })
+          .sort({ examDate: 1 })
+          .limit(10),
+        StudySession.find({ userId, startTime: { $gte: startOfToday } })
+          .sort({ startTime: 1 })
+          .limit(10),
+        StudySession.find({
+          userId,
+          startTime: { $gte: startOfWeek, $lt: endOfWeek },
+        }).sort({ startTime: 1 }),
+        ClassModel.find({
+          userId,
+          dayOfWeek: dayNames[now.getUTCDay()],
+          isActive: true,
+        }).sort({ startTime: 1 }),
+        CalendarEvent.find({ userId, date: today }).sort({ startTime: 1 }),
+      ]);
 
     const overdueTasks = tasks.filter(
       (task) => task.status !== "completed" && task.dueDate < startOfToday,
@@ -53,6 +66,29 @@ export const GET = withAuth(async (_request, { userId }) => {
     const completedTasks = tasks.filter((task) => task.status === "completed");
     const pendingTasks = tasks.filter(
       (task) => task.status !== "completed" && task.dueDate >= startOfToday,
+    );
+    const activeTasks = tasks.filter((task) => task.status !== "completed");
+    const priorityTasks = [...activeTasks]
+      .sort((left, right) => {
+        const priorityRank = { high: 0, medium: 1, low: 2 };
+        return (
+          priorityRank[String(left.priority) as keyof typeof priorityRank] -
+            priorityRank[String(right.priority) as keyof typeof priorityRank] ||
+          left.dueDate.getTime() - right.dueDate.getTime()
+        );
+      })
+      .slice(0, 5);
+    const dueSoonTasks = activeTasks
+      .filter(
+        (task) => task.dueDate >= startOfToday && task.dueDate <= endOfSoon,
+      )
+      .sort((left, right) => left.dueDate.getTime() - right.dueDate.getTime())
+      .slice(0, 5);
+    const weeklyTasks = tasks.filter(
+      (task) => task.dueDate >= startOfWeek && task.dueDate < endOfWeek,
+    );
+    const weeklyCompletedTasks = weeklyTasks.filter(
+      (task) => task.status === "completed",
     );
 
     const todaySchedule = [
@@ -111,6 +147,8 @@ export const GET = withAuth(async (_request, { userId }) => {
       todaySchedule,
       dueTodayTasks,
       overdueTasks,
+      priorityTasks,
+      dueSoonTasks,
       upcomingExams: exams,
       upcomingStudySessions: sessions,
       recentStudySessions: await StudySession.find({ userId })
@@ -128,6 +166,20 @@ export const GET = withAuth(async (_request, { userId }) => {
           (total, session) => total + session.duration,
           0,
         ),
+        weeklyProgress: {
+          completionRate: weeklyTasks.length
+            ? Math.round(
+                (weeklyCompletedTasks.length / weeklyTasks.length) * 100,
+              )
+            : 0,
+          completedTasks: weeklyCompletedTasks.length,
+          totalTasks: weeklyTasks.length,
+          studyMinutes: weekSessions.reduce(
+            (total, session) => total + session.duration,
+            0,
+          ),
+          goalMinutes: 14 * 60,
+        },
       },
     });
   } catch (error) {
