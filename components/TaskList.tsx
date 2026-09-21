@@ -8,11 +8,17 @@ import {
   ChevronUp,
   Circle,
   Pencil,
+  Trash2,
 } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui";
-import { completeTask, getSubjects, getTasks } from "@/lib/frontend-data";
+import {
+  completeTask,
+  deleteTask,
+  getSubjects,
+  getTasks,
+} from "@/lib/frontend-data";
 import type { Subject, Task } from "@/types";
 
 export default function TaskList({ limit }: { limit?: number }) {
@@ -21,6 +27,7 @@ export default function TaskList({ limit }: { limit?: number }) {
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
+  const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
 
   useEffect(() => {
     async function loadTasks() {
@@ -165,6 +172,38 @@ export default function TaskList({ limit }: { limit?: number }) {
                     >
                       <Pencil size={15} />
                     </Link>
+                    <motion.button
+                      whileHover={{ scale: 1.12 }}
+                      whileTap={{ scale: 0.9 }}
+                      type="button"
+                      aria-label={`Delete ${task.title}`}
+                      disabled={deletingTaskId === task.id}
+                      onClick={async (event) => {
+                        event.stopPropagation();
+                        if (!window.confirm(`Delete "${task.title}"?`)) return;
+
+                        const previousTasks = tasks;
+                        setDeletingTaskId(task.id);
+                        setTasks((items) =>
+                          items.filter((item) => item.id !== task.id),
+                        );
+                        try {
+                          await deleteTask(task.id);
+                        } catch (mutationError) {
+                          setTasks(previousTasks);
+                          setError(
+                            mutationError instanceof Error
+                              ? mutationError.message
+                              : "Unable to delete task.",
+                          );
+                        } finally {
+                          setDeletingTaskId(null);
+                        }
+                      }}
+                      className="shrink-0 cursor-pointer rounded-lg p-1.5 text-(--muted) transition-all duration-200 hover:bg-(--danger-soft) hover:text-(--danger) disabled:cursor-wait disabled:opacity-50"
+                    >
+                      <Trash2 size={15} />
+                    </motion.button>
                   </div>
                   <div className="mt-1 flex flex-wrap items-center gap-3 text-xs text-(--muted)">
                     <span className="flex items-center gap-1">
