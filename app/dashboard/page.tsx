@@ -7,19 +7,21 @@ import {
   Check,
   Clock3,
   GraduationCap,
+  AlertTriangle,
   MapPin,
   Plus,
+  Target,
 } from "lucide-react";
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import AppShell from "@/components/AppShell";
-import TaskList from "@/components/TaskList";
 import { Badge, Button, Card, PageHeader } from "@/components/ui";
-import { getClasses, getDashboard, getSubjects } from "@/lib/frontend-data";
-import type { Class, Exam, StudySession, Subject, Task } from "@/types";
+import { getDashboard } from "@/lib/frontend-data";
+import type { Exam, StudySession, Task } from "@/types";
 
 const CHIP = {
-  primary: "bg-[linear-gradient(145deg,var(--primary),var(--primary-strong))] text-white",
+  primary:
+    "bg-[linear-gradient(145deg,var(--primary),var(--primary-strong))] text-white",
   support: "bg-[linear-gradient(145deg,var(--support),#0c8988)] text-white",
   danger: "bg-[linear-gradient(145deg,var(--danger),#b23955)] text-white",
 } as const;
@@ -28,20 +30,14 @@ export default function DashboardPage() {
   const [dashboard, setDashboard] = useState<Awaited<
     ReturnType<typeof getDashboard>
   > | null>(null);
-  const [subjects, setSubjects] = useState<Subject[]>([]);
-  const [classes, setClasses] = useState<Class[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => setHasMounted(true));
-    Promise.all([getDashboard(), getSubjects(), getClasses()])
-      .then(([dashboardData, subjectData, classData]) => {
-        setDashboard(dashboardData);
-        setSubjects(subjectData);
-        setClasses(classData);
-      })
+    getDashboard()
+      .then((dashboardData) => setDashboard(dashboardData))
       .catch((loadError) =>
         setError(
           loadError instanceof Error
@@ -53,19 +49,17 @@ export default function DashboardPage() {
     return () => window.cancelAnimationFrame(frame);
   }, []);
 
-  const tasks: Task[] = dashboard?.dueTodayTasks ?? [];
+  const tasks: Task[] = dashboard?.priorityTasks ?? [];
   const exams: Exam[] = dashboard?.upcomingExams ?? [];
   const studySessions: StudySession[] = dashboard?.recentStudySessions ?? [];
-  const pendingTasks =
-    dashboard?.statistics.pendingTasks ??
-    tasks.filter((task) => task.status === "pending").length;
-  const upcomingExams = exams.slice(0, 2);
-  const upcomingClasses = classes.slice(0, 3);
+  const overdueTasks = dashboard?.overdueTasks ?? [];
+  const upcomingExams = exams.slice(0, 3);
+  const weeklyProgress = dashboard?.statistics.weeklyProgress;
+
   const todaySchedule = (dashboard?.todaySchedule ?? []).map(
     (item, index) =>
       [
         String(item.id ?? `${item.type ?? "schedule"}-${index}`),
-        String(item.startTime ?? ""),
         String(item.title ?? ""),
         String(item.room ?? item.priority ?? ""),
         String(item.type ?? ""),
@@ -115,30 +109,34 @@ export default function DashboardPage() {
         <QuickStat
           icon={<Check size={17} />}
           tone="primary"
-          label="Pending tasks"
-          value={`${pendingTasks}`}
-          detail="1 needs attention today"
+          label="Due today"
+          value={`${dashboard?.dueTodayTasks.length ?? 0}`}
+          detail="Tasks planned for today"
         />
         <QuickStat
           icon={<CalendarDays size={17} />}
           tone="danger"
           label="Overdue"
-          value="0"
-          detail="You are on track"
+          value={`${overdueTasks.length}`}
+          detail={overdueTasks.length ? "Needs attention" : "Nothing overdue"}
         />
         <QuickStat
           icon={<GraduationCap size={17} />}
           tone="danger"
           label="Upcoming exams"
-          value={`${upcomingExams.length}`}
-          detail="Next one tomorrow"
+          value={`${exams.length}`}
+          detail={
+            upcomingExams[0]
+              ? countdownLabel(upcomingExams[0].examDate)
+              : "No exams scheduled"
+          }
         />
         <QuickStat
           icon={<Clock3 size={17} />}
           tone="support"
           label="Study time"
-          value={`${Math.floor((dashboard?.statistics.studyMinutes ?? 0) / 60)}h ${(dashboard?.statistics.studyMinutes ?? 0) % 60}m`}
-          detail={`Across ${studySessions.length} sessions`}
+          value={formatMinutes(weeklyProgress?.studyMinutes ?? 0)}
+          detail={`Across ${studySessions.length} recent sessions`}
         />
       </motion.div>
 
@@ -150,36 +148,54 @@ export default function DashboardPage() {
             tone="primary"
           >
             <Card className="divide-y divide-(--border) p-0 bg-(--surface) border border-(--border)">
-              {todaySchedule.map(([id, time, title, detail, type]) => (
-                <div
-                  key={id}
-                  className="grid grid-cols-[4.5rem_1fr_auto] items-center gap-4 px-5 py-4"
-                >
-                  <span className="text-sm font-bold text-(--primary-strong)">
-                    {time}
-                  </span>
-                  <div>
-                    <p className="text-sm font-bold text-(--foreground)">{title}</p>
-                    <p className="mt-1 text-xs text-(--muted)">{detail}</p>
-                  </div>
-                  <Badge
-                    tone={
-                      type === "Task"
-                        ? "amber"
-                        : type === "Class"
-                          ? "blue"
-                          : "neutral"
-                    }
+              {todaySchedule.length > 0 ? (
+                todaySchedule.map(([id, title, detail, type]) => (
+                  <div
+                    key={id}
+                    className="flex items-center justify-between gap-4 px-5 py-4"
                   >
-                    {type}
-                  </Badge>
-                </div>
-              ))}
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-bold text-(--foreground)">
+                        {title}
+                      </p>
+                      <div className="mt-1 flex items-center gap-2 text-xs text-(--muted)">
+                        <span className="font-medium">
+                          Due Date:{" "}
+                          <span className="text-red-600">
+                            {formatDashboardDate(dashboard?.date ?? "")}
+                          </span>
+                        </span>
+                        {detail && (
+                          <>
+                            <span>·</span>
+                            <span>{detail}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    <Badge
+                      tone={
+                        type === "task"
+                          ? "amber"
+                          : type === "class"
+                            ? "blue"
+                            : "neutral"
+                      }
+                    >
+                      {type}
+                    </Badge>
+                  </div>
+                ))
+              ) : (
+                <p className="px-5 py-8 text-center text-sm text-(--muted)">
+                  Nothing scheduled for today.
+                </p>
+              )}
             </Card>
           </DashboardSection>
 
           <DashboardSection
-            title="Tasks to complete"
+            title="Tasks needing attention"
             icon={<Check size={16} />}
             tone="primary"
             action={
@@ -191,9 +207,10 @@ export default function DashboardPage() {
               </Link>
             }
           >
-            <div className="rounded-xl border border-(--border) bg-(--surface) p-2 shadow-xs">
-              <TaskList limit={3} />
-            </div>
+            <TaskPanel
+              tasks={tasks}
+              overdueTasks={overdueTasks}
+            />
           </DashboardSection>
 
           <DashboardSection
@@ -223,17 +240,9 @@ export default function DashboardPage() {
                       {session.title}
                     </p>
                     <p className="mt-1 text-xs text-(--muted)">
-                      {
-                        subjects.find(
-                          (subject) => subject.id === session.subjectId,
-                        )?.code
-                      }{" "}
-                      · {session.date}
+                      {session.date}
                     </p>
                   </div>
-                  <span className="text-sm font-semibold text-(--muted)">
-                    {session.startTime}–{session.endTime}
-                  </span>
                 </div>
               ))}
             </Card>
@@ -255,87 +264,47 @@ export default function DashboardPage() {
             }
           >
             <div className="space-y-3">
-              {upcomingExams.map((exam, index) => (
-                <Card
-                  key={exam.id || `exam-${index}`}
-                  className="relative overflow-hidden p-4 pl-5 bg-(--surface) border border-(--border) shadow-xs"
-                >
-                  <span
-                    className={`absolute inset-y-0 left-0 w-1.5 ${
-                      index === 0 ? "bg-(--danger)" : "bg-(--support)"
-                    }`}
-                  />
-                  <div className="flex items-start justify-between gap-3">
-                    <div>
-                      <p className="text-xs font-bold uppercase tracking-[0.06em] text-(--primary-strong)">
-                        {
-                          subjects.find(
-                            (subject) => subject.id === exam.subjectId,
-                          )?.code
-                        }
-                      </p>
-                      <p className="mt-1 text-sm font-bold text-(--foreground)">
-                        {exam.title}
-                      </p>
-                    </div>
-                    <Badge tone={index === 0 ? "red" : "amber"}>
-                      {index === 0 ? "Tomorrow" : "9 days"}
-                    </Badge>
-                  </div>
-                  <p className="mt-3 text-xs text-(--muted)">
-                    {formatDashboardDate(exam.examDate)} · {exam.startTime} ·{" "}
-                    {exam.location}
-                  </p>
-                </Card>
-              ))}
-            </div>
-          </DashboardSection>
+              {upcomingExams.map((exam, index) => {
+                // Ensure location handles empty strings or undefined gracefully
+                const examLocation =
+                  exam.location && exam.location.trim() !== ""
+                    ? exam.location
+                    : "Location TBA";
 
-          <DashboardSection
-            title="Upcoming classes"
-            icon={<GraduationCap size={16} />}
-            tone="primary"
-            action={
-              <Link
-                href="/classes"
-                className="text-sm font-semibold text-(--primary-strong) hover:underline"
-              >
-                Timetable
-              </Link>
-            }
-          >
-            <Card className="divide-y divide-(--border) p-0 bg-(--surface) border border-(--border) shadow-xs">
-              {upcomingClasses.map((item) => {
-                const subject = subjects.find(
-                  (subjectItem) => subjectItem.id === item.subjectId,
-                );
                 return (
-                  <div
-                    key={item.id || `class-${item.dayOfWeek}-${item.startTime}`}
-                    className="px-5 py-4"
+                  <Card
+                    key={exam.id || `exam-${index}`}
+                    className="relative overflow-hidden p-4 pl-5 bg-(--surface) border border-(--border) shadow-xs"
                   >
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-bold text-(--foreground)">
-                        {subject?.code}
-                      </p>
-                      <span className="text-xs font-semibold text-(--primary-strong)">
-                        {item.dayOfWeek}
+                    <span
+                      className={`absolute inset-y-0 left-0 w-1.5 ${
+                        index === 0 ? "bg-(--danger)" : "bg-(--support)"
+                      }`}
+                    />
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="mt-1 text-sm font-bold text-(--foreground)">
+                          {exam.title}
+                        </p>
+                      </div>
+                      <Badge tone={index === 0 ? "red" : "amber"}>
+                        {countdownLabel(exam.examDate)}
+                      </Badge>
+                    </div>
+                    <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-(--muted)">
+                      <span className="flex items-center gap-1">
+                        <CalendarDays size={13} />
+                        Due {formatDashboardDate(exam.examDate)}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <MapPin size={13} />
+                        {examLocation}
                       </span>
                     </div>
-                    <p className="mt-1 text-sm text-(--foreground)">
-                      {subject?.name}
-                    </p>
-                    <p className="mt-2 flex items-center gap-1 text-xs text-(--muted)">
-                      <Clock3 size={13} />
-                      {item.startTime}–{item.endTime}
-                      <span className="mx-1">·</span>
-                      <MapPin size={13} />
-                      {item.room}
-                    </p>
-                  </div>
+                  </Card>
                 );
               })}
-            </Card>
+            </div>
           </DashboardSection>
 
           <DashboardSection
@@ -347,22 +316,31 @@ export default function DashboardPage() {
               <div className="flex items-end justify-between">
                 <div>
                   <p className="text-3xl font-extrabold tracking-[-0.03em] text-(--foreground)">
-                    9h 45m
+                    {formatMinutes(weeklyProgress?.studyMinutes ?? 0)}
                   </p>
                   <p className="mt-1 text-xs text-(--muted)">
                     Focused study this week
                   </p>
                 </div>
                 <span className="rounded-full bg-(--support-soft) px-2.5 py-1 text-xs font-bold text-(--support)">
-                  +2h this week
+                  {weeklyProgress?.completedTasks ?? 0} completed
                 </span>
               </div>
               <div className="mt-5 h-2 rounded-full bg-(--surface-muted)">
-                <div className="h-full w-[68%] rounded-full bg-[linear-gradient(90deg,var(--support),var(--primary))]" />
+                <div
+                  className="h-full rounded-full bg-[linear-gradient(90deg,var(--support),var(--primary))]"
+                  style={{
+                    width: `${Math.min(100, weeklyProgress?.completionRate ?? 0)}%`,
+                  }}
+                />
               </div>
               <div className="mt-3 flex justify-between text-xs text-(--muted)">
-                <span>Goal: 14 hours</span>
-                <span className="font-semibold text-(--foreground)">68%</span>
+                <span>
+                  Goal: {formatMinutes(weeklyProgress?.goalMinutes ?? 0)}
+                </span>
+                <span className="font-semibold text-(--foreground)">
+                  {weeklyProgress?.completionRate ?? 0}% complete
+                </span>
               </div>
             </Card>
           </DashboardSection>
@@ -370,6 +348,74 @@ export default function DashboardPage() {
       </div>
     </AppShell>
   );
+}
+
+function TaskPanel({
+  tasks,
+  overdueTasks,
+}: {
+  tasks: Task[];
+  dueSoonTasks: Task[];
+  overdueTasks: Task[];
+}) {
+  const visibleTasks = tasks.slice(0, 5);
+
+  return (
+    <Card className="overflow-hidden p-0">
+      {visibleTasks.length ? (
+        <div className="divide-y divide-(--border)">
+          {visibleTasks.map((task) => {
+            const overdue = overdueTasks.some((item) => item.id === task.id);
+            return (
+              <div key={task.id} className="flex items-center gap-3 px-5 py-4">
+                <span
+                  className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg ${overdue ? "bg-(--danger-soft) text-(--danger)" : "bg-(--primary-soft) text-(--primary-strong)"}`}
+                >
+                  {overdue ? <AlertTriangle size={15} /> : <Target size={15} />}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-bold text-(--foreground)">
+                    {task.title}
+                  </p>
+                  <p className="mt-1 text-xs text-(--muted)">
+                    {overdue
+                      ? "Overdue"
+                      : `Due ${formatDashboardDate(task.dueDate)}`}
+                  </p>
+                </div>
+                <Badge
+                  tone={
+                    overdue
+                      ? "red"
+                      : task.priority === "high"
+                        ? "amber"
+                        : "neutral"
+                  }
+                >
+                  {overdue ? "Overdue" : task.priority}
+                </Badge>
+              </div>
+            );
+          })}
+        </div>
+      ) : (
+        <p className="px-5 py-8 text-center text-sm text-(--muted)">
+          No tasks need attention.
+        </p>
+      )}
+    </Card>
+  );
+}
+
+function formatMinutes(minutes: number) {
+  return `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
+}
+
+function countdownLabel(value: string) {
+  const days = Math.ceil((new Date(value).getTime() - Date.now()) / 86400000);
+  if (days <= 0) return "Today";
+  if (days === 1) return "Tomorrow";
+  return `${days} days`;
 }
 
 function QuickStat({
@@ -404,15 +450,14 @@ function QuickStat({
             {value}
           </span>
         </div>
-        <p className="mt-0.5 text-xs text-(--muted)">
-          {detail}
-        </p>
+        <p className="mt-0.5 text-xs text-(--muted)">{detail}</p>
       </div>
     </motion.div>
   );
 }
 
 function formatDashboardDate(value: string) {
+  if (!value) return "Today";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
 
