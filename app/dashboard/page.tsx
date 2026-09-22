@@ -10,6 +10,7 @@ import {
   AlertTriangle,
   MapPin,
   Plus,
+  Gauge,
   Target,
 } from "lucide-react";
 import { motion } from "motion/react";
@@ -25,6 +26,53 @@ const CHIP = {
   support: "bg-[linear-gradient(145deg,var(--support),#0c8988)] text-white",
   danger: "bg-[linear-gradient(145deg,var(--danger),#b23955)] text-white",
 } as const;
+
+// Deterministic workload scoring algorithm (No AI/ML)
+function calculateWorkloadScore(tasks: Task[], exams: Exam[]) {
+  let score = 0;
+  const now = new Date();
+
+  // 1. Evaluate task priority & urgency
+  tasks.forEach((task) => {
+    const priorityWeight =
+      task.priority === "high" ? 18 : task.priority === "medium" ? 10 : 5;
+    
+    const dueDate = new Date(task.dueDate);
+    const daysLeft = Math.max(
+      0,
+      Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)),
+    );
+    const urgencyMultiplier =
+      daysLeft === 0 ? 2.0 : daysLeft === 1 ? 1.5 : daysLeft <= 3 ? 1.2 : 0.8;
+
+    score += priorityWeight * urgencyMultiplier;
+  });
+
+  // 2. Evaluate exam proximity
+  exams.forEach((exam) => {
+    const examDate = new Date(exam.examDate);
+    const daysToExam = Math.max(
+      0,
+      Math.ceil((examDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)),
+    );
+
+    if (daysToExam === 0) score += 35;
+    else if (daysToExam <= 2) score += 25;
+    else if (daysToExam <= 7) score += 15;
+  });
+
+  const finalScore = Math.min(100, Math.round(score));
+
+  let status = "Light";
+  if (finalScore >= 75) status = "Heavy";
+  else if (finalScore >= 40) status = "Moderate";
+
+  return {
+    score: finalScore,
+    status,
+    explanation: `Based on ${tasks.length} active tasks and ${exams.length} upcoming exams considering priority and deadlines.`,
+  };
+}
 
 export default function DashboardPage() {
   const [dashboard, setDashboard] = useState<Awaited<
@@ -55,6 +103,8 @@ export default function DashboardPage() {
   const overdueTasks = dashboard?.overdueTasks ?? [];
   const upcomingExams = exams.slice(0, 3);
   const weeklyProgress = dashboard?.statistics.weeklyProgress;
+
+  const workload = calculateWorkloadScore(tasks, exams);
 
   const todaySchedule = (dashboard?.todaySchedule ?? []).map(
     (item, index) =>
@@ -207,10 +257,7 @@ export default function DashboardPage() {
               </Link>
             }
           >
-            <TaskPanel
-              tasks={tasks}
-              overdueTasks={overdueTasks}
-            />
+            <TaskPanel tasks={tasks} overdueTasks={overdueTasks} />
           </DashboardSection>
 
           <DashboardSection
@@ -265,7 +312,6 @@ export default function DashboardPage() {
           >
             <div className="space-y-3">
               {upcomingExams.map((exam, index) => {
-                // Ensure location handles empty strings or undefined gracefully
                 const examLocation =
                   exam.location && exam.location.trim() !== ""
                     ? exam.location
@@ -344,6 +390,39 @@ export default function DashboardPage() {
               </div>
             </Card>
           </DashboardSection>
+
+          <DashboardSection
+            title="Workload score"
+            icon={<Gauge size={16} />}
+            tone="primary"
+          >
+            <Card className="p-5 bg-(--surface) border border-(--border) shadow-xs">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-xs font-bold uppercase tracking-wider text-(--muted)">
+                    Calculated score
+                  </p>
+                  <p className="mt-1 text-3xl font-extrabold text-(--foreground)">
+                    {workload.score} / 100
+                  </p>
+                </div>
+                <Badge
+                  tone={
+                    workload.score > 70
+                      ? "red"
+                      : workload.score > 40
+                        ? "amber"
+                        : "green"
+                  }
+                >
+                  {workload.status}
+                </Badge>
+              </div>
+              <p className="mt-3 text-xs leading-relaxed text-(--muted)">
+                {workload.explanation}
+              </p>
+            </Card>
+          </DashboardSection>
         </aside>
       </div>
     </AppShell>
@@ -355,7 +434,6 @@ function TaskPanel({
   overdueTasks,
 }: {
   tasks: Task[];
-  dueSoonTasks: Task[];
   overdueTasks: Task[];
 }) {
   const visibleTasks = tasks.slice(0, 5);
