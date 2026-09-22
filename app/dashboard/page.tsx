@@ -18,6 +18,7 @@ import AppShell from "@/components/AppShell";
 import { Badge, Button, Card, PageHeader } from "@/components/ui";
 import { getDashboard } from "@/lib/frontend-data";
 import type { Exam, StudySession, Task } from "@/types";
+import { useRouter } from "next/navigation";
 
 const CHIP = {
   primary:
@@ -35,7 +36,7 @@ function calculateWorkloadScore(tasks: Task[], exams: Exam[]) {
   tasks.forEach((task) => {
     const priorityWeight =
       task.priority === "high" ? 18 : task.priority === "medium" ? 10 : 5;
-    
+
     const dueDate = new Date(task.dueDate);
     const daysLeft = Math.max(
       0,
@@ -102,7 +103,7 @@ export default function DashboardPage() {
   const overdueTasks = dashboard?.overdueTasks ?? [];
   const upcomingExams = exams.slice(0, 3);
   const weeklyProgress = dashboard?.statistics.weeklyProgress;
-
+  const router = useRouter();
   const workload = calculateWorkloadScore(tasks, exams);
 
   const todaySchedule = (dashboard?.todaySchedule ?? []).map(
@@ -319,24 +320,34 @@ export default function DashboardPage() {
                 return (
                   <Card
                     key={exam.id || `exam-${index}`}
-                    className="relative overflow-hidden p-4 pl-5 bg-(--surface) border border-(--border) shadow-xs"
+                    className="group relative overflow-hidden border border-(--border) bg-(--surface) p-4 pl-5 shadow-xs transition-all duration-300 hover:scale-[1.02] cursor-pointer"
+                    onClick={() => {
+                      router.push(`/exams`);
+                    }}
                   >
+                    <span className="pointer-events-none absolute inset-0 -translate-x-full bg-(--danger) transition-all duration-500 ease-in-out group-hover:translate-x-0 group-hover:scale-105" />
+
                     <span
-                      className={`absolute inset-y-0 left-0 w-1.5 ${
+                      className={`absolute inset-y-0 left-0 z-10 w-1.5 transition-all duration-300 ${
                         index === 0 ? "bg-(--danger)" : "bg-(--support)"
                       }`}
                     />
-                    <div className="flex items-start justify-between gap-3">
+
+                    <div className="relative z-10 flex items-start justify-between gap-3">
                       <div>
-                        <p className="mt-1 text-sm font-bold text-(--foreground)">
+                        <p className="mt-1 text-sm font-bold text-(--foreground) transition-all duration-300 group-hover:text-white dark:group-hover:text-black">
                           {exam.title}
                         </p>
                       </div>
-                      <Badge tone={index === 0 ? "red" : "amber"}>
+                      <Badge
+                        tone={index === 0 ? "red" : "amber"}
+                        className="transition-colors duration-300 group-hover:text-white! dark:group-hover:text-black!"
+                      >
                         {countdownLabel(exam.examDate)}
                       </Badge>
                     </div>
-                    <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-(--muted)">
+
+                    <div className="relative z-10 mt-3 flex flex-wrap items-center gap-3 text-xs text-(--muted) transition-colors duration-300 group-hover:text-white dark:group-hover:text-black">
                       <span className="flex items-center gap-1">
                         <CalendarDays size={13} />
                         Due {formatDashboardDate(exam.examDate)}
@@ -389,7 +400,6 @@ export default function DashboardPage() {
               </div>
             </Card>
           </DashboardSection>
-
         </aside>
       </div>
     </AppShell>

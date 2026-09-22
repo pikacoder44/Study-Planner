@@ -67,12 +67,15 @@ export function Card({
   );
 }
 
+
 export function Badge({
   children,
   tone = "neutral",
+  className,
 }: {
   children: ReactNode;
   tone?: "neutral" | "blue" | "green" | "amber" | "red" | "emerald";
+  className?: string;
 }) {
   const tones = {
     neutral: "bg-(--surface-muted) text-(--muted)",
@@ -82,11 +85,13 @@ export function Badge({
     amber: "bg-amber-500/15 text-(--amber)",
     red: "bg-rose-500/15 text-(--danger)",
   };
+
   return (
     <span
       className={cn(
         "inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold",
         tones[tone],
+        className,
       )}
     >
       {children}
