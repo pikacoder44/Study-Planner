@@ -38,6 +38,5 @@ export function calculateWorkloadScore({ tasks, exams }: WorkloadInput) {
   return {
     score: finalScore,
     status,
-    explanation: `Calculated from ${tasks.length} active tasks and ${exams.length} upcoming exams based on priority, time estimates, and urgency.`,
   };
 }

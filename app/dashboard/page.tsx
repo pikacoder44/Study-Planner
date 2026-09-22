@@ -10,7 +10,6 @@ import {
   AlertTriangle,
   MapPin,
   Plus,
-  Gauge,
   Target,
 } from "lucide-react";
 import { motion } from "motion/react";
@@ -184,9 +183,9 @@ export default function DashboardPage() {
         <QuickStat
           icon={<Clock3 size={17} />}
           tone="support"
-          label="Study time"
-          value={formatMinutes(weeklyProgress?.studyMinutes ?? 0)}
-          detail={`Across ${studySessions.length} recent sessions`}
+          label="Workload"
+          value={`${workload.score} / 100`}
+          detail={`Status: ${workload.status}`}
         />
       </motion.div>
 
@@ -391,38 +390,6 @@ export default function DashboardPage() {
             </Card>
           </DashboardSection>
 
-          <DashboardSection
-            title="Workload score"
-            icon={<Gauge size={16} />}
-            tone="primary"
-          >
-            <Card className="p-5 bg-(--surface) border border-(--border) shadow-xs">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-xs font-bold uppercase tracking-wider text-(--muted)">
-                    Calculated score
-                  </p>
-                  <p className="mt-1 text-3xl font-extrabold text-(--foreground)">
-                    {workload.score} / 100
-                  </p>
-                </div>
-                <Badge
-                  tone={
-                    workload.score > 70
-                      ? "red"
-                      : workload.score > 40
-                        ? "amber"
-                        : "green"
-                  }
-                >
-                  {workload.status}
-                </Badge>
-              </div>
-              <p className="mt-3 text-xs leading-relaxed text-(--muted)">
-                {workload.explanation}
-              </p>
-            </Card>
-          </DashboardSection>
         </aside>
       </div>
     </AppShell>
