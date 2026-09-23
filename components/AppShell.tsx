@@ -127,7 +127,7 @@ export default function AppShell({ children }: { children: ReactNode }) {
         type="button"
         onClick={handleLogout}
         disabled={loggingOut}
-        className="mt-2 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium text-(--muted) hover:bg-(--surface-muted) hover:text-(--foreground) disabled:opacity-60"
+        className="mt-2 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium hover:bg-(--surface-muted) hover:text-(--foreground) text-red-600 disabled:opacity-60"
       >
         {loggingOut ? "Signing out..." : "Sign out"}
       </button>
