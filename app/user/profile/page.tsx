@@ -9,6 +9,7 @@ import {
   CheckCheck,
   Flame,
   GraduationCap,
+  KeyRound,
   LoaderCircle,
   Mail,
   MapPin,
@@ -339,14 +340,21 @@ export default function UserProfilePage() {
                 </div>
 
                 <div className="flex flex-col gap-3">
-                  <Link
-                    href={`/user/profile/update/${user._id ?? user.username}`}
-                  >
-                    <Button className="min-w-36">
-                      <PencilLine size={16} />
-                      Edit profile
-                    </Button>
-                  </Link>
+                  <div className="flex flex-wrap gap-2 sm:flex-col">
+                    <Link href={`/user/profile/update/${user._id}`}>
+                      <Button className="w-full min-w-36">
+                        <PencilLine size={16} />
+                        Edit profile
+                      </Button>
+                    </Link>
+                    <Link href="/user/change-password">
+                      <Button variant="secondary" className="w-full min-w-36">
+                        <KeyRound size={16} />
+                        Change password
+                      </Button>
+                    </Link>
+                  </div>
+
                   <div className="rounded-lg border border-zinc-200 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-950/60">
                     <p className="text-xs font-semibold uppercase tracking-[0.14em] text-(--profile-muted)">
                       Profile completeness
