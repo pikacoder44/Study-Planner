@@ -464,7 +464,7 @@ export async function changePassword(input: {
   newPassword: string;
 }): Promise<void> {
   await request("/api/auth/password", {
-    method: "POST",
+    method: "PATCH",
     body: JSON.stringify(input),
   });
 }
