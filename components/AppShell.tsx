@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import {
   ArrowUpRight,
   Bell,
@@ -17,7 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
-import { getProfile, logout } from "@/lib/frontend-data";
+import { getProfile } from "@/lib/frontend-data";
 import ThemeToggle from "@/components/ThemeToggle";
 
 const mainLinks = [
@@ -32,9 +32,7 @@ const mainLinks = [
 
 export default function AppShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [loggingOut, setLoggingOut] = useState(false);
   const [profileName, setProfileName] = useState("Profile");
   const [todayLabel, setTodayLabel] = useState("");
 
@@ -57,15 +55,6 @@ export default function AppShell({ children }: { children: ReactNode }) {
       .then(({ user }) => setProfileName(user.username || "Profile"))
       .catch(() => undefined);
   }, []);
-
-  const handleLogout = async () => {
-    setLoggingOut(true);
-    try {
-      await logout();
-    } finally {
-      router.push("/login");
-    }
-  };
 
   const navigation = (
     <>
@@ -123,26 +112,6 @@ export default function AppShell({ children }: { children: ReactNode }) {
         Teacher view
         <ChevronRight size={15} className="ml-auto" />
       </Link>
-      <button
-        type="button"
-        onClick={handleLogout}
-        disabled={loggingOut}
-        className="mt-2 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-left text-sm font-medium hover:bg-(--surface-muted) hover:text-(--foreground) text-red-600 disabled:opacity-60"
-      >
-        {loggingOut ? "Signing out..." : "Sign out"}
-      </button>
-
-      <div className="mt-8 rounded-xl border border-(--border) bg-(--surface) p-4 shadow-xs">
-        <p className="text-xs font-semibold uppercase tracking-[0.14em] text-(--muted)">
-          Focus status
-        </p>
-        <p className="mt-2 text-sm font-bold tracking-[-0.01em] text-(--foreground)">
-          68% of weekly study goal
-        </p>
-        <div className="mt-3 h-1.5 rounded-full bg-(--surface-muted)">
-          <div className="h-full w-[68%] rounded-full bg-(--support)" />
-        </div>
-      </div>
     </>
   );
 
