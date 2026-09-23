@@ -13,7 +13,6 @@ import {
   GraduationCap,
   LayoutDashboard,
   Menu,
-  Settings,
   Users,
   X,
 } from "lucide-react";
@@ -115,18 +114,6 @@ export default function AppShell({ children }: { children: ReactNode }) {
         })}
       </nav>
       <div className="my-7 border-t border-(--border)" />
-      <Link
-        href="/settings"
-        onClick={() => setMobileOpen(false)}
-        className={`flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium ${
-          pathname.startsWith("/settings")
-            ? "bg-(--surface-muted) text-(--foreground) font-bold"
-            : "text-(--muted) hover:bg-(--surface-muted) hover:text-(--foreground)"
-        }`}
-      >
-        <Settings size={18} />
-        Settings
-      </Link>
       <Link
         href="/teacher"
         onClick={() => setMobileOpen(false)}
