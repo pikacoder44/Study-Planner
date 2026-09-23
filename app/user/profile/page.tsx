@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   AlertCircle,
   Calendar,
   KeyRound,
   LoaderCircle,
+  LogOut,
   PencilLine,
   ShieldCheck,
   User,
@@ -13,7 +15,7 @@ import {
 import { motion } from "motion/react";
 import { useEffect, useState } from "react";
 import AppShell from "@/components/AppShell";
-import { getProfile } from "@/lib/frontend-data";
+import { getProfile, logout } from "@/lib/frontend-data";
 import { Badge, Card, PageHeader } from "@/components/ui";
 
 type UserRole = "student" | "teacher";
@@ -37,9 +39,11 @@ const formatDate = (value?: string) => {
 };
 
 export default function UserProfilePage() {
+  const router = useRouter();
   const [user, setUser] = useState<UserProfileResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [loggingOut, setLoggingOut] = useState(false);
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -59,6 +63,15 @@ export default function UserProfilePage() {
 
     void fetchUserProfile();
   }, []);
+
+  const handleLogout = async () => {
+    setLoggingOut(true);
+    try {
+      await logout();
+    } finally {
+      router.push("/login");
+    }
+  };
 
   const initials = (user?.username || "SP").slice(0, 2).toUpperCase();
 
@@ -122,18 +135,24 @@ export default function UserProfilePage() {
                   </div>
                 </div>
 
-                {/* Equal-Sized Action Buttons with Smooth Hover Animations */}
+                {/* Right-aligned Equal Action Buttons */}
                 <div className="grid w-full grid-cols-1 gap-2.5 sm:w-48">
                   <Link href={`/user/profile/update/${user._id}`}>
                     <motion.button
                       whileHover={{ scale: 1.02, y: -1 }}
                       whileTap={{ scale: 0.98 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 25,
+                      }}
                       className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl bg-(--primary) px-4 py-2.5 text-sm font-bold text-white shadow-xs transition-colors hover:bg-(--primary-strong)"
                     >
-                      {/* Subtle hover gradient sheen */}
                       <span className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-500 ease-in-out group-hover:translate-x-full" />
-                      <PencilLine size={16} className="transition-transform duration-200 group-hover:scale-110" />
+                      <PencilLine
+                        size={16}
+                        className="transition-transform duration-200 group-hover:scale-110"
+                      />
                       <span>Edit profile</span>
                     </motion.button>
                   </Link>
@@ -142,12 +161,18 @@ export default function UserProfilePage() {
                     <motion.button
                       whileHover={{ scale: 1.02, y: -1 }}
                       whileTap={{ scale: 0.98 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 25 }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 25,
+                      }}
                       className="group relative flex w-full items-center justify-center gap-2 overflow-hidden rounded-xl border border-(--border) bg-(--surface-muted) px-4 py-2.5 text-sm font-bold text-(--foreground) shadow-xs transition-colors hover:border-(--primary-soft) hover:bg-(--surface)"
                     >
-                      {/* Subtle hover gradient sheen */}
                       <span className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/10 to-transparent transition-transform duration-500 ease-in-out group-hover:translate-x-full" />
-                      <KeyRound size={16} className="text-(--muted) transition-colors duration-200 group-hover:text-(--primary-strong)" />
+                      <KeyRound
+                        size={16}
+                        className="text-(--muted) transition-colors duration-200 group-hover:text-(--primary-strong)"
+                      />
                       <span>Change password</span>
                     </motion.button>
                   </Link>
@@ -186,6 +211,34 @@ export default function UserProfilePage() {
                   </dd>
                 </div>
               </dl>
+
+              {/* Sign Out Action at the end, right-aligned */}
+              <div className="mt-6 flex justify-end border-t border-(--border) pt-6">
+                <motion.button
+                  type="button"
+                  onClick={handleLogout}
+                  disabled={loggingOut}
+                  whileHover={{ scale: 1.02, y: -1 }}
+                  whileTap={{ scale: 0.98 }}
+                  transition={{
+                    type: "spring",
+                    stiffness: 400,
+                    damping: 25,
+                  }}
+                  className="group relative flex w-full sm:w-48 items-center justify-center gap-2 overflow-hidden rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-2.5 text-sm font-bold text-rose-600 dark:text-rose-400 shadow-xs transition-colors hover:bg-rose-500 hover:text-white disabled:opacity-60"
+                >
+                  <span className="pointer-events-none absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent transition-transform duration-500 ease-in-out group-hover:translate-x-full" />
+                  {loggingOut ? (
+                    <LoaderCircle className="animate-spin" size={16} />
+                  ) : (
+                    <LogOut
+                      size={16}
+                      className="transition-transform duration-200 group-hover:scale-110"
+                    />
+                  )}
+                  <span>{loggingOut ? "Signing out..." : "Sign out"}</span>
+                </motion.button>
+              </div>
             </Card>
           </motion.div>
         )}
