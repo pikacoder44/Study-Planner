@@ -21,9 +21,24 @@ import {
 } from "@/lib/frontend-data";
 import type { Subject, Task } from "@/types";
 
-export default function TaskList({ limit }: { limit?: number }) {
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [subjects, setSubjects] = useState<Subject[]>([]);
+type TaskListProps = {
+  limit?: number;
+  query?: string;
+  statusFilter?: Task["status"] | "all";
+  priorityFilter?: Task["priority"] | "all";
+};
+
+type TaskWithId = Task & { _id?: string };
+type SubjectWithId = Subject & { _id?: string };
+
+export default function TaskList({
+  limit,
+  query = "",
+  statusFilter = "all",
+  priorityFilter = "all",
+}: TaskListProps) {
+  const [tasks, setTasks] = useState<TaskWithId[]>([]);
+  const [subjects, setSubjects] = useState<SubjectWithId[]>([]);
   const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -36,8 +51,19 @@ export default function TaskList({ limit }: { limit?: number }) {
           getTasks(),
           getSubjects(),
         ]);
-        setTasks(taskData);
-        setSubjects(subjectData);
+        // Normalize MongoDB _id to id
+        setTasks(
+          (taskData || []).map((t: TaskWithId) => ({
+            ...t,
+            id: t.id || t._id || "",
+          })),
+        );
+        setSubjects(
+          (subjectData || []).map((s: SubjectWithId) => ({
+            ...s,
+            id: s.id || s._id || "",
+          })),
+        );
       } catch (loadError) {
         setError(
           loadError instanceof Error
@@ -52,12 +78,36 @@ export default function TaskList({ limit }: { limit?: number }) {
     void loadTasks();
   }, []);
 
-  const visibleTasks = limit ? tasks.slice(0, limit) : tasks;
+  const normalizedQuery = query.trim().toLowerCase();
+
+  const filteredTasks = tasks.filter((task) => {
+    const taskId = task.id || task._id;
+    const subject = subjects.find(
+      (item) => (item.id || item._id) === task.subjectId,
+    );
+
+    const matchesQuery =
+      !normalizedQuery ||
+      [task.title, task.description, task.type, subject?.name, subject?.code]
+        .filter(Boolean)
+        .some((value) => value!.toLowerCase().includes(normalizedQuery));
+
+    const matchesStatus =
+      statusFilter === "all" || task.status === statusFilter;
+
+    const matchesPriority =
+      priorityFilter === "all" || task.priority === priorityFilter;
+
+    return Boolean(taskId && matchesQuery && matchesStatus && matchesPriority);
+  });
+
+  const visibleTasks = limit ? filteredTasks.slice(0, limit) : filteredTasks;
+
   if (error) {
     return (
       <p
         role="alert"
-        className="rounded-xl bg-(--danger-soft) p-4 text-sm text-(--danger)"
+        className="rounded-xl bg-(--danger-soft) p-4 text-sm font-semibold text-(--danger)"
       >
         {error}
       </p>
@@ -65,11 +115,17 @@ export default function TaskList({ limit }: { limit?: number }) {
   }
 
   if (loading) {
-    return <p className="text-sm text-(--muted)">Loading tasks...</p>;
+    return <p className="text-sm font-semibold text-(--muted)">Loading tasks...</p>;
   }
 
   if (visibleTasks.length === 0) {
-    return <p className="text-sm text-(--muted)">No tasks yet.</p>;
+    return (
+      <p className="text-sm font-semibold text-(--muted)">
+        {tasks.length === 0
+          ? "No tasks yet."
+          : "No tasks match the current filters."}
+      </p>
+    );
   }
 
   return (
@@ -81,12 +137,16 @@ export default function TaskList({ limit }: { limit?: number }) {
     >
       <AnimatePresence initial={false}>
         {visibleTasks.map((task) => {
+          const taskId = (task.id || task._id)!;
           const completed = task.status === "completed";
-          const expanded = expandedTaskId === task.id;
-          const subject = subjects.find((item) => item.id === task.subjectId);
+          const expanded = expandedTaskId === taskId;
+          const subject = subjects.find(
+            (item) => (item.id || item._id) === task.subjectId,
+          );
+
           return (
             <motion.div
-              key={task.id}
+              key={taskId}
               layout
               variants={{
                 hidden: { opacity: 0, y: 8 },
@@ -101,11 +161,11 @@ export default function TaskList({ limit }: { limit?: number }) {
               }`}
               tabIndex={0}
               aria-expanded={expanded}
-              onClick={() => setExpandedTaskId(expanded ? null : task.id)}
+              onClick={() => setExpandedTaskId(expanded ? null : taskId)}
               onKeyDown={(event) => {
                 if (event.key === "Enter" || event.key === " ") {
                   event.preventDefault();
-                  setExpandedTaskId(expanded ? null : task.id);
+                  setExpandedTaskId(expanded ? null : taskId);
                 }
               }}
             >
@@ -123,7 +183,7 @@ export default function TaskList({ limit }: { limit?: number }) {
                     const nextCompleted = !completed;
                     setTasks((items) =>
                       items.map((item) =>
-                        item.id === task.id
+                        (item.id || item._id) === taskId
                           ? {
                               ...item,
                               status: nextCompleted ? "completed" : "pending",
@@ -132,11 +192,11 @@ export default function TaskList({ limit }: { limit?: number }) {
                       ),
                     );
                     try {
-                      await completeTask(task.id, nextCompleted);
+                      await completeTask(taskId, nextCompleted);
                     } catch (mutationError) {
                       setTasks((items) =>
                         items.map((item) =>
-                          item.id === task.id ? task : item,
+                          (item.id || item._id) === taskId ? task : item,
                         ),
                       );
                       setError(
@@ -165,7 +225,7 @@ export default function TaskList({ limit }: { limit?: number }) {
                       {task.title}
                     </p>
                     <Link
-                      href={`/tasks/${task.id}/edit`}
+                      href={`/tasks/${taskId}/edit`}
                       aria-label={`Edit ${task.title}`}
                       onClick={(event) => event.stopPropagation()}
                       className="shrink-0 rounded-lg p-1 text-(--muted) hover:bg-(--surface-muted) hover:text-(--primary-strong)"
@@ -177,18 +237,20 @@ export default function TaskList({ limit }: { limit?: number }) {
                       whileTap={{ scale: 0.9 }}
                       type="button"
                       aria-label={`Delete ${task.title}`}
-                      disabled={deletingTaskId === task.id}
+                      disabled={deletingTaskId === taskId}
                       onClick={async (event) => {
                         event.stopPropagation();
                         if (!window.confirm(`Delete "${task.title}"?`)) return;
 
                         const previousTasks = tasks;
-                        setDeletingTaskId(task.id);
+                        setDeletingTaskId(taskId);
                         setTasks((items) =>
-                          items.filter((item) => item.id !== task.id),
+                          items.filter(
+                            (item) => (item.id || item._id) !== taskId,
+                          ),
                         );
                         try {
-                          await deleteTask(task.id);
+                          await deleteTask(taskId);
                         } catch (mutationError) {
                           setTasks(previousTasks);
                           setError(
@@ -212,7 +274,7 @@ export default function TaskList({ limit }: { limit?: number }) {
                         fill="var(--primary)"
                         color="var(--primary)"
                       />
-                      {subject?.code ?? "Unknown subject"}
+                      {subject?.code ?? "General"}
                     </span>
                     <span className="capitalize">{task.type}</span>
                   </div>
