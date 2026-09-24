@@ -274,24 +274,30 @@ export default function DashboardPage() {
             }
           >
             <Card className="divide-y divide-(--border) p-0 bg-(--surface) border border-(--border) shadow-xs">
-              {studySessions.slice(0, 3).map((session, index) => (
-                <div
-                  key={session.id || `study-session-${index}`}
-                  className="flex items-center gap-4 px-5 py-4"
-                >
-                  <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-(--support-soft) text-(--support)">
-                    <BookOpen size={16} />
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-bold text-(--foreground)">
-                      {session.title}
-                    </p>
-                    <p className="mt-1 text-xs text-(--muted)">
-                      {session.date}
-                    </p>
+              {studySessions.length > 0 ? (
+                studySessions.slice(0, 3).map((session, index) => (
+                  <div
+                    key={session.id || `study-session-${index}`}
+                    className="flex items-center gap-4 px-5 py-4"
+                  >
+                    <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-(--support-soft) text-(--support)">
+                      <BookOpen size={16} />
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-bold text-(--foreground)">
+                        {session.title}
+                      </p>
+                      <p className="mt-1 text-xs text-(--muted)">
+                        {session.date}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              ) : (
+                <p className="px-5 py-8 text-center text-sm text-(--muted)">
+                  No recent study activity.
+                </p>
+              )}
             </Card>
           </DashboardSection>
         </div>
@@ -310,57 +316,63 @@ export default function DashboardPage() {
               </Link>
             }
           >
-            <div className="space-y-3">
-              {upcomingExams.map((exam, index) => {
-                const examLocation =
-                  exam.location && exam.location.trim() !== ""
-                    ? exam.location
-                    : "Location TBA";
+            {upcomingExams.length > 0 ? (
+              <div className="space-y-3">
+                {upcomingExams.map((exam, index) => {
+                  const examLocation =
+                    exam.location && exam.location.trim() !== ""
+                      ? exam.location
+                      : "Location TBA";
 
-                return (
-                  <Card
-                    key={exam.id || `exam-${index}`}
-                    className="group relative overflow-hidden border border-(--border) bg-(--surface) p-4 pl-5 shadow-xs transition-all duration-300 hover:scale-[1.02] cursor-pointer"
-                    onClick={() => {
-                      router.push(`/exams`);
-                    }}
-                  >
-                    <span className="pointer-events-none absolute inset-0 -translate-x-full bg-(--danger) transition-all duration-500 ease-in-out group-hover:translate-x-0 group-hover:scale-105" />
+                  return (
+                    <Card
+                      key={exam.id || `exam-${index}`}
+                      className="group relative cursor-pointer overflow-hidden border border-(--border) bg-(--surface) p-4 pl-5 shadow-xs transition-all duration-300 hover:scale-[1.02]"
+                      onClick={() => {
+                        router.push(`/exams`);
+                      }}
+                    >
+                      <span className="pointer-events-none absolute inset-0 -translate-x-full bg-(--danger) transition-all duration-500 ease-in-out group-hover:translate-x-0 group-hover:scale-105" />
 
-                    <span
-                      className={`absolute inset-y-0 left-0 z-10 w-1.5 transition-all duration-300 ${
-                        index === 0 ? "bg-(--danger)" : "bg-(--support)"
-                      }`}
-                    />
+                      <span
+                        className={`absolute inset-y-0 left-0 z-10 w-1.5 transition-all duration-300 ${
+                          index === 0 ? "bg-(--danger)" : "bg-(--support)"
+                        }`}
+                      />
 
-                    <div className="relative z-10 flex items-start justify-between gap-3">
-                      <div>
-                        <p className="mt-1 text-sm font-bold text-(--foreground) transition-all duration-300 group-hover:text-white dark:group-hover:text-black">
-                          {exam.title}
-                        </p>
+                      <div className="relative z-10 flex items-start justify-between gap-3">
+                        <div>
+                          <p className="mt-1 text-sm font-bold text-(--foreground) transition-all duration-300 group-hover:text-white dark:group-hover:text-black">
+                            {exam.title}
+                          </p>
+                        </div>
+                        <Badge
+                          tone={index === 0 ? "red" : "amber"}
+                          className="transition-colors duration-300 group-hover:text-white! dark:group-hover:text-black!"
+                        >
+                          {countdownLabel(exam.examDate)}
+                        </Badge>
                       </div>
-                      <Badge
-                        tone={index === 0 ? "red" : "amber"}
-                        className="transition-colors duration-300 group-hover:text-white! dark:group-hover:text-black!"
-                      >
-                        {countdownLabel(exam.examDate)}
-                      </Badge>
-                    </div>
 
-                    <div className="relative z-10 mt-3 flex flex-wrap items-center gap-3 text-xs text-(--muted) transition-colors duration-300 group-hover:text-white dark:group-hover:text-black">
-                      <span className="flex items-center gap-1">
-                        <CalendarDays size={13} />
-                        Due {formatDashboardDate(exam.examDate)}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <MapPin size={13} />
-                        {examLocation}
-                      </span>
-                    </div>
-                  </Card>
-                );
-              })}
-            </div>
+                      <div className="relative z-10 mt-3 flex flex-wrap items-center gap-3 text-xs text-(--muted) transition-colors duration-300 group-hover:text-white dark:group-hover:text-black">
+                        <span className="flex items-center gap-1">
+                          <CalendarDays size={13} />
+                          Due {formatDashboardDate(exam.examDate)}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <MapPin size={13} />
+                          {examLocation}
+                        </span>
+                      </div>
+                    </Card>
+                  );
+                })}
+              </div>
+            ) : (
+              <Card className="border border-(--border) bg-(--surface) p-5 text-center text-sm text-(--muted) shadow-xs">
+                No upcoming exams.
+              </Card>
+            )}
           </DashboardSection>
 
           <DashboardSection
