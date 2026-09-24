@@ -1,4 +1,5 @@
 "use client";
+
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import AppShell from "@/components/AppShell";
@@ -13,6 +14,7 @@ import {
   PageHeader,
   Select,
 } from "@/components/ui";
+
 export default function NewTaskPage() {
   const router = useRouter();
   const [subjects, setSubjects] = useState<Subject[]>([]);
@@ -54,15 +56,28 @@ export default function NewTaskPage() {
     event.preventDefault();
     setError("");
     const formData = new FormData(event.currentTarget);
+
+    const title = (formData.get("title") as string)?.trim();
+    const subjectId = (formData.get("subjectId") as string)?.trim();
+    const dueDate = (formData.get("dueDate") as string)?.trim();
+    const type = (formData.get("type") as string) || "assignment";
+    const priority = (formData.get("priority") as string) || "low";
+    const description = (formData.get("description") as string)?.trim() || "";
+
+    if (!title || !subjectId || !dueDate) {
+      setError("Please fill in Title, Subject, and Due Date.");
+      return;
+    }
+
     try {
       await createTask({
-          title: formData.get("title"),
-          description: formData.get("description"),
-          subjectId: formData.get("subjectId"),
-          type: formData.get("type"),
-          dueDate: formData.get("dueDate"),
-          priority: formData.get("priority"),
-        } as Parameters<typeof createTask>[0]);
+        title,
+        description,
+        subjectId,
+        type,
+        dueDate,
+        priority,
+      });
       router.push("/tasks");
     } catch (submitError) {
       setError(
@@ -89,7 +104,7 @@ export default function NewTaskPage() {
               required
             />
           </Field>
-          <Field label="Description">
+          <Field label="Description (Optional)">
             <textarea
               name="description"
               className="min-h-28 w-full rounded-md border border-(--border) p-3 text-sm outline-none focus:border-(--accent)"
@@ -103,7 +118,7 @@ export default function NewTaskPage() {
                   {loading ? "Loading subjects..." : "Select a subject"}
                 </option>
                 {subjects.map((subject) => (
-                  <option key={subject.id} value={subject.id}>
+                  <option key={subject.id || subject._id} value={subject.id || subject._id}>
                     {subject.name} ({subject.code})
                   </option>
                 ))}
@@ -121,18 +136,18 @@ export default function NewTaskPage() {
             <Field label="Due date">
               <Input name="dueDate" type="date" min={minimumDueDate} required />
             </Field>
-            <Field label="Priority">
-              <Select name="priority" defaultValue="medium">
+            <Field label="Priority (Optional)">
+              <Select name="priority" defaultValue="low">
+                <option value="low">Low (Default)</option>
                 <option value="medium">Medium</option>
                 <option value="high">High</option>
-                <option value="low">Low</option>
               </Select>
             </Field>
           </div>
           {error && (
             <p
               role="alert"
-              className="rounded-xl bg-(--danger-soft) p-3 text-sm text-(--danger)"
+              className="rounded-xl bg-(--danger-soft) p-3 text-sm font-semibold text-(--danger)"
             >
               {error}
             </p>

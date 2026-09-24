@@ -28,11 +28,9 @@ export const POST = withAuth(async (req, { userId }) => {
 
     if (
       !title ||
-      !description ||
       !subjectId ||
       !type ||
-      !dueDate ||
-      !priority
+      !dueDate
     ) {
       return NextResponse.json(
         { error: "Missing required fields" },
