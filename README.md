@@ -1,4 +1,4 @@
-# Smart Study 
+# Smart Study Planner
 
 ## Overview
 
