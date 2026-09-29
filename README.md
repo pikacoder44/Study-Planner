@@ -21,7 +21,7 @@ The current application uses realistic mock data. Backend APIs, authentication, 
 
 ## Tech Stack
 
-- Next.js 16 (App Router; compatible with the requested Next.js 15 patterns)
+- Next.js 16
 - TypeScript
 - React
 - Tailwind CSS v4
