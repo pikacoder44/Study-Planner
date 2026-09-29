@@ -2,7 +2,7 @@
 
 ## Overview
 
-Smart Study Planner is a calm, practical academic planning workspace for students. It brings tasks, subjects, exams, classes, study sessions, and calendar events into one responsive frontend.
+Smart Study Planner is a , practical academic planning workspace for students. It brings tasks, subjects, exams, classes, study sessions, and calendar events into one responsive frontend.
 
 The current application uses realistic mock data. Backend APIs, authentication, persistence, and authorization are intentionally left for the next development stage.
 
