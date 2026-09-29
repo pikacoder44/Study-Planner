@@ -26,7 +26,7 @@ The current application uses realistic mock data. Backend APIs, authentication, 
 - React
 - Tailwind CSS v4
 - Lucide React
-- MongoDB/Mongoose (planned backend, not implemented in this frontend)
+- MongoDB/Mongoose
 
 ## Architecture
 
