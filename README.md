@@ -12,7 +12,7 @@ The current application uses realistic mock data. Backend APIs, authentication, 
 - Task creation, search and filter UI, priorities, and completion states
 - Subject progress cards
 - Upcoming and past exam overview
-- Weekly class timetable with conflict-checking placeholder UI
+- Weekly class timetable with conflict-checking
 - Study session planning and weekly statistics
 - Combined calendar view
 - Profile and notification preferences
