@@ -1,0 +1,33 @@
+
+name: Daily Project Maintenance
+
+on:
+  schedule:
+    - cron: "15 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  maintenance:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Record daily maintenance
+        run: |
+          mkdir -p maintenance
+          DATE=$(TZ=Asia/Karachi date +%Y-%m-%d)
+          echo "- ${DATE}: Automated repository maintenance and whitespace check." >> maintenance/daily-log.md
+          git diff --check
+
+      - name: Commit maintenance log
+        run: |
+          git config user.name "pikacoder44"
+          git config user.email "140448001+pikacoder44@users.noreply.github.com"
+          git add maintenance/daily-log.md
+          git commit -m "chore: record daily maintenance"
+          git push
